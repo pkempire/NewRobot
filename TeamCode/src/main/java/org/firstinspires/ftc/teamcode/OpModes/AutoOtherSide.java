@@ -17,7 +17,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
-@Autonomous(name="Blue Blocks Auto(", group="Linear Opmode")
+@Autonomous(name="Blue Depot Auto", group="Linear Opmode")
 
 public class AutoOtherSide extends LinearOpMode {
 

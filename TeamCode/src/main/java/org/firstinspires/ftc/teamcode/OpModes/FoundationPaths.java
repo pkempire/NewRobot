@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
@@ -17,9 +17,8 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
-@Autonomous(name="Foundation sstuf(", group="Linear Opmode")
-
-public class AnotherONe extends LinearOpMode {
+@Autonomous(name="Foundation", group="Linear Opmode")
+public class FoundationPaths extends LinearOpMode {
 
     // Declare OpMode members ======================================================================
     private DcMotor RightFront;

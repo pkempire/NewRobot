@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.Odometry;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
@@ -11,7 +12,7 @@ import org.firstinspires.ftc.teamcode.Odometry.OdometerRadians;
 import org.firstinspires.ftc.teamcode.Subsystem;
 
 @Autonomous(name="Odometer Test", group="Linear Opmode")
-
+@Disabled
 public class OdometerTest extends LinearOpMode {
 
     // Declare OpMode members.

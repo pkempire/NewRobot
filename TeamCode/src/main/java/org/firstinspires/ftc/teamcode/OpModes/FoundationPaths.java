@@ -7,12 +7,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Hardware.Drive;
+import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Hardware.Intake;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 
-import org.firstinspires.ftc.teamcode.SkystoneLocation;
-import org.firstinspires.ftc.teamcode.CustomCV.SamplePipeline;
+import org.firstinspires.ftc.teamcode.CustomCV.MainPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
@@ -35,7 +34,7 @@ public class FoundationPaths extends LinearOpMode {
     private Drive Driver;
     private Intake Intaker;
 
-    private SamplePipeline pipeline;
+    private MainPipeline pipeline;
     private OpenCvCamera phoneCam;
 
     // Important Variables =========================================================================
@@ -87,7 +86,7 @@ public class FoundationPaths extends LinearOpMode {
         phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         phoneCam.openCameraDevice();
 
-        pipeline = new SamplePipeline();
+        pipeline = new MainPipeline();
         phoneCam.setPipeline(pipeline);
         phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
@@ -106,20 +105,18 @@ public class FoundationPaths extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-        Driver.strafeToPointOrient(-70,237,0, 3,2);
+        //Driver.strafeToPointOrient(-70,237,0, 3,2);
         delay(90);
         foundationClampFront.setPosition(0.95);
         foundationClampBack.setPosition(0.95);
         delay(90);
         Driver.pointInDirectionRough(-40, 3);
-        telemetry.addData("doenwithturning", "dpne");
         Driver.strafeToPointOrient2(-32,194,-45,3,2);
         delay(90);
         Driver.strafeToPointOrient2(-1,186,-91,3,2);
         foundationClampFront.setPosition(0.25);
         foundationClampBack.setPosition(0.25);
     }
-
     private void scanSkystone(){
         skyPosition = pipeline.getSkystonePosition();
 

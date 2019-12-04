@@ -14,7 +14,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class SamplePipeline extends OpenCvPipeline {
+public class MainPipeline extends OpenCvPipeline {
 
     private Mat mat0;
     private Mat mat1;

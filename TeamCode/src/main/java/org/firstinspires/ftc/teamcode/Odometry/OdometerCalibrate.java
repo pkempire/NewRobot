@@ -7,8 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.Subsystem;
-import org.firstinspires.ftc.teamcode.Hardware.Drive;
+import org.firstinspires.ftc.teamcode.Movement.Drive;
 
 @Autonomous(name="Odometer Calibration", group="Linear Opmode")
 @Disabled

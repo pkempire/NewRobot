@@ -7,14 +7,14 @@ It corrects by a constant value until the reading gets close enough to the targe
 it switches over to a P controller.
 */
 
-public class ConstantP extends Controller {
+public class ConstantProportional extends Controller {
 
     private double pGain;
     private double pRange;
     private double constant;
     private double error = 1000;
 
-    public ConstantP(double constant, double p_Range, double p_Gain) {
+    public ConstantProportional(double constant, double p_Range, double p_Gain) {
 
         this.constant = constant;
         this.pGain = p_Gain;

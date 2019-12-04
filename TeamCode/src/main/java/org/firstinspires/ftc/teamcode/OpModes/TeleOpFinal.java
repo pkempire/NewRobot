@@ -3,21 +3,13 @@ package org.firstinspires.ftc.teamcode.OpModes;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Hardware.Drive;
-import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
+import org.firstinspires.ftc.teamcode.Movement.Drive;
 
-import org.firstinspires.ftc.teamcode.Hardware.Extrusion;
-import org.firstinspires.ftc.teamcode.Hardware.Intake;
-import org.firstinspires.ftc.teamcode.Hardware.Outtake;
-
-@TeleOp(name="Tele-Op NJ", group="Linear Opmode")
+@TeleOp(name="Tele-Op", group="Linear Opmode")
 
 public class TeleOpFinal extends LinearOpMode {
 
@@ -69,8 +61,8 @@ public class TeleOpFinal extends LinearOpMode {
     private double FOUNDATION_CLAMP_1_DOWN = 0.95;
     private double FOUNDATION_CLAMP_2_DOWN = 0.198;
     private double LOWER_INTAKE = 0;
-    private double LEFT_FLIPPER_SERVO_OUT = 0.5;
-    private double RIGHT_FLIPPER_SERVO_OUT = 0.5;
+    private double LEFT_FLIPPER_SERVO_OUT = 0.4;
+    private double RIGHT_FLIPPER_SERVO_OUT = 0.6;
 
 
     private boolean G2_RIGHT_BUMPER_RELEASED;
@@ -82,11 +74,11 @@ public class TeleOpFinal extends LinearOpMode {
     private double FOUNDATION_CLAMP_1_UP = 0.248;
     private double FOUNDATION_CLAMP_2_UP = 0.923;
 
-    private double LEFT_FLIPPER_SERVO_MID = 0.8;
-    private double RIGHT_FLIPPER_SERVO_MID = .2;
+    private double LEFT_FLIPPER_SERVO_CAPSTONE = 0.95;
+    private double RIGHT_FLIPPER_SERVO_CAPSTONE = 0.05;
 
-    private double LEFT_FLIPPER_SERVO_IN = 1.0;
-    private double RIGHT_FLIPPER_SERVO_IN = 0;
+    private double LEFT_FLIPPER_SERVO_IN = 0.9;
+    private double RIGHT_FLIPPER_SERVO_IN = 0.12;
 
 
 
@@ -278,8 +270,8 @@ public class TeleOpFinal extends LinearOpMode {
 //BLOCK FLIPPER=====================================================================================
 
             if(gamepad2.left_trigger > 0.2) {
-                flipperServoLeft.setPosition(LEFT_FLIPPER_SERVO_MID);
-                flipperServoRight.setPosition(RIGHT_FLIPPER_SERVO_MID);
+                flipperServoLeft.setPosition(LEFT_FLIPPER_SERVO_CAPSTONE);
+                flipperServoRight.setPosition(RIGHT_FLIPPER_SERVO_CAPSTONE);
             }
             else if(gamepad2.left_bumper){
                 flipperServoLeft.setPosition(LEFT_FLIPPER_SERVO_OUT);

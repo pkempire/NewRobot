@@ -1,36 +1,28 @@
 
-package org.firstinspires.ftc.teamcode.CustomCV;
+package org.firstinspires.ftc.teamcode.Movement;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.CustomCV.MainPipeline;
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
 
-@TeleOp(name="Vision Test", group = "Linear Opmode")
+@Autonomous(name="Drive Test", group="Linear Opmode")
 @Disabled
-public class VisionTest extends LinearOpMode {
+public class DriveTest extends LinearOpMode {
 
-    OpenCvCamera phoneCam;
+    // Declare OpMode members.
     private DcMotor RightFront;
     private DcMotor RightBack;
     private DcMotor LeftFront;
     private DcMotor LeftBack;
 
-    private String skystring;
-
     private Odometer2 Adham;
-
     private Drive Driver;
-
     private BNO055IMU Imu;
     private BNO055IMU.Parameters Params;
 
@@ -39,8 +31,6 @@ public class VisionTest extends LinearOpMode {
         telemetry.update();
 
         // Initialize all objects declared above
-
-
         Params = new BNO055IMU.Parameters();
         Params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         Params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -68,33 +58,26 @@ public class VisionTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        // Wait for the game to start (driver presses PLAY)
         initialize();
-
         waitForStart();
-
         telemetry.addData("Status: ", "Running");
         telemetry.update();
+        //Start Autonomous period
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
-        phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        phoneCam.openCameraDevice();
+        //Make sure nothing is still using the thread
+    }
 
-        MainPipeline pipeline = new MainPipeline();
-
-        phoneCam.setPipeline(pipeline);
-
-        phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-
-        while (opModeIsActive())
-        {
-            telemetry.addData("FPS", String.format("%.2f", phoneCam.getFps()));
-            telemetry.addData("location", pipeline.location);
-            telemetry.addData("type", pipeline.location.getClass());
-            telemetry.update();
-
-            sleep(100);
+    private void delay(int millis) {
+        for(int x=0;x<millis; x++) {
+            if (opModeIsActive()) {
+                Adham.updateOdometry();
+                try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}
+            }else {
+                break;
+            }
         }
     }
-}
 
+}

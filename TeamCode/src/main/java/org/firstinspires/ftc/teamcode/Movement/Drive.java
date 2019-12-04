@@ -1,18 +1,15 @@
-package org.firstinspires.ftc.teamcode.Hardware;
+package org.firstinspires.ftc.teamcode.Movement;
 
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Controllers.Proportional;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
-import org.firstinspires.ftc.teamcode.Odometry.OdometerRadians;
 
-import org.firstinspires.ftc.teamcode.Controllers.ConstantP;
+import org.firstinspires.ftc.teamcode.Controllers.ConstantProportional;
 import org.firstinspires.ftc.teamcode.Controllers.PID;
 import org.firstinspires.ftc.teamcode.Subsystem;
 
@@ -88,7 +85,7 @@ public class Drive extends Subsystem {
     public void pointInDirection(double direction) { // Verified
         isRunning = true;
 
-        ConstantP turn = new ConstantP(0.5, 20, 0.025);
+        ConstantProportional turn = new ConstantProportional(0.5, 20, 0.025);
         double correction = 10;
 
         while (Math.abs(correction) > 0.1) {
@@ -113,7 +110,7 @@ public class Drive extends Subsystem {
     public void pointInDirectionRough(double direction, double threshold) { // Verified
         isRunning = true;
 
-        ConstantP turn = new ConstantP(0.6, 30, 0.5);
+        ConstantProportional turn = new ConstantProportional(0.6, 30, 0.5);
         double correction = 10;
         double error = Adhameter.getHeadingDeg() - direction;
 

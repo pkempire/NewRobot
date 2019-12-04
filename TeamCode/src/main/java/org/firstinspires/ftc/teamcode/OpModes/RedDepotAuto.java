@@ -7,19 +7,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Hardware.Drive;
+import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Hardware.Intake;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 
-import org.firstinspires.ftc.teamcode.SkystoneLocation;
-import org.firstinspires.ftc.teamcode.CustomCV.SamplePipeline;
+import org.firstinspires.ftc.teamcode.CustomCV.MainPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
 @Autonomous(name="Red Depot Auto", group="Linear Opmode")
 
-public class AutoBlocksSide extends LinearOpMode {
+public class RedDepotAuto extends LinearOpMode {
 
     // Declare OpMode members ======================================================================
     private DcMotor RightFront;
@@ -36,7 +35,7 @@ public class AutoBlocksSide extends LinearOpMode {
     private Drive Driver;
     private Intake Intaker;
 
-    private SamplePipeline pipeline;
+    private MainPipeline pipeline;
     private OpenCvCamera phoneCam;
 
     // Important Variables =========================================================================
@@ -84,7 +83,7 @@ public class AutoBlocksSide extends LinearOpMode {
         phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         phoneCam.openCameraDevice();
 
-        pipeline = new SamplePipeline();
+        pipeline = new MainPipeline();
         phoneCam.setPipeline(pipeline);
         phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 

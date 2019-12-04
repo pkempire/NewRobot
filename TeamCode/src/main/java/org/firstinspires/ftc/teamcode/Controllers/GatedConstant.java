@@ -5,7 +5,7 @@ This is a gated constant controller. If the error is over a threshold, it is one
 if error is under the threshold it is another constant.
 */
 
-public class Step extends Controller{
+public class GatedConstant extends Controller{
 
     private double constantA;
     private double constantB;
@@ -13,7 +13,7 @@ public class Step extends Controller{
     private double error;
     private double correction;
 
-    public Step(double above, double below, double threshold) {
+    public GatedConstant(double above, double below, double threshold) {
         this.constantA = above;
         this.constantB = below;
         this.thresh = threshold;

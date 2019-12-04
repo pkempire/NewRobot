@@ -3,7 +3,6 @@ package org.firstinspires.ftc.teamcode.Hardware;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
-import com.qualcomm.robotcore.hardware.Gamepad;
 
 import org.firstinspires.ftc.teamcode.Controllers.PID;
 import org.firstinspires.ftc.teamcode.Subsystem;

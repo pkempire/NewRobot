@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp(name="Bare Teleop", group="Linear Opmode")
 @Disabled
 
-public class BareTeleOpL extends LinearOpMode {
+public class BareOpMode extends LinearOpMode {
 
     // Declare OpMode members.
 

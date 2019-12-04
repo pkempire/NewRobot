@@ -7,19 +7,18 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import org.firstinspires.ftc.teamcode.Hardware.Drive;
+import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Hardware.Intake;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 
-import org.firstinspires.ftc.teamcode.SkystoneLocation;
-import org.firstinspires.ftc.teamcode.CustomCV.SamplePipeline;
+import org.firstinspires.ftc.teamcode.CustomCV.MainPipeline;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
 @Autonomous(name="Blue Depot Auto", group="Linear Opmode")
 
-public class AutoOtherSide extends LinearOpMode {
+public class BlueDepotAuto extends LinearOpMode {
 
     // Declare OpMode members ======================================================================
     private DcMotor RightFront;
@@ -36,7 +35,7 @@ public class AutoOtherSide extends LinearOpMode {
     private Drive Driver;
     private Intake Intaker;
 
-    private SamplePipeline pipeline;
+    private MainPipeline pipeline;
     private OpenCvCamera phoneCam;
 
     // Important Variables =========================================================================
@@ -83,7 +82,7 @@ public class AutoOtherSide extends LinearOpMode {
         phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
         phoneCam.openCameraDevice();
 
-        pipeline = new SamplePipeline();
+        pipeline = new MainPipeline();
         phoneCam.setPipeline(pipeline);
         phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
@@ -123,41 +122,41 @@ public class AutoOtherSide extends LinearOpMode {
 
         delay(23);
 
-        Driver.strafeToPointOrient(-33, 66, 0, 4.2, 2);
+        Driver.strafeToPointOrient(-33, 66, 0, 4, 1.5);
         delay(7);
-        Driver.strafeToPointOrient(-45, 158, 0, 4.2, 2);
+        Driver.strafeToPointOrient(-50, 158, 0, 4, 1.5);
 
         blockHook2.setPosition(0.9);
 
         delay(23);
 
-        Driver.strafeToPointOrient(-39, -12, 0, 4.2, 2);
+        Driver.strafeToPointOrient(-39, -12, 0, 3.5, 1.5);
         delay(7);
 
         if(skyPosition == 0) {
-            Driver.strafeToPointOrient(-79.2, -52, 0, 3, 2);
+            Driver.strafeToPointOrient(-80, -52, 0, 3, 2);
             delay(23);
             blockHook2.setPosition(0.4);
             delay(23);
         }else if(skyPosition == 1) {
-            Driver.strafeToPointOrient(-79.2, -33, 0, 3, 2);
+            Driver.strafeToPointOrient(-80, -33, 0, 3, 2);
             delay(23);
             blockHook2.setPosition(0.4);
             delay(23);
         }else if(skyPosition == 2) {
-            Driver.strafeToPointOrient(-79.2, -11, 0, 3, 2);
+            Driver.strafeToPointOrient(-80, -11, 0, 3, 2);
             delay(23);
             blockHook2.setPosition(0.4);
             delay(23);
         }
 
         //park
-        Driver.strafeToPointOrient(-45, 158, 0, 3.5, 2);
+        Driver.strafeToPointOrient(-50, 158, 0, 3.5, 2);
         blockHook2.setPosition(0.9);
         delay(23);
         //Make sure nothing is still using the thread - End Autonomous period
         //park
-        Driver.strafeToPointOrient(-59, 99, 0, 3.5, 3);
+        Driver.strafeToPointOrient(-62, 99, 0, 3.5, 3);
     }
 
     private void scanSkystone(){

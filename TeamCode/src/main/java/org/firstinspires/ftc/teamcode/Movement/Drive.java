@@ -112,9 +112,8 @@ public class Drive extends Subsystem {
 
         ConstantProportional turn = new ConstantProportional(0.6, 30, 0.5);
         double correction = 10;
-        double error = Adhameter.getHeadingDeg() - direction;
 
-        while (Math.abs(error) > threshold) {
+        while (Adhameter.getHeadingVelocity() > threshold) {
             if(opmode.opModeIsActive()) {
                 correction = turn.getCorrection(direction, Adhameter.getHeadingDeg());
 
@@ -124,7 +123,6 @@ public class Drive extends Subsystem {
                 frontRight.setPower(0.9 * correction);
                 backRight.setPower(0.9 * correction);
 
-                error = Adhameter.getHeadingDeg() - direction;
                 localize();
 
             }else{
@@ -191,6 +189,7 @@ public class Drive extends Subsystem {
         frontLeft.setPower(0);
         backLeft.setPower(0);
         isRunning = false;
+
     }
 
     public void strafeToPointOrient2(double x, double y, double heading, double posThreshold, double headThreshold) { // Verified
@@ -251,11 +250,61 @@ public class Drive extends Subsystem {
         backLeft.setPower(0);
         isRunning = false;
     }
-    public void moveByAmount(double xChange, double yChange, double headingChange) {
+
+    public void moveToPointOrient(double targX, double targY, double targHead, double posThresh, double headThresh, double power) {
+
+        PID VelocityFinder = new PID(0.1, 0.3, 0.3, 100, 10);
+
+        PID MotorFinder = new PID(0.1, 0.1, 0.1, 10, 0.5);
+        Proportional HeadingCorrecter = new Proportional(0.2, 0.1);
+
+        double distX;
+        double distY;
+
+        double headingError;
+
+        do{
+            // Find current position
+            localize();
+            double x = Adhameter.getPosition()[0];
+            double y = Adhameter.getPosition()[1];
+            double velX = Adhameter.getUpdateVelocity()[0];
+            double velY = Adhameter.getUpdateVelocity()[1];
+
+            distX = targX - x;
+            distY = targY - y;
+            // Find target global velocity
+            double targVelX = VelocityFinder.getCorrection(targX, x);
+            double targVelY = VelocityFinder.getCorrection(targY, y);
+
+            // Find target relative velocity
+            double heading = Adhameter.getHeadingAbsoluteDeg();
+            double targRelVelX = cos(-heading) * targVelX - sin(-heading) * targVelY;
+            double targRelVelY = sin(-heading) * targVelX + cos(-heading) * targVelY;
+            // Find actual relative velocity
+            double relVelX = cos(-heading) * velX - sin(-heading) * velY;
+            double relVelY = sin(-heading) * velX + cos(-heading) * velY;
+            // Finding motor power corrections
+            double xCorrect = MotorFinder.getCorrection(targRelVelX, relVelX);
+            double yCorrect = MotorFinder.getCorrection(targRelVelY, relVelY);
+            // Find motor power correction for heading
+            headingError = targHead - heading;
+            double hCorrect = HeadingCorrecter.getCorrection(targHead, heading);
+
+            frontLeft.setPower(power * (-xCorrect - yCorrect - hCorrect));
+            backLeft.setPower(power * (xCorrect - yCorrect - hCorrect));
+            frontRight.setPower(power * (xCorrect - yCorrect + hCorrect));
+            backRight.setPower(power * (-xCorrect - yCorrect + hCorrect));
+
+        }while(!(Math.hypot(distX, distY) < posThresh && headingError < headThresh));
+    }
+
+    public void moveByAmount(double xChange, double yChange, double headingChange, double threshold) {
+
         double x = Adhameter.getPosition()[0];
         double y = Adhameter.getPosition()[1];
         double heading = Adhameter.getHeadingAbsoluteDeg();
-        strafeToPointOrient(x + xChange, y + yChange, heading + headingChange, 2, 2);
+        strafeToPointOrient(x + xChange, y + yChange, heading + headingChange, threshold, 2);
 
     }
 
@@ -283,41 +332,6 @@ public class Drive extends Subsystem {
                 backRight.setPower(0.5);
 
                 delay(500);
-                localize();
-
-            }else {
-                break;
-            }
-        }
-        isRunning = false;
-    }
-
-    public void goToPointCurve(double x, double y, double power, double threshold) {
-        isRunning = true;
-
-        double Xdiff = x - Adhameter.getPosition()[0];
-        double Ydiff = y - Adhameter.getPosition()[1];
-        double direction;
-        double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
-
-        Proportional orient = new Proportional(0.02, 0.9 - power);
-
-        while (distance > threshold) {
-            if (opmode.opModeIsActive()) {
-
-                Xdiff = y - Adhameter.getPosition()[0];
-                Ydiff = x - Adhameter.getPosition()[1];
-                direction = Math.toDegrees(Math.atan(Ydiff/Xdiff));
-                distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
-
-                double correct = orient.getCorrection(direction, Adhameter.getHeadingDeg());
-
-                frontLeft.setPower(power - correct);
-                backLeft.setPower(power - correct);
-
-                frontRight.setPower(power + correct);
-                backRight.setPower(power + correct);
-
                 localize();
 
             }else {

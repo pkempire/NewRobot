@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Hardware;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 
 import org.firstinspires.ftc.teamcode.Controllers.PID;
@@ -45,9 +46,14 @@ public class Extrusion extends Subsystem {
         lowSwitch.setMode(DigitalChannel.Mode.INPUT);
 
         motor1.setPower(0);
+        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
         motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        motor2.setPower(0);
+        motor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         this.powerLowLimit = minPower;
         this.powerHighLimit = maxPower;
@@ -56,18 +62,15 @@ public class Extrusion extends Subsystem {
 
     // Utility Methods =============================================================================
 
-    public void setPower(double power) {
+    private void setPower(double power) {
         if(power > powerHighLimit) {
             power = powerHighLimit;
         }else if(power < -powerHighLimit) {
             power = -powerHighLimit;
-        }else if(power > -powerLowLimit && power < 0) {
-            power = -powerLowLimit;
-        }else if(power > 0 && power < powerLowLimit) {
-            power = powerLowLimit;
         }
 
         motor1.setPower(power);
+        motor2.setPower(power);
 
     }
 
@@ -91,33 +94,44 @@ public class Extrusion extends Subsystem {
         isRunning = true;
         if(method.equals("encoder")) {
             runToPosition(upperLimit - 10);
-        }else if(method.equals("switch")) {
-            //No upper limit switch as of now
         }
         isRunning = false;
     }
 
     public void retract(String method) {
         isRunning = true;
-        // crap here
         if(method.equals("encoder")) {
-            runToPosition(0);
+            runToPosition(lowerLimit);
         }else if(method.equals("switch")) {
             while(lowSwitch.getState()) {
                 setPower(-0.4);
             }
         }
-
         isRunning = false;
-
     }
 
     // Continuous Methods ==========================================================================
-    public void extrudeManual(double input, double deadZone) {
+    public void runManual(double input, double deadZone) {
         if(Math.abs(input) > deadZone) {
-            motor1.setPower(input);
+            setPower(input);
         }else {
-            motor1.setPower(0);
+            setPower(0);
+        }
+    }
+
+    public void extrudeManual(boolean trigger) {
+        if(trigger) {
+            setPower(0.4);
+        }else{
+            setPower(0);
+        }
+    }
+
+    public void retractManual(boolean trigger) {
+        if(trigger) {
+            setPower(-0.4);
+        }else{
+            setPower(0);
         }
     }
 
@@ -125,19 +139,19 @@ public class Extrusion extends Subsystem {
         double correct = run.getCorrection(target, motor1.getCurrentPosition());
         if (Math.abs(correct) > powerLowLimit) {
             isRunning = true;
-            motor1.setPower(-correct);
+            setPower(correct);
         }else {
-            motor1.setPower(0);
+            setPower(0);
             isRunning = false;
         }
     }
 
     public void retractTeleOp() {
         if (!lowSwitch.getState()) {
-            motor1.setPower(0);
+            setPower(0);
             isRunning = false;
         }else {
-            motor1.setPower(0.4);
+            setPower(-0.4);
             isRunning = true;
         }
     }

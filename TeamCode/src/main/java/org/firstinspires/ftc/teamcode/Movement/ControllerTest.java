@@ -9,7 +9,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Controllers.PID;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
-import org.firstinspires.ftc.teamcode.Odometry.OdometerRadians;
 
 /*
 This is an OpMode to test out controllers.

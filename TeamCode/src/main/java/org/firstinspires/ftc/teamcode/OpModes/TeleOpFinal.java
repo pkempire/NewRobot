@@ -121,8 +121,6 @@ public class TeleOpFinal extends LinearOpMode {
         //Some Housekeeping========================================================================
         liftLimitSwitch.setMode(DigitalChannel.Mode.INPUT);
 
-
-
         driveFrontRight.setDirection(DcMotor.Direction.REVERSE);
         driveFrontLeft.setDirection(DcMotor.Direction.REVERSE);
         driveBackLeft.setDirection(DcMotor.Direction.REVERSE);

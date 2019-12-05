@@ -8,8 +8,10 @@ public class Outtake extends Subsystem {
     public boolean isRunning;
 
     private Extrusion VerticalExtrusion;
-    private Servo Gripper;
-    private Servo Flipper;
+    private Servo GripperFront;
+    private Servo GripperBack;
+    private Servo FlipperRight;
+    private Servo FlipperLeft;
 
     // Servo values for flipper
     private double flipped;
@@ -18,10 +20,12 @@ public class Outtake extends Subsystem {
     private double clamped;
     private double dropped;
 
-    public Outtake(Extrusion VerticalExtrusion, Servo Gripper, Servo Flipper) {
+    public Outtake(Extrusion VerticalExtrusion, Servo GripperFront, Servo GripperBack, Servo FlipperRight, Servo FlipperLeft) {
         this.VerticalExtrusion = VerticalExtrusion;
-        this.Flipper = Flipper;
-        this.Gripper = Gripper;
+        this.FlipperRight = FlipperRight;
+        this.FlipperLeft = FlipperLeft;
+        this.GripperFront = GripperFront;
+        this.GripperBack = GripperBack;
 
     }
 
@@ -31,21 +35,56 @@ public class Outtake extends Subsystem {
         this.flipped = flipped;
         this.inside = inside;
 
-        Gripper.setPosition(dropped);
-        Flipper.setPosition(inside);
+        setFlipperPosition(inside);
 
     }
 
-    // Autonomous Methods ==========================================================================
+    // Utility Methods =============================================================================
+    public void setFlipperPosition(double position) {
+        //position flipped means [pivot=======block] (the arm is level with ground and pointing out)
+        if(position < flipped) {
+            position = flipped;
+        }else if (position > inside){
+            position = inside;
+        }
+        FlipperLeft.setPosition(position);
+        FlipperRight.setPosition(1 - position);
+
+    }
+
+    public void setGripperState(String state) {
+        //0 = both open
+        double front, back;
+        if(state == "Receive") {
+            front = dropped;
+            back = 1-clamped;
+        }else if(state == "Clamped") {
+            front = clamped;
+            back = 1-clamped;
+        }else if(state == "Deposited") {
+            front = clamped;
+            back = 1-dropped;
+        }else if(state == "Open"){
+            back = 1-dropped;
+            front = dropped;
+        }else {
+            front = dropped;
+            back = 1-dropped;
+        }
+        GripperFront.setPosition(front);
+        GripperBack.setPosition(back);
+    }
 
     // TeleOp Methods ==============================================================================
 
-    public void dropManual(boolean trigger){
+    public void dropManual(boolean DropTrigger, boolean ClampTrigger){
         isRunning = true;
-        if(trigger) {
-            Gripper.setPosition(dropped);
+        if(DropTrigger) {
+            setGripperState("Deposited");
+        }else if(ClampTrigger){
+            setGripperState("Clamped");
         }else {
-            Gripper.setPosition(clamped);
+            setGripperState("Receive");
         }
         isRunning = false;
 
@@ -54,9 +93,11 @@ public class Outtake extends Subsystem {
     public void flipManual(boolean trigger){
         isRunning = true;
         if(trigger) {
-            Flipper.setPosition(flipped);
+            setGripperState("Clamped");
+            setFlipperPosition(flipped);
         }else {
-            Gripper.setPosition(inside);
+            setFlipperPosition(inside);
+            setGripperState("Receive");
         }
         isRunning = false;
 

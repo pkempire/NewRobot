@@ -45,11 +45,9 @@ public class RedDepotAuto extends LinearOpMode {
     private BNO055IMU.Parameters Params;
 
     private void initialize(){
-
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
-        // Initialize all objects declared above
         // Initialize all objects declared above
         RightFront = hardwareMap.dcMotor.get("driveFrontRight");
         LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");

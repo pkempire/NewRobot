@@ -137,14 +137,14 @@ public class Odometer2 extends Subsystem{
             back = backEnc.getCurrentPosition() * encScale * backEncDir;
 
             // Calculates direction
-            // heading = getImuHeading() + headingOffset;
-            heading = Math.toRadians(getImuHeading());
+            heading = Math.toRadians(getImuHeading() + headingOffset);
 
+            // Calculating the change in all 3 encoders
             rightChange = right - rightLastVal;
             leftChange = left - leftLastVal;
             backChange = back - backLastVal;
 
-            //Calculating the position-change-vector from Left+Right encoders
+            // Calculating the position-change-vector from Left+Right encoders
             headingChange = heading - headingLastVal;
 
             if(headingChange == 0) { // RobotHardware has gone straight/not moved
@@ -152,7 +152,7 @@ public class Odometer2 extends Subsystem{
                 posChangeLR[0] = 0;
                 posChangeLR[1] = rightChange;
 
-            }else if(Math.abs(rightChange) < Math.abs(leftChange)){ //l is on inside - verified
+            }else if(Math.abs(rightChange) < Math.abs(leftChange)){ // l is on inside - verified
 
                 xOffestLR = leftChange/headingChange;
 
@@ -180,11 +180,11 @@ public class Odometer2 extends Subsystem{
             posChangeB[0] = Math.cos(headingChange) * backOmniExtra;
             posChangeB[1] = Math.sin(headingChange) * backOmniExtra;
 
-            //Add the two vectors together
+            // Add the two vectors together
             totalPosChange[0] = posChangeLR[0] + posChangeB[0];
             totalPosChange[1] = posChangeLR[1] + posChangeB[1];
 
-            //Rotate the vector;
+            // Rotate the vector
             rotatedMovement[0] = totalPosChange[0] * Math.cos(headingLastVal) - totalPosChange[1] * Math.sin(headingLastVal);
             rotatedMovement[1] = totalPosChange[0] * Math.sin(headingLastVal) + totalPosChange[1] * Math.cos(headingLastVal);
 
@@ -196,6 +196,7 @@ public class Odometer2 extends Subsystem{
     }
 
     public void integrate(){
+        // Integrating the calculated vector. In other words, choosing a new "lastPosition"
 
         lastX = x;
         lastY = y;
@@ -209,6 +210,7 @@ public class Odometer2 extends Subsystem{
     }
 
     public void update() {
+        // Calculate and integrate
         updateOdometry();
         integrate();
 
@@ -220,6 +222,14 @@ public class Odometer2 extends Subsystem{
         double d = AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle);
 
         return d % 360;
+    }
+
+    public double[] getUpdateVelocity() {
+        return rotatedMovement;
+    }
+
+    public double getHeadingVelocity() {
+        return headingChange;
     }
 
     public double getRightReading() {
@@ -244,14 +254,6 @@ public class Odometer2 extends Subsystem{
 
     public double getHeadingAbsoluteDeg() {
         return Math.toDegrees(heading) % 360;
-    }
-
-    public double getHeadingLastVal() {
-        return headingLastVal;
-    }
-
-    public double getHeadingOffset() {
-        return headingOffset;
     }
 
     public double[] getPosition() {

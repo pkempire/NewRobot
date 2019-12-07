@@ -23,12 +23,15 @@ public class MainPipeline extends OpenCvPipeline {
     private Scalar WHITE = new Scalar(255,255,255);
     private Scalar RED = new Scalar(255, 0, 0);
 
-    private double cx0 = 100;
-    private double cy0 = 35;
-    private double cx1 = 100;
-    private double cy1 = 150;
-    private double cx2 = 100;
-    private double cy2 = 265;
+    //X is actually Y
+    private double cx0 = 120;
+    private double cy0 = 150;
+
+    private double cx1 = 120;
+    private double cy1 = 210;
+
+    private double cx2 = 120;
+    private double cy2 = 270;
 
     private int r = 5;
     private int strokeWidth = 3;

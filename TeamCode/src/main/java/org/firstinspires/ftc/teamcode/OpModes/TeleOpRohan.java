@@ -76,7 +76,7 @@ public class TeleOpRohan extends LinearOpMode {
 
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         intakeRight = hardwareMap.dcMotor.get("intakeRight");
-        intakeDropper = hardwareMap.crservo.get("intakeDropper");
+        //intakeDropper = hardwareMap.crservo.get("intakeDropper");
 
         liftRight = hardwareMap.dcMotor.get("liftRight");
         liftLeft = hardwareMap.dcMotor.get("liftLeft");

@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Subsystem;
 
-@Autonomous(name="Encoder Test", group="Linear Opmode")
+@Autonomous(name="O-Encoder Test", group="Linear Opmode")
 
 public class EncoderTest extends LinearOpMode {
 

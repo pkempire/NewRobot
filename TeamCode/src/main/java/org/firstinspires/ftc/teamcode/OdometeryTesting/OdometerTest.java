@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 
-@Autonomous(name="Odometer Test", group="Linear Opmode")
+@Autonomous(name="O-Odometer Test", group="Linear Opmode")
 
 public class OdometerTest extends LinearOpMode {
 
@@ -64,21 +64,16 @@ public class OdometerTest extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-        int count = 0;
 
         while(opModeIsActive()) {
             telemetry.addData("heading", Adham.getHeadingAbsoluteDeg());
             telemetry.addData("X", Adham.getPosition()[0]);
             telemetry.addData("Y", Adham.getPosition()[1]);
+            telemetry.addData("Vx", Adham.getUpdateVelocity()[0]);
+            telemetry.addData("Vy", Adham.getUpdateVelocity()[1]);
             telemetry.update();
 
-            Adham.updateOdometry();
-
-            if(count%5 == 0) {
-                Adham.integrate();
-            }
-
-            count++;
+            Driver.localize();
             
         }
 
@@ -100,14 +95,7 @@ public class OdometerTest extends LinearOpMode {
     }
 
     private void delay(int millis) {
-        for(int x=0;x<millis; x++) {
-            if (opModeIsActive()) {
-                Adham.updateOdometry();
-                try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}
-            }else {
-                break;
-            }
-        }
+        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
     }
 
 }

@@ -15,17 +15,17 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
-@TeleOp(name="Vision Test", group = "Linear Opmode")
-@Disabled
+@TeleOp(name="V-Vision Test", group = "Linear Opmode")
+
 public class VisionTest extends LinearOpMode {
 
-    OpenCvCamera phoneCam;
+    private OpenCvCamera phoneCam;
+    private MainPipeline pipeline;
+
     private DcMotor RightFront;
     private DcMotor RightBack;
     private DcMotor LeftFront;
     private DcMotor LeftBack;
-
-    private String skystring;
 
     private Odometer2 Adham;
 
@@ -39,8 +39,6 @@ public class VisionTest extends LinearOpMode {
         telemetry.update();
 
         // Initialize all objects declared above
-
-
         Params = new BNO055IMU.Parameters();
         Params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         Params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -49,6 +47,8 @@ public class VisionTest extends LinearOpMode {
         Params.loggingTag          = "IMU";
         Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         Imu = hardwareMap.get(BNO055IMU.class, "imu");
+        //==========================================================================================
+        Imu.initialize(Params);
 
         RightFront = hardwareMap.dcMotor.get("driveFrontRight");
         LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");
@@ -61,6 +61,16 @@ public class VisionTest extends LinearOpMode {
         Driver = new Drive(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
         Driver.initialize();
 
+        // Vision ==================================================================================
+        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+
+        phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
+        phoneCam.openCameraDevice();
+
+        pipeline = new MainPipeline();
+
+        phoneCam.setPipeline(pipeline);
+
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();
 
@@ -69,31 +79,23 @@ public class VisionTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         initialize();
-
         waitForStart();
-
         telemetry.addData("Status: ", "Running");
         telemetry.update();
 
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-
-        phoneCam = new OpenCvInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-        phoneCam.openCameraDevice();
-
-        MainPipeline pipeline = new MainPipeline();
-
-        phoneCam.setPipeline(pipeline);
-
         phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
-        while (opModeIsActive())
-        {
-            telemetry.addData("FPS", String.format("%.2f", phoneCam.getFps()));
-            telemetry.addData("location", pipeline.location);
-            telemetry.addData("type", pipeline.location.getClass());
+        while (opModeIsActive()) {
+
+            //telemetry.addData("FPS", String.format("%.2f", phoneCam.getFps()));
+            //telemetry.addData("location", pipeline.location);
+            //telemetry.addData("type", pipeline.location.getClass());
+            telemetry.addData("X", Adham.getPosition()[0]);
+            telemetry.addData("Y", Adham.getPosition()[1]);
+            telemetry.addData("H", Adham.getHeadingAbsoluteDeg());
             telemetry.update();
 
-            sleep(100);
+            Driver.localize();
         }
     }
 }

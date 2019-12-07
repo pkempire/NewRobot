@@ -132,13 +132,13 @@ public class Drive extends Subsystem {
         isRunning = false;
     }
             
-    public void strafeToPointOrient(double x, double y, double heading, double posThreshold, double headThreshold) { // Verified
+    public void strafeToPointOrient(double x, double y, double heading, double posThreshold, double headThreshold, double power) { // Verified
         isRunning = true;
 
         count = 0;
 
-        PID holdX = new PID(0.017, 0.0085 ,0, 7, 0.4);
-        PID holdY = new PID(0.017, 0.0085, 0, 7, 0.4);
+        PID holdX = new PID(0.013, 0.01,0, 15, 0.4);
+        PID holdY = new PID(0.013, 0.01, 0, 15, 0.4);
 
         Proportional orient = new Proportional(0.02, 0.4);
 
@@ -162,11 +162,11 @@ public class Drive extends Subsystem {
                 double xCorrect = holdX.getCorrection(0, XD);
                 double yCorrect = holdY.getCorrection(0, YD);
                 
-                frontLeft.setPower(-xCorrect - yCorrect - hCorrect);
-                backLeft.setPower(xCorrect - yCorrect - hCorrect);
+                frontLeft.setPower(power * (-xCorrect - yCorrect - hCorrect));
+                backLeft.setPower(power * (xCorrect - yCorrect - hCorrect));
 
-                frontRight.setPower(xCorrect - yCorrect + hCorrect);
-                backRight.setPower(-xCorrect - yCorrect + hCorrect);
+                frontRight.setPower(power * (xCorrect - yCorrect + hCorrect));
+                backRight.setPower(power * (-xCorrect - yCorrect + hCorrect));
 
                 localize();
                 String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
@@ -251,51 +251,53 @@ public class Drive extends Subsystem {
         isRunning = false;
     }
 
-    public void moveToPointOrient(double targX, double targY, double targHead, double posThresh, double headThresh, double power) {
+    public void moveToPointOrient(double targX, double targY, double targHead, double posThresh, double headThresh, double maxSpeed, double power) {
 
-        PID VelocityFinder = new PID(0.1, 0.3, 0.3, 100, 10);
+        //PID VelocityFinder = new PID(0.2, 0.03, 0.1, 10, 10);
 
-        PID MotorFinder = new PID(0.1, 0.1, 0.1, 10, 0.5);
+        PID MotorFinder = new PID(0.1, 0.005, 0.1, 10, 0.5);
         Proportional HeadingCorrecter = new Proportional(0.2, 0.1);
 
-        double distX;
-        double distY;
+        double distX = 0;
+        double distY = 0;
 
-        double headingError;
+        double headingError = 0;
 
         do{
-            // Find current position
-            localize();
-            double x = Adhameter.getPosition()[0];
-            double y = Adhameter.getPosition()[1];
-            double velX = Adhameter.getUpdateVelocity()[0];
-            double velY = Adhameter.getUpdateVelocity()[1];
+            if (opmode.opModeIsActive()) {
+                // Find current position
+                localize();
+                double x = Adhameter.getPosition()[0];
+                double y = Adhameter.getPosition()[1];
+                double velX = Adhameter.getUpdateVelocity()[0];
+                double velY = Adhameter.getUpdateVelocity()[1];
 
-            distX = targX - x;
-            distY = targY - y;
-            // Find target global velocity
-            double targVelX = VelocityFinder.getCorrection(targX, x);
-            double targVelY = VelocityFinder.getCorrection(targY, y);
+                distX = targX - x;
+                distY = targY - y;
+                // Find target global velocity
+                double targVelX = distX / (Math.abs(distX) + Math.abs(distY)) * maxSpeed;
+                double targVelY = distY / (Math.abs(distX) + Math.abs(distY)) * maxSpeed;
 
-            // Find target relative velocity
-            double heading = Adhameter.getHeadingAbsoluteDeg();
-            double targRelVelX = cos(-heading) * targVelX - sin(-heading) * targVelY;
-            double targRelVelY = sin(-heading) * targVelX + cos(-heading) * targVelY;
-            // Find actual relative velocity
-            double relVelX = cos(-heading) * velX - sin(-heading) * velY;
-            double relVelY = sin(-heading) * velX + cos(-heading) * velY;
-            // Finding motor power corrections
-            double xCorrect = MotorFinder.getCorrection(targRelVelX, relVelX);
-            double yCorrect = MotorFinder.getCorrection(targRelVelY, relVelY);
-            // Find motor power correction for heading
-            headingError = targHead - heading;
-            double hCorrect = HeadingCorrecter.getCorrection(targHead, heading);
+                // Find target relative velocity
+                double heading = Adhameter.getHeadingAbsoluteDeg();
+                double targRelVelX = cos(-heading) * targVelX - sin(-heading) * targVelY;
+                double targRelVelY = sin(-heading) * targVelX + cos(-heading) * targVelY;
+                // Find actual relative velocity
+                double relVelX = cos(-heading) * velX - sin(-heading) * velY;
+                double relVelY = sin(-heading) * velX + cos(-heading) * velY;
+                // Finding motor power corrections
+                double xCorrect = MotorFinder.getCorrection(targRelVelX, relVelX);
+                double yCorrect = MotorFinder.getCorrection(targRelVelY, relVelY);
+                // Find motor power correction for heading
+                headingError = targHead - heading;
+                double hCorrect = HeadingCorrecter.getCorrection(targHead, heading);
 
-            frontLeft.setPower(power * (-xCorrect - yCorrect - hCorrect));
-            backLeft.setPower(power * (xCorrect - yCorrect - hCorrect));
-            frontRight.setPower(power * (xCorrect - yCorrect + hCorrect));
-            backRight.setPower(power * (-xCorrect - yCorrect + hCorrect));
+                frontLeft.setPower(power * (-xCorrect - yCorrect - hCorrect));
+                backLeft.setPower(power * (xCorrect - yCorrect - hCorrect));
+                frontRight.setPower(power * (xCorrect - yCorrect + hCorrect));
+                backRight.setPower(power * (-xCorrect - yCorrect + hCorrect));
 
+            }
         }while(!(Math.hypot(distX, distY) < posThresh && headingError < headThresh));
     }
 
@@ -304,7 +306,7 @@ public class Drive extends Subsystem {
         double x = Adhameter.getPosition()[0];
         double y = Adhameter.getPosition()[1];
         double heading = Adhameter.getHeadingAbsoluteDeg();
-        strafeToPointOrient(x + xChange, y + yChange, heading + headingChange, threshold, 2);
+        strafeToPointOrient(x + xChange, y + yChange, heading + headingChange, threshold, 1, 1);
 
     }
 
@@ -352,15 +354,7 @@ public class Drive extends Subsystem {
     }
 
     private void delay(int millis) {
-        int limit = (int)(millis/2);
-        for(int x=0;x<limit; x++) {
-            if (opmode.opModeIsActive()) {
-                localize();
-                try{Thread.sleep(2);}catch(InterruptedException e){e.printStackTrace();}
-            }else {
-                break;
-            }
-        }
+        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
     }
 
     private double cos(double theta) {

@@ -14,7 +14,7 @@ import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 This is an OpMode to test out controllers.
  */
 
-@Autonomous(name="Controller Test", group="Linear Opmode")
+@Autonomous(name="D-Controller Test", group="Linear Opmode")
 @Disabled
 public class ControllerTest extends LinearOpMode {
 

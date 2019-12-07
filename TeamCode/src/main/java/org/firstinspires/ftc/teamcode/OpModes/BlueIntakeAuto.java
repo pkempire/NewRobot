@@ -16,9 +16,9 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
-@Autonomous(name="Intake Blue Auto", group="Linear Opmode")
+@Autonomous(name="1-Blue Intake Auto", group="Linear Opmode")
 
-public class IntakeBlueSide extends LinearOpMode {
+public class BlueIntakeAuto extends LinearOpMode {
 
     // Declare OpMode members ======================================================================
     private DcMotor RightFront;
@@ -79,6 +79,8 @@ public class IntakeBlueSide extends LinearOpMode {
         Driver = new Drive(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
         Driver.initialize();
 
+        Intaker = new Intake(intakeLeft, intakeRight);
+        Intaker.initialize(-1, 1);
 
         // Vision
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -99,57 +101,24 @@ public class IntakeBlueSide extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         initialize();
         waitForStart();
-
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-        intakeBlock();
-        delay(30);
-        Driver.strafeToPointOrient(-40, -14, 0, 3, 2);
-        delay(7);
         scanSkystone();
-        delay(7);
 
         if(skyPosition == 0) {
-
-            delay(20);
-
-            delay(20);
-        }else if(skyPosition == 1) {
-            Driver.strafeToPointOrient(27,71,48,2.5,2);
-            delay(20);
-            Driver.strafeToPointOrient(18,89,54,3,2);
-            delay(20);
-            intakeBlock();
-        }else if(skyPosition == 2) {
-
-            delay(20);
-
-            delay(20);
+            Driver.strafeToPointOrient(60, 40, 0, 2, 1, 0.47);
+            Driver.strafeToPointOrient(61, 75, 52, 2, 1, 0.7);
+            Intaker.intake(0.4);
+            Driver.strafeToPointOrient(47, 90, 46, 2, 1, 0.4);
+            delay(500);
+            Intaker.stop();
+            delay(500);
+            Intaker.intake(0.5);
+            Driver.strafeToPointOrient(40,  95, 50, 2, 1, 0.4);
+            delay(500);
+            Intaker.stop();
         }
-
-        delay(20);
-
-        delay(7);
-
-        if(skyPosition == 0) {
-
-            delay(20);
-
-            delay(20);
-        }else if(skyPosition == 1) {
-
-            delay(20);
-
-            delay(20);
-        }else if(skyPosition == 2) {
-
-            delay(20);
-
-            delay(20);
-        }
-
-        //park
 
     }
 
@@ -162,35 +131,7 @@ public class IntakeBlueSide extends LinearOpMode {
     }
 
     private void delay(int millis) {
-        int limit = (int)(millis/2);
-        for(int x=0;x<limit; x++) {
-            if (opModeIsActive()) {
-                Driver.localize();
-                try{Thread.sleep(2);}catch(InterruptedException e){e.printStackTrace();}
-            }else {
-                break;
-            }
-        }
-    }
-
-    private void intakeBlock(){
-        intakeLeft.setPower(-0.6);
-        intakeRight.setPower(-0.6);
-        delay(100);
-        LeftBack.setPower(0.15);
-        LeftFront.setPower(0.15);
-        RightBack.setPower(0.15);
-        RightFront.setPower(0.15);
-        delay(15);
-        LeftBack.setPower(0);
-        LeftFront.setPower(0);
-        RightBack.setPower(0);
-        RightFront.setPower(0);
-        intakeLeft.setPower(-0.6);
-        intakeRight.setPower(-0.6);
-        delay(30);
-        intakeLeft.setPower(0);
-        intakeRight.setPower(0);
+        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
     }
 
 }

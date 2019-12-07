@@ -16,7 +16,7 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
-@Autonomous(name="Blue Depot Auto", group="Linear Opmode")
+@Autonomous(name="1-Blue Depot Auto", group="Linear Opmode")
 
 public class BlueDepotAuto extends LinearOpMode {
 
@@ -98,23 +98,23 @@ public class BlueDepotAuto extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-        Driver.strafeToPointOrient(-36, 8, 0, 3, 2);
+        Driver.strafeToPointOrient(-36, 8, 0, 3, 2, 1);
         delay(7);
         scanSkystone();
         delay(7);
 
         if(skyPosition == 0) {
-            Driver.strafeToPointOrient(-77, 11, 0, 3, 2);
+            Driver.strafeToPointOrient(-77, 11, 0, 3, 2, 1);
             delay(23);
             blockHook2.setPosition(0.4);
             delay(23);
         }else if(skyPosition == 1) {
-            Driver.strafeToPointOrient(-77, 31, 0, 3, 2);
+            Driver.strafeToPointOrient(-77, 31, 0, 3, 2, 1);
             delay(23);
             blockHook2.setPosition(0.4);
             delay(23);
         }else if(skyPosition == 2) {
-            Driver.strafeToPointOrient(-77, 51, 0, 3, 2);
+            Driver.strafeToPointOrient(-77, 51, 0, 3, 2, 1);
             delay(23);
             blockHook2.setPosition(0.4);
             delay(23);
@@ -122,41 +122,41 @@ public class BlueDepotAuto extends LinearOpMode {
 
         delay(23);
 
-        Driver.strafeToPointOrient(-33, 66, 0, 4, 1.5);
+        Driver.strafeToPointOrient(-33, 66, 0, 4, 1.5, 1);
         delay(7);
-        Driver.strafeToPointOrient(-50, 158, 0, 4, 1.5);
+        Driver.strafeToPointOrient(-50, 158, 0, 4, 1.5, 1);
 
         blockHook2.setPosition(0.9);
 
         delay(23);
 
-        Driver.strafeToPointOrient(-39, -12, 0, 3.5, 1.5);
+        Driver.strafeToPointOrient(-39, -12, 0, 3.5, 1.5, 1);
         delay(7);
 
         if(skyPosition == 0) {
-            Driver.strafeToPointOrient(-80, -52, 0, 3, 2);
+            Driver.strafeToPointOrient(-80, -52, 0, 3, 2, 1);
             delay(23);
             blockHook2.setPosition(0.4);
             delay(23);
         }else if(skyPosition == 1) {
-            Driver.strafeToPointOrient(-80, -33, 0, 3, 2);
+            Driver.strafeToPointOrient(-80, -33, 0, 3, 2, 1);
             delay(23);
             blockHook2.setPosition(0.4);
             delay(23);
         }else if(skyPosition == 2) {
-            Driver.strafeToPointOrient(-80, -11, 0, 3, 2);
+            Driver.strafeToPointOrient(-80, -11, 0, 3, 2, 1);
             delay(23);
             blockHook2.setPosition(0.4);
             delay(23);
         }
 
         //park
-        Driver.strafeToPointOrient(-50, 158, 0, 3.5, 2);
+        Driver.strafeToPointOrient(-50, 158, 0, 3.5, 2, 1);
         blockHook2.setPosition(0.9);
         delay(23);
         //Make sure nothing is still using the thread - End Autonomous period
         //park
-        Driver.strafeToPointOrient(-62, 99, 0, 3.5, 3);
+        Driver.strafeToPointOrient(-62, 99, 0, 3.5, 3, 1);
     }
 
     private void scanSkystone(){

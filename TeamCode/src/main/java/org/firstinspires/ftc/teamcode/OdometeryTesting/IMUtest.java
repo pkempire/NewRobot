@@ -9,7 +9,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 
-@Autonomous(name="IMU Test", group="Linear Opmode")
+@Autonomous(name="O-IMU Test", group="Linear Opmode")
 @Disabled
 public class IMUtest extends LinearOpMode {
 

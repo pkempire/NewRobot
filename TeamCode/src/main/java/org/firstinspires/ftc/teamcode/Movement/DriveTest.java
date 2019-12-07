@@ -8,11 +8,13 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.Controllers.PID;
+import org.firstinspires.ftc.teamcode.Controllers.Proportional;
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 
-@Autonomous(name="Drive Test", group="Linear Opmode")
-@Disabled
+@Autonomous(name="D-Drive Test", group="Linear Opmode")
+
 public class DriveTest extends LinearOpMode {
 
     // Declare OpMode members.
@@ -45,6 +47,7 @@ public class DriveTest extends LinearOpMode {
         LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
         RightBack = hardwareMap.dcMotor.get("driveBackRight");
 
+        Imu.initialize(Params);
         Adham = new Odometer2(RightFront, LeftFront, LeftBack, Imu, -1, -1, -1, this);
         Adham.initialize(0, 0, 0);
 
@@ -64,20 +67,21 @@ public class DriveTest extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-
+        Driver.strafeToPointOrient(10, 0, 0, 1, 1, 0.8);
 
         //Make sure nothing is still using the thread
     }
 
     private void delay(int millis) {
-        for(int x=0;x<millis; x++) {
-            if (opModeIsActive()) {
-                Adham.updateOdometry();
-                try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}
-            }else {
-                break;
-            }
-        }
+        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
+    }
+
+    private double cos(double theta) {
+        return Math.cos(Math.toRadians(theta));
+    }
+
+    private double sin(double theta) {
+        return Math.sin(Math.toRadians(theta));
     }
 
 }

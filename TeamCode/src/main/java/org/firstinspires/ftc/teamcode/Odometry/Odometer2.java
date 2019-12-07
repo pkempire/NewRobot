@@ -105,7 +105,7 @@ public class Odometer2 extends Subsystem{
         lastY = y;
 
         headingOffset = Heading;
-        headingLastVal = 0;
+        headingLastVal = Heading;
 
         encScale = encdrRad*2*Math.PI/ticksPerRotation*gear;
 

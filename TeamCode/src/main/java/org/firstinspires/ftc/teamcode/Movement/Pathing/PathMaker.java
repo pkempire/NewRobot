@@ -1,8 +1,9 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.Movement.Pathing;
+
+import android.util.Log;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -22,9 +23,9 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
 
-@Autonomous(name="D-Path Testing", group="Linear Opmode")
+@TeleOp(name="D-Path Maker", group="Linear Opmode")
 
-public class PathTesting extends LinearOpMode {
+public class PathMaker extends LinearOpMode {
     // Declare OpMode members ======================================================================
     private DcMotor RightFront;
     private DcMotor RightBack;
@@ -106,16 +107,31 @@ public class PathTesting extends LinearOpMode {
         telemetry.addData("Status", "Running");
         telemetry.update();
 
-        /*
-        testPath.addPoint(0, 20, 0, "");
-        testPath.addPoint(20, 20, 270, "Intake");
-        testPath.addPoint(20, 0, 180, "");
-        testPath.addPoint(0, 0, 90, "");
+        int points = 0;
 
-        ImpurePursuit.followPathSimple(testPath, 7, 2);
-         */
+        while(opModeIsActive()) {
 
-        Driver.moveToPointOrient(10, 10,0, 2, 1, 0.4);
+            double x = Adham.getPosition()[0];
+            double y = Adham.getPosition()[1];
+            double h = Adham.getHeadingAbsoluteDeg();
+
+            telemetry.addData("heading", h);
+            telemetry.addData("X", x);
+            telemetry.addData("Y", y);
+            telemetry.update();
+
+            if(gamepad1.a) {
+                Log.d("Path", "PointNum: " + points);
+                Log.d("Path", "X: " + x);
+                Log.d("Path","Y: " + y);
+                Log.d("Path","H: " + h);
+                Log.d("Path","------------------------------------");
+
+                points ++;
+            }
+
+            Driver.localize();
+        }
         // run until the end of the match (driver presses STOP)
 
     }

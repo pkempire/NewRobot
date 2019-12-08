@@ -106,16 +106,14 @@ public class FoundationPaths extends LinearOpMode {
         telemetry.update();
         //Start Autonomous period
         //Driver.strafeToPointOrient(-70,237,0, 3,2);
-        delay(90);
-        foundationClampFront.setPosition(0.95);
-        foundationClampBack.setPosition(0.95);
-        delay(90);
-        Driver.pointInDirectionRough(-40, 3);
-        Driver.strafeToPointOrient2(-32,194,-45,3,2);
-        delay(90);
-        Driver.strafeToPointOrient2(-1,186,-91,3,2);
-        foundationClampFront.setPosition(0.25);
-        foundationClampBack.setPosition(0.25);
+        delay(100);
+        telemetry.addData("p", "b4");
+        Driver.pointInDirection(-180);
+        telemetry.addData("p", "after");
+        delay(100);
+
+        Driver.moveByAmount(0,30,0,2);
+
     }
     private void scanSkystone(){
         skyPosition = pipeline.getSkystonePosition();
@@ -126,15 +124,7 @@ public class FoundationPaths extends LinearOpMode {
     }
 
     private void delay(int millis) {
-        int limit = (int)(millis/2);
-        for(int x=0;x<limit; x++) {
-            if (opModeIsActive()) {
-                Driver.localize();
-                try{Thread.sleep(2);}catch(InterruptedException e){e.printStackTrace();}
-            }else {
-                break;
-            }
-        }
+        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
     }
 
 }

@@ -137,8 +137,8 @@ public class Drive extends Subsystem {
 
         count = 0;
 
-        PID holdX = new PID(0.013, 0.01,0, 15, 0.4);
-        PID holdY = new PID(0.013, 0.01, 0, 15, 0.4);
+        PID holdX = new PID(0.019, 0.0085 ,0, 7, 0.4);
+        PID holdY = new PID(0.019, 0.0085, 0, 7, 0.4);
 
         Proportional orient = new Proportional(0.02, 0.4);
 
@@ -170,14 +170,14 @@ public class Drive extends Subsystem {
 
                 localize();
                 String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
-                Log.d("FTC", logStr);
-                Log.d("FTC", "distance: " + distance);
-                Log.d("FTC", "xCorrect: " + xCorrect);
-                Log.d("FTC","yCorrect: " + yCorrect);
-                Log.d("FTC","xCorrect: " + xCorrect);
-                Log.d("FTC","xDiff: " + Xdiff);
-                Log.d("FTC","yDiff: " + Ydiff);
-                Log.d("FTC","------------------------------------");
+                Log.d("parth", logStr);
+                Log.d("parth", "distance: " + distance);
+                Log.d("parth", "xCorrect: " + xCorrect);
+                Log.d("parth","yCorrect: " + yCorrect);
+
+                Log.d("parth","xDiff: " + Xdiff);
+                Log.d("parth","yDiff: " + Ydiff);
+                Log.d("parth","------------------------------------");
 
 
             }else {
@@ -197,8 +197,8 @@ public class Drive extends Subsystem {
 
         count = 0;
 
-        PID holdX = new PID(0.005, 0.009 ,0, 7, 0.4);
-        PID holdY = new PID(0.005, 0.009, 0, 7, 0.4);
+        PID holdX = new PID(0.02, 0.0085 ,0, 10, 0.4);
+        PID holdY = new PID(0.02, 0.0085, 0, 10, 0.4);
 
         Proportional orient = new Proportional(0.01, 0.4);
 
@@ -221,23 +221,28 @@ public class Drive extends Subsystem {
                 double hCorrect = orient.getCorrection(heading, h);
                 double xCorrect = holdX.getCorrection(0, XD);
                 double yCorrect = holdY.getCorrection(0, YD);
+                if (xCorrect < 1.8){
+                    xCorrect = 1.8;
+                } if(yCorrect < 1.8){
+                    yCorrect = 1.8;
+                }
 
-                frontLeft.setPower(0.7 * (-xCorrect - yCorrect - hCorrect));
-                backLeft.setPower(0.7 * (xCorrect - yCorrect - hCorrect));
+                frontLeft.setPower(0.65 * (-xCorrect - yCorrect - hCorrect));
+                backLeft.setPower(0.65 * (xCorrect - yCorrect - hCorrect));
 
-                frontRight.setPower(0.7 * (xCorrect - yCorrect + hCorrect));
-                backRight.setPower(0.7 * (-xCorrect - yCorrect + hCorrect));
+                frontRight.setPower(0.65 * (xCorrect - yCorrect + hCorrect));
+                backRight.setPower(0.65 * (-xCorrect - yCorrect + hCorrect));
 
                 localize();
                 String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
-                Log.d("FTC", logStr);
-                Log.d("FTC", "distance: " + distance);
-                Log.d("FTC", "xCorrect: " + xCorrect);
-                Log.d("FTC","yCorrect: " + yCorrect);
-                Log.d("FTC","xCorrect: " + xCorrect);
-                Log.d("FTC","xDiff: " + Xdiff);
-                Log.d("FTC","yDiff: " + Ydiff);
-                Log.d("FTC","------------------------------------");
+                Log.d("newlog", logStr);
+                Log.d("newlog", "distance: " + distance);
+                Log.d("newlog", "xCorrect: " + xCorrect);
+                Log.d("newlog","yCorrect: " + yCorrect);
+                Log.d("newlog","xCorrect: " + xCorrect);
+                Log.d("newlog","xDiff: " + Xdiff);
+                Log.d("newlog","yDiff: " + Ydiff);
+                Log.d("newlog","------------------------------------");
 
 
             }else {
@@ -260,7 +265,7 @@ public class Drive extends Subsystem {
         double distance;
         double headingError = 0;
 
-        double power = 1;
+        double mypower = 1;
 
         do{
             if (opmode.opModeIsActive()) {
@@ -270,27 +275,27 @@ public class Drive extends Subsystem {
                 double y = Adhameter.getPosition()[1];
                 double velX = Adhameter.getUpdateVelocity()[0];
                 double velY = Adhameter.getUpdateVelocity()[1];
-
+                // Find target global distances
                 distX = targX - x;
                 distY = targY - y;
                 distance = Math.hypot(distX, distY);
-                // Find target global velocity
-                double targVelX = distX / (Math.abs(distX) + Math.abs(distY)) * maxSpeed;
-                double targVelY = distY / (Math.abs(distX) + Math.abs(distY)) * maxSpeed;
 
-                // Find target relative velocity
+                // Find target relative distances
                 double heading = Adhameter.getHeadingAbsoluteDeg();
-                double targRelVelX = cos(-heading) * targVelX - sin(-heading) * targVelY;
-                double targRelVelY = sin(-heading) * targVelX + cos(-heading) * targVelY;
+                double RelX = cos(-heading) * distX - sin(-heading) * distY;
+                double RelY = sin(-heading) * distX + cos(-heading) * distY;
 
-                if(Math.hypot(velX, velY) < 1) {
-                    power = power * 1.5;
+                double targRelVelX = RelX / (Math.abs(RelX) + Math.abs(RelY)) * maxSpeed;
+                double targRelVelY = RelY / (Math.abs(RelX) + Math.abs(RelY)) * maxSpeed;
+
+                if(Math.hypot(velX, velY) < 0.2) {
+                    mypower = mypower * 1.5;
                 }else {
-                    power = 1;
+                    mypower = 1;
                 }
 
-                double xCorrect = targRelVelX * power;
-                double yCorrect = targRelVelY * power;
+                double xCorrect = targRelVelX * mypower;
+                double yCorrect = targRelVelY * mypower;
 
                 // Find motor power correction for heading
                 headingError = targHead - heading;
@@ -301,6 +306,16 @@ public class Drive extends Subsystem {
                 backLeft.setPower((xCorrect - yCorrect - hCorrect));
                 frontRight.setPower((xCorrect - yCorrect + hCorrect));
                 backRight.setPower((-xCorrect - yCorrect + hCorrect));
+
+                String logStr = "posThreshold "+ posThresh + " targetX: "+ targX +" targetY: " + targY;
+                Log.d("rohan", logStr);
+                Log.d("rohan", "distance: " + distance);
+                Log.d("rohan", "xCorrect: " + xCorrect);
+                Log.d("rohan","yCorrect: " + yCorrect);
+                Log.d("rohan","power: " + mypower);
+                Log.d("rohan","xRelativeDistance: " + RelX);
+                Log.d("rohan","yRelativeDistance: " + RelY);
+                Log.d("rohan","------------------------------------");
 
             }else {
                 break;

@@ -18,7 +18,7 @@ public class PathFollow {
         Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 1);
         for(int i=1; i<Path.getLength()-1; i++) {
             point = Path.getPoint(i);
-            Driver.moveToPointOrient(point.x, point.y, point.h, posThreshold, headThreshold, 2);
+            Driver.moveToPointOrient(point.x, point.y, point.h, posThreshold, headThreshold, 1);
 
         }
         point = Path.getPoint(Path.getLength()-1);

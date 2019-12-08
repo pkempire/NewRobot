@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.Controllers.ConstantProportional;
 import org.firstinspires.ftc.teamcode.Controllers.PID;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 
@@ -15,7 +16,7 @@ This is an OpMode to test out controllers.
  */
 
 @Autonomous(name="D-Controller Test", group="Linear Opmode")
-@Disabled
+
 public class ControllerTest extends LinearOpMode {
 
     // Declare OpMode members.
@@ -25,7 +26,7 @@ public class ControllerTest extends LinearOpMode {
     private DcMotor LeftBack;
 
     private Odometer2 Adham;
-    private PID pid;
+    private ConstantProportional turn;
 
     private BNO055IMU Imu;
     private BNO055IMU.Parameters Params;
@@ -49,11 +50,11 @@ public class ControllerTest extends LinearOpMode {
         Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         Imu = hardwareMap.get(BNO055IMU.class, "imu");
 
+        Imu.initialize(Params);
         Adham = new Odometer2(RightFront, LeftFront, LeftBack, Imu, -1, -1, -1, this);
         Adham.initialize(0, 0, 0);
 
-        pid = new PID(0.016, 0.001, 0.01, 5, 0.4);
-
+        turn = new ConstantProportional(0.6, 30, 0.5);
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();
     }
@@ -75,7 +76,7 @@ public class ControllerTest extends LinearOpMode {
             current = Adham.getHeadingAbsoluteDeg();
 
             telemetry.addData("current ", current);
-            telemetry.addData("correction ", pid.getCorrection(target, current));
+            telemetry.addData("correction ", turn.getCorrection(target, current));
             telemetry.update();
 
             Adham.updateOdometry();

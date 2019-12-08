@@ -140,6 +140,19 @@ public class TeleOpRohan extends LinearOpMode {
 
             Driver.handleDrive(Miles, false);
 
+            Intaker.intakeManual(Ryan);
+
+            if(Ryan.a) {
+                Outtake.setGripperState("Receive");
+            }else if(Ryan.b) {
+                Outtake.setGripperState("Deposit");
+            }else if(Ryan.x){
+                Outtake.setGripperState("Clamped");
+            }
+
+
+
+
             time++;
         }
     }

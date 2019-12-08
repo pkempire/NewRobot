@@ -110,7 +110,7 @@ public class PathTesting extends LinearOpMode {
         testPath.addPoint(20, 0, 180, "");
         testPath.addPoint(0, 0, 90, "");
 
-        ImpurePursuit.followPathSimple(testPath, 4, 2);
+        ImpurePursuit.followPathSimple(testPath, 7, 2);
         // run until the end of the match (driver presses STOP)
 
     }

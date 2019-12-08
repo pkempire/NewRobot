@@ -20,6 +20,8 @@ public class Outtake extends Subsystem {
     private double clamped;
     private double dropped;
 
+    private String state;
+
     public Outtake(Extrusion VerticalExtrusion, Servo GripperFront, Servo GripperBack, Servo FlipperRight, Servo FlipperLeft) {
         this.VerticalExtrusion = VerticalExtrusion;
         this.FlipperRight = FlipperRight;
@@ -52,8 +54,9 @@ public class Outtake extends Subsystem {
 
     }
 
-    public void setGripperState(String state) {
+    public void setGripperState(String setState) {
         //0 = both open
+        state = setState;
         double front, back;
         if(state == "Receive") {
             front = dropped;

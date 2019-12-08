@@ -2,24 +2,28 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
-
-import org.firstinspires.ftc.teamcode.Movement.Drive;
-import org.firstinspires.ftc.teamcode.Hardware.Intake;
-import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
+import com.qualcomm.robotcore.robot.Robot;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.teamcode.CustomCV.MainPipeline;
+import org.firstinspires.ftc.teamcode.Hardware.Intake;
+import org.firstinspires.ftc.teamcode.Movement.Drive;
+import org.firstinspires.ftc.teamcode.Movement.Pathing.PathFollow;
+import org.firstinspires.ftc.teamcode.Movement.Pathing.RobotPath;
+import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
-@Autonomous(name="1-Blue Depot Auto", group="Linear Opmode")
 
-public class BlueDepotAuto extends LinearOpMode {
+@TeleOp(name="D-Path Testing", group="Linear Opmode")
 
+public class PathTesting extends LinearOpMode {
     // Declare OpMode members ======================================================================
     private DcMotor RightFront;
     private DcMotor RightBack;
@@ -29,10 +33,15 @@ public class BlueDepotAuto extends LinearOpMode {
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
 
+    private BNO055IMU Imu;
+    private BNO055IMU.Parameters Params;
+
     private Servo blockHook2;
     private Odometer2 Adham;
     private Drive Driver;
     private Intake Intaker;
+
+    private PathFollow ImpurePursuit;
 
     private MainPipeline pipeline;
     private OpenCvCamera phoneCam;
@@ -40,13 +49,11 @@ public class BlueDepotAuto extends LinearOpMode {
     // Important Variables =========================================================================
     private int skyPosition;
 
-    private BNO055IMU Imu;
-    private BNO055IMU.Parameters Params;
+    private RobotPath testPath = new RobotPath(10, "Test");
 
     private void initialize(){
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
-
         // Initialize all objects declared above ===================================================
 
         RightFront = hardwareMap.dcMotor.get("driveFrontRight");
@@ -73,6 +80,8 @@ public class BlueDepotAuto extends LinearOpMode {
         Driver = new Drive(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
         Driver.initialize();
 
+        ImpurePursuit = new PathFollow(Driver);
+
         // Vision
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
 
@@ -93,88 +102,16 @@ public class BlueDepotAuto extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         initialize();
         waitForStart();
-        telemetry.addData("Status: ", "Running");
+        telemetry.addData("Status", "Running");
         telemetry.update();
-        //Start Autonomous period
-        Driver.strafeToPointOrient(-36, 8, 0, 3, 2, 1);
-        delay(7);
-        scanSkystone();
-        delay(7);
 
-        if(skyPosition == 0) {
-            Driver.strafeToPointOrient(-77, 11, 0, 3, 2, 1);
-            delay(23);
-            blockHook2.setPosition(0.4);
-            delay(23);
-        }else if(skyPosition == 1) {
-            Driver.strafeToPointOrient(-77, 31, 0, 3, 2, 1);
-            delay(23);
-            blockHook2.setPosition(0.4);
-            delay(23);
-        }else if(skyPosition == 2) {
-            Driver.strafeToPointOrient(-77, 51, 0, 3, 2, 1);
-            delay(23);
-            blockHook2.setPosition(0.4);
-            delay(23);
-        }
+        testPath.addPoint(0, 20, 0, "");
+        testPath.addPoint(20, 20, 270, "Intake");
+        testPath.addPoint(20, 0, 180, "");
+        testPath.addPoint(0, 0, 90, "");
 
-        delay(23);
+        ImpurePursuit.followPathSimple(testPath, 4, 2);
+        // run until the end of the match (driver presses STOP)
 
-        Driver.strafeToPointOrient(-33, 66, 0, 4, 1.5, 1);
-        delay(7);
-        Driver.strafeToPointOrient(-50, 158, 0, 4, 1.5, 1);
-
-        blockHook2.setPosition(0.9);
-
-        delay(23);
-
-        Driver.strafeToPointOrient(-39, -12, 0, 3.5, 1.5, 1);
-        delay(7);
-
-        if(skyPosition == 0) {
-            Driver.strafeToPointOrient(-80, -52, 0, 3, 2, 1);
-            delay(23);
-            blockHook2.setPosition(0.4);
-            delay(23);
-        }else if(skyPosition == 1) {
-            Driver.strafeToPointOrient(-80, -33, 0, 3, 2, 1);
-            delay(23);
-            blockHook2.setPosition(0.4);
-            delay(23);
-        }else if(skyPosition == 2) {
-            Driver.strafeToPointOrient(-80, -11, 0, 3, 2, 1);
-            delay(23);
-            blockHook2.setPosition(0.4);
-            delay(23);
-        }
-
-        //park
-        Driver.strafeToPointOrient(-50, 158, 0, 3.5, 2, 1);
-        blockHook2.setPosition(0.9);
-        delay(23);
-        //Make sure nothing is still using the thread - End Autonomous period
-        //park
-        Driver.strafeToPointOrient(-62, 99, 0, 3.5, 3, 1);
     }
-
-    private void scanSkystone(){
-        skyPosition = pipeline.getSkystonePosition();
-
-        if(skyPosition == 404) {
-            scanSkystone();
-        }
-    }
-
-    private void delay(int millis) {
-        int limit = (int)(millis/2);
-        for(int x=0;x<limit; x++) {
-            if (opModeIsActive()) {
-                Driver.localize();
-                try{Thread.sleep(2);}catch(InterruptedException e){e.printStackTrace();}
-            }else {
-                break;
-            }
-        }
-    }
-
 }

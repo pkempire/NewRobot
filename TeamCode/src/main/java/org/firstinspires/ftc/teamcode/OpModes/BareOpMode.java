@@ -6,7 +6,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
-@TeleOp(name="Bare Teleop", group="Linear Opmode")
+@TeleOp(name="Bare OpMode", group="Linear Opmode")
 @Disabled
 
 public class BareOpMode extends LinearOpMode {

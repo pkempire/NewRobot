@@ -251,17 +251,16 @@ public class Drive extends Subsystem {
         isRunning = false;
     }
 
-    public void moveToPointOrient(double targX, double targY, double targHead, double posThresh, double headThresh, double maxSpeed, double power) {
+    public void moveToPointOrient(double targX, double targY, double targHead, double posThresh, double headThresh, double maxSpeed) {
 
-        //PID VelocityFinder = new PID(0.2, 0.03, 0.1, 10, 10);
-
-        PID MotorFinder = new PID(0.1, 0.005, 0.1, 10, 0.5);
         Proportional HeadingCorrecter = new Proportional(0.2, 0.1);
 
         double distX = 0;
         double distY = 0;
-
+        double distance;
         double headingError = 0;
+
+        double power = 1;
 
         do{
             if (opmode.opModeIsActive()) {
@@ -274,6 +273,7 @@ public class Drive extends Subsystem {
 
                 distX = targX - x;
                 distY = targY - y;
+                distance = Math.hypot(distX, distY);
                 // Find target global velocity
                 double targVelX = distX / (Math.abs(distX) + Math.abs(distY)) * maxSpeed;
                 double targVelY = distY / (Math.abs(distX) + Math.abs(distY)) * maxSpeed;
@@ -282,23 +282,30 @@ public class Drive extends Subsystem {
                 double heading = Adhameter.getHeadingAbsoluteDeg();
                 double targRelVelX = cos(-heading) * targVelX - sin(-heading) * targVelY;
                 double targRelVelY = sin(-heading) * targVelX + cos(-heading) * targVelY;
-                // Find actual relative velocity
-                double relVelX = cos(-heading) * velX - sin(-heading) * velY;
-                double relVelY = sin(-heading) * velX + cos(-heading) * velY;
-                // Finding motor power corrections
-                double xCorrect = MotorFinder.getCorrection(targRelVelX, relVelX);
-                double yCorrect = MotorFinder.getCorrection(targRelVelY, relVelY);
+
+                if(Math.hypot(velX, velY) < 1) {
+                    power = power * 1.5;
+                }else {
+                    power = 1;
+                }
+
+                double xCorrect = targRelVelX * power;
+                double yCorrect = targRelVelY * power;
+
                 // Find motor power correction for heading
                 headingError = targHead - heading;
                 double hCorrect = HeadingCorrecter.getCorrection(targHead, heading);
 
-                frontLeft.setPower(power * (-xCorrect - yCorrect - hCorrect));
-                backLeft.setPower(power * (xCorrect - yCorrect - hCorrect));
-                frontRight.setPower(power * (xCorrect - yCorrect + hCorrect));
-                backRight.setPower(power * (-xCorrect - yCorrect + hCorrect));
+                // Converting corrections into motor powers.
+                frontLeft.setPower((-xCorrect - yCorrect - hCorrect));
+                backLeft.setPower((xCorrect - yCorrect - hCorrect));
+                frontRight.setPower((xCorrect - yCorrect + hCorrect));
+                backRight.setPower((-xCorrect - yCorrect + hCorrect));
 
+            }else {
+                break;
             }
-        }while(!(Math.hypot(distX, distY) < posThresh && headingError < headThresh));
+        }while(!(distance < posThresh && headingError < headThresh));
     }
 
     public void moveByAmount(double xChange, double yChange, double headingChange, double threshold) {

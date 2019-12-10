@@ -85,7 +85,7 @@ public class Drive extends Subsystem {
     public void pointInDirection(double direction) { // Verified
         isRunning = true;
 
-        ConstantProportional turn = new ConstantProportional(0.5, 20, 0.025);
+        ConstantProportional turn = new ConstantProportional(0.3, 20, 0.02);
         double correction = 10;
 
         while (Math.abs(correction) > 0.1) {
@@ -110,19 +110,28 @@ public class Drive extends Subsystem {
     public void pointInDirectionRough(double direction, double threshold) { // Verified
         isRunning = true;
 
-        ConstantProportional turn = new ConstantProportional(0.6, 30, 0.5);
-        double correction = 10;
+        ConstantProportional turn = new ConstantProportional(0.5, 5, 0.01);
+        double correction;
+        double distance = Math.abs(Adhameter.getHeadingDeg() - direction);
+        double minPower = 0.2;
 
-        while (Adhameter.getHeadingVelocity() > threshold) {
+        while (distance > threshold) {
             if(opmode.opModeIsActive()) {
                 correction = turn.getCorrection(direction, Adhameter.getHeadingDeg());
+                if(Math.abs(correction) < minPower){
+                    if(correction < minPower) {
+                        correction = minPower;
+                    }else if(correction > -minPower){
+                        correction = -minPower;
+                    }
+                }
+                frontLeft.setPower(-correction);
+                backLeft.setPower(-correction);
 
-                frontLeft.setPower(0.9 * -correction);
-                backLeft.setPower(0.9 * -correction);
+                frontRight.setPower( correction);
+                backRight.setPower(correction);
 
-                frontRight.setPower(0.9 * correction);
-                backRight.setPower(0.9 * correction);
-
+                distance = Math.abs(Adhameter.getHeadingDeg() - direction);
                 localize();
 
             }else{

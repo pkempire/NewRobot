@@ -40,8 +40,8 @@ public class FoundationPaths extends LinearOpMode {
     // Important Variables =========================================================================
     private int skyPosition;
 
-    private Servo foundationClampFront;
-    private Servo foundationClampBack;
+    private Servo foundationClampLeft;
+    private Servo foundationClampRight;
 
     private BNO055IMU Imu;
     private BNO055IMU.Parameters Params;
@@ -58,11 +58,11 @@ public class FoundationPaths extends LinearOpMode {
         LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
         RightBack = hardwareMap.dcMotor.get("driveBackRight");
 
-        foundationClampFront = hardwareMap.servo.get("foundationClampFront");
-        foundationClampBack = hardwareMap.servo.get("foundationClampBack");
+        foundationClampLeft = hardwareMap.servo.get("foundationClampLeft");
+        foundationClampRight = hardwareMap.servo.get("foundationClampRight");
 
-        blockHook2 = hardwareMap.servo.get("blockGrabberBack");
-        blockHook2.setPosition(0.9);
+
+
         Params = new BNO055IMU.Parameters();
         Params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
         Params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
@@ -90,8 +90,12 @@ public class FoundationPaths extends LinearOpMode {
         phoneCam.setPipeline(pipeline);
         phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
-        foundationClampFront.setPosition(0.25);
-        foundationClampBack.setPosition(0.25);
+
+        foundationClampLeft.setPosition(0.8);
+        delay(500);
+        foundationClampRight.setPosition(0.3);
+
+
 
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();
@@ -102,17 +106,26 @@ public class FoundationPaths extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         initialize();
         waitForStart();
+
+        foundationClampLeft.setPosition(-0.2);
+        delay(500);
+        foundationClampRight.setPosition(1);
+
+
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
         //Driver.strafeToPointOrient(-70,237,0, 3,2);
-        delay(100);
+        delay(700);
         telemetry.addData("p", "b4");
         Driver.pointInDirection(-180);
         telemetry.addData("p", "after");
-        delay(100);
-
-        Driver.moveByAmount(0,30,0,2);
+        delay(500);
+        foundationClampLeft.setPosition(0.8);
+        foundationClampRight.setPosition(0.3);
+        delay(1000);
+        //Driver.strafeToPointOrient();
+        Driver.strafeToPointOrient(0,30,-180,2,1,0.85);
 
     }
     private void scanSkystone(){
@@ -124,7 +137,9 @@ public class FoundationPaths extends LinearOpMode {
     }
 
     private void delay(int millis) {
-        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
+        if(opModeIsActive()) {
+            try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
+        }
     }
 
 }

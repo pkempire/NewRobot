@@ -26,4 +26,18 @@ public class PathFollow {
 
     }
 
+    public void followPathSmooth(RobotPath Path, double posThreshold, double headThreshold) {
+
+        RobotPoint point = Path.getPoint(0);
+        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 1);
+        for(int i=1; i<Path.getLength()-1; i++) {
+            point = Path.getPoint(i);
+            Driver.moveToPointOrient(point.x, point.y, point.h, posThreshold, headThreshold, 1);
+
+        }
+        point = Path.getPoint(Path.getLength()-1);
+        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 0.8);
+
+    }
+
 }

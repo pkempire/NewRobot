@@ -269,42 +269,50 @@ public class Drive extends Subsystem {
 
         Proportional HeadingCorrecter = new Proportional(0.2, 0.1);
 
-        double distX = 0;
-        double distY = 0;
-        double distance;
-        double headingError = 0;
+        double x, y, heading;
+        double velX, velY;
 
-        double mypower = 1;
+        double distX, distY;
+        double distance;
+        double headingError;
+
+        double xPower = 1, yPower = 1;
 
         do{
             if (opmode.opModeIsActive()) {
                 // Find current position
                 localize();
-                double x = Adhameter.getPosition()[0];
-                double y = Adhameter.getPosition()[1];
-                double velX = Adhameter.getUpdateVelocity()[0];
-                double velY = Adhameter.getUpdateVelocity()[1];
+                x = Adhameter.getPosition()[0];
+                y = Adhameter.getPosition()[1];
+                velX = Adhameter.getUpdateRelVelocity()[0];
+                velY = Adhameter.getUpdateRelVelocity()[1];
                 // Find target global distances
                 distX = targX - x;
                 distY = targY - y;
                 distance = Math.hypot(distX, distY);
 
                 // Find target relative distances
-                double heading = Adhameter.getHeadingAbsoluteDeg();
+                heading = Adhameter.getHeadingAbsoluteDeg();
                 double RelX = cos(-heading) * distX - sin(-heading) * distY;
                 double RelY = sin(-heading) * distX + cos(-heading) * distY;
 
-                double targRelVelX = RelX / (Math.abs(RelX) + Math.abs(RelY)) * maxSpeed;
-                double targRelVelY = RelY / (Math.abs(RelX) + Math.abs(RelY)) * maxSpeed;
+                double targRelVelX = (RelX / (Math.abs(RelX) + Math.abs(RelY))) * maxSpeed;
+                double targRelVelY = (RelY / (Math.abs(RelX) + Math.abs(RelY))) * maxSpeed;
 
-                if(Math.hypot(velX, velY) < 0.2) {
-                    mypower = mypower * 1.5;
+                if(Math.abs(velX) < 0.1) {
+                    xPower = xPower * 1.5;
                 }else {
-                    mypower = 1;
+                    xPower = 1;
                 }
 
-                double xCorrect = targRelVelX * mypower;
-                double yCorrect = targRelVelY * mypower;
+                if(Math.abs(velY) < 0.1) {
+                    yPower = yPower * 1.5;
+                }else {
+                    yPower = 1;
+                }
+
+                double xCorrect = targRelVelX * xPower;
+                double yCorrect = targRelVelY * yPower;
 
                 // Find motor power correction for heading
                 headingError = targHead - heading;
@@ -321,7 +329,8 @@ public class Drive extends Subsystem {
                 Log.d("rohan", "distance: " + distance);
                 Log.d("rohan", "xCorrect: " + xCorrect);
                 Log.d("rohan","yCorrect: " + yCorrect);
-                Log.d("rohan","power: " + mypower);
+                Log.d("rohan","xPower: " + xPower);
+                Log.d("rohan","yPower: " + yPower);
                 Log.d("rohan","xRelativeDistance: " + RelX);
                 Log.d("rohan","yRelativeDistance: " + RelY);
                 Log.d("rohan","------------------------------------");
@@ -339,39 +348,6 @@ public class Drive extends Subsystem {
         double heading = Adhameter.getHeadingAbsoluteDeg();
         strafeToPointOrient(x + xChange, y + yChange, heading + headingChange, threshold, 1, 1);
 
-    }
-
-    public void goToPointStraight(double x, double y, double threshold) {
-        isRunning = true;
-
-        double Xdiff = x - Adhameter.getPosition()[0];
-        double Ydiff = y - Adhameter.getPosition()[1];
-        double direction;
-        double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
-
-        while (distance > threshold) {
-            if (opmode.opModeIsActive()) {
-
-                Xdiff = y - Adhameter.getPosition()[0];
-                Ydiff = x - Adhameter.getPosition()[1];
-                direction = Math.toDegrees(Math.atan(Ydiff/Xdiff));
-                distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
-
-                pointInDirectionRough((direction-90), 10);
-
-                frontLeft.setPower(0.5);
-                backLeft.setPower(0.5);
-                frontRight.setPower(0.5);
-                backRight.setPower(0.5);
-
-                delay(500);
-                localize();
-
-            }else {
-                break;
-            }
-        }
-        isRunning = false;
     }
 
     // Utility Methods =============================================================================

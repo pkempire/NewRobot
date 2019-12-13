@@ -224,7 +224,7 @@ public class Odometer2 extends Subsystem{
         return d % 360;
     }
 
-    public double[] getUpdateVelocity() {
+    public double[] getUpdateRelVelocity() {
         return rotatedMovement;
     }
 

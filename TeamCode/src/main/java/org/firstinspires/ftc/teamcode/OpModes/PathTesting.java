@@ -26,16 +26,8 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 public class PathTesting extends LinearOpMode {
     // Declare OpMode members ======================================================================
-    private DcMotor RightFront;
-    private DcMotor RightBack;
-    private DcMotor LeftFront;
-    private DcMotor LeftBack;
-
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
-
-    private BNO055IMU Imu;
-    private BNO055IMU.Parameters Params;
 
     private Servo blockHook2;
     private Odometer2 Adham;
@@ -57,14 +49,7 @@ public class PathTesting extends LinearOpMode {
         telemetry.update();
         // Initialize all objects declared above ===================================================
 
-        RightFront = hardwareMap.dcMotor.get("driveFrontRight");
-        LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");
-        LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
-        RightBack = hardwareMap.dcMotor.get("driveBackRight");
-
-        //==========================================================================================
-        Imu.initialize(Params);
-        Adham = new Odometer2(hardwareMap, Imu, -1, -1, -1, this);
+        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
         Adham.initialize();
 
         Driver = new Drive(hardwareMap, Adham, this);
@@ -104,7 +89,7 @@ public class PathTesting extends LinearOpMode {
 
         ImpurePursuit.followPathSimple(testPath, 7, 2);
 
-        Driver.moveToPointOrient(10, 10,0, 2, 1, 0.4);
+        Driver.moveToPointOrient(10, 10,0, 2, 1, 1);
         // run until the end of the match (driver presses STOP)
 
     }

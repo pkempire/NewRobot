@@ -71,16 +71,16 @@ public class Drive extends Subsystem {
         if(opmode.opModeIsActive()){
             delay(600);
             frontRight.setPower(0.4);
-            delay(500);
+            delay(1000);
             frontRight.setPower(0);
             frontLeft.setPower(0.4);
-            delay(500);
+            delay(1000);
             frontLeft.setPower(0);
             backRight.setPower(0.4);
-            delay(500);
+            delay(1000);
             backRight.setPower(0);
             backLeft.setPower(0.4);
-            delay(500);
+            delay(1000);
             backLeft.setPower(0);
         }
     }
@@ -270,80 +270,54 @@ public class Drive extends Subsystem {
         isRunning = false;
     }
 
-    public void moveToPointOrient(double targX, double targY, double targHead, double posThresh, double headThresh, double maxSpeed) {
+    public void moveToPointOrient(double targX, double targY, double targHead, double posThresh, double headThresh, double power) {
 
-        Proportional HeadingCorrecter = new Proportional(0.2, 0.1);
+        isRunning = true;
 
-        double x, y, heading;
-        double velX, velY;
+        count = 0;
 
-        double distX, distY;
-        double distance;
-        double headingError;
+        PID holdX = new PID(0.03, 0.0085 ,0, 7, 0.4);
+        PID holdY = new PID(0.03, 0.0085, 0, 7, 0.4);
 
-        double xPower = 1, yPower = 1;
+        Proportional orient = new Proportional(0.02, 0.4);
 
-        do{
+        double Xdiff = targX - Adhameter.getPosition()[0];
+        double Ydiff = targY - Adhameter.getPosition()[1];
+        double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+
+        while(distance > posThresh || Math.abs(orient.getError()) > headThresh) {
             if (opmode.opModeIsActive()) {
-                // Find current position
+
+                Xdiff = targX - Adhameter.getPosition()[0];
+                Ydiff = targY - Adhameter.getPosition()[1];
+                distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+
+                double h = Adhameter.getHeadingDeg();
+
+                double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
+                double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
+
+                double hCorrect = orient.getCorrection(targHead, h);
+                double xCorrect = holdX.getCorrection(0, XD);
+                double yCorrect = holdY.getCorrection(0, YD);
+
+                frontLeft.setPower(power * (-xCorrect - yCorrect - hCorrect));
+                backLeft.setPower(power * (xCorrect - yCorrect - hCorrect));
+
+                frontRight.setPower(power * (xCorrect - yCorrect + hCorrect));
+                backRight.setPower(power * (-xCorrect - yCorrect + hCorrect));
+
                 localize();
-                x = Adhameter.getPosition()[0];
-                y = Adhameter.getPosition()[1];
-                velX = Adhameter.getUpdateRelVelocity()[0];
-                velY = Adhameter.getUpdateRelVelocity()[1];
-                // Find target global distances
-                distX = targX - x;
-                distY = targY - y;
-                distance = Math.hypot(distX, distY);
-
-                // Find target relative distances
-                heading = Adhameter.getHeadingAbsoluteDeg();
-                double RelX = cos(-heading) * distX - sin(-heading) * distY;
-                double RelY = sin(-heading) * distX + cos(-heading) * distY;
-
-                double targRelVelX = (RelX / (Math.abs(RelX) + Math.abs(RelY))) * maxSpeed;
-                double targRelVelY = (RelY / (Math.abs(RelX) + Math.abs(RelY))) * maxSpeed;
-
-                if(Math.abs(velX) < 0.1) {
-                    xPower = xPower * 1.5;
-                }else {
-                    xPower = 1;
-                }
-
-                if(Math.abs(velY) < 0.1) {
-                    yPower = yPower * 1.5;
-                }else {
-                    yPower = 1;
-                }
-
-                double xCorrect = targRelVelX * xPower;
-                double yCorrect = targRelVelY * yPower;
-
-                // Find motor power correction for heading
-                headingError = targHead - heading;
-                double hCorrect = HeadingCorrecter.getCorrection(targHead, heading);
-
-                // Converting corrections into motor powers.
-                frontLeft.setPower((-xCorrect - yCorrect - hCorrect));
-                backLeft.setPower((xCorrect - yCorrect - hCorrect));
-                frontRight.setPower((xCorrect - yCorrect + hCorrect));
-                backRight.setPower((-xCorrect - yCorrect + hCorrect));
-
-                String logStr = "posThreshold "+ posThresh + " targetX: "+ targX +" targetY: " + targY;
-                Log.d("rohan", logStr);
-                Log.d("rohan", "distance: " + distance);
-                Log.d("rohan", "xCorrect: " + xCorrect);
-                Log.d("rohan","yCorrect: " + yCorrect);
-                Log.d("rohan","xPower: " + xPower);
-                Log.d("rohan","yPower: " + yPower);
-                Log.d("rohan","xRelativeDistance: " + RelX);
-                Log.d("rohan","yRelativeDistance: " + RelY);
-                Log.d("rohan","------------------------------------");
 
             }else {
                 break;
             }
-        }while(!(distance < posThresh && headingError < headThresh));
+        }
+        frontRight.setPower(0);
+        backRight.setPower(0);
+        frontLeft.setPower(0);
+        backLeft.setPower(0);
+        isRunning = false;
     }
 
     public void moveByAmount(double xChange, double yChange, double headingChange, double threshold) {

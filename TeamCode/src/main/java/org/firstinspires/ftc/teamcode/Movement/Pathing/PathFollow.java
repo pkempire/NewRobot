@@ -15,28 +15,28 @@ public class PathFollow {
     public void followPathSimple(RobotPath Path, double posThreshold, double headThreshold) {
 
         RobotPoint point = Path.getPoint(0);
-        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 1);
+        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 0.4);
         for(int i=1; i<Path.getLength()-1; i++) {
             point = Path.getPoint(i);
-            Driver.moveToPointOrient(point.x, point.y, point.h, posThreshold, headThreshold, 1);
+            Driver.moveToPointOrient(point.x, point.y, point.h, posThreshold, 1, 0.4);
 
         }
         point = Path.getPoint(Path.getLength()-1);
-        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 0.8);
+        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 0.4);
 
     }
 
     public void followPathSmooth(RobotPath Path, double posThreshold, double headThreshold) {
 
         RobotPoint point = Path.getPoint(0);
-        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 1);
+        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 0.4);
         for(int i=1; i<Path.getLength()-1; i++) {
             point = Path.getPoint(i);
-            Driver.moveToPointOrient(point.x, point.y, point.h, posThreshold, headThreshold, 1);
+            Driver.moveToPointOrient(point.x, point.y, point.h, posThreshold, 1, 0.4);
 
         }
         point = Path.getPoint(Path.getLength()-1);
-        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 0.8);
+        Driver.moveToPointOrient(point.x, point.y, point.h, 2, 1, 0.4);
 
     }
 

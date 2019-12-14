@@ -20,14 +20,9 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 public class FoundationPaths extends LinearOpMode {
 
     // Declare OpMode members ======================================================================
-    private DcMotor RightFront;
-    private DcMotor RightBack;
-    private DcMotor LeftFront;
-    private DcMotor LeftBack;
 
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
-
 
     private Servo blockHook2;
     private Odometer2 Adham;
@@ -43,16 +38,13 @@ public class FoundationPaths extends LinearOpMode {
     private Servo foundationClampLeft;
     private Servo foundationClampRight;
 
-    private BNO055IMU Imu;
-    private BNO055IMU.Parameters Params;
-
     private void initialize(){
 
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
         // Initialize all objects declared above
-        // Initialize all objects declared above
+
         Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
         Adham.initialize();
 
@@ -69,12 +61,9 @@ public class FoundationPaths extends LinearOpMode {
         phoneCam.setPipeline(pipeline);
         phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
 
-
         foundationClampLeft.setPosition(0.8);
         delay(500);
         foundationClampRight.setPosition(0.3);
-
-
 
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();

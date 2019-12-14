@@ -14,42 +14,18 @@ import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 public class OdometerTest extends LinearOpMode {
 
     // Declare OpMode members.
-    private DcMotor RightFront;
-    private DcMotor RightBack;
-    private DcMotor LeftFront;
-    private DcMotor LeftBack;
-
     private Odometer2 Adham;
     private Drive Driver;
-
-    private BNO055IMU Imu;
-    private BNO055IMU.Parameters Params;
 
     private void initialize(){
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
         // Initialize all objects declared above
-        RightFront = hardwareMap.dcMotor.get("driveFrontRight");
-        LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");
-        LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
-        RightBack = hardwareMap.dcMotor.get("driveBackRight");
+        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
+        Adham.initialize();
 
-        Params = new BNO055IMU.Parameters();
-        Params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        Params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        Params.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opMode
-        Params.loggingEnabled      = true;
-        Params.loggingTag          = "IMU";
-        Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        Imu = hardwareMap.get(BNO055IMU.class, "imu");
-
-        //==========================================================================================
-        Imu.initialize(Params);
-        Adham = new Odometer2(RightFront, LeftFront, LeftBack, Imu, -1, -1, -1, this);
-        Adham.initialize(0, 0, 0);
-
-        Driver = new Drive(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
+        Driver = new Drive(hardwareMap, Adham, this);
         Driver.initialize();
 
         telemetry.addData("Status: ", "Initialized");
@@ -64,33 +40,17 @@ public class OdometerTest extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
+        Adham.startTracking(0, 0, 0);
 
         while(opModeIsActive()) {
             telemetry.addData("heading", Adham.getHeadingAbsoluteDeg());
             telemetry.addData("X", Adham.getPosition()[0]);
             telemetry.addData("Y", Adham.getPosition()[1]);
-            telemetry.addData("Vx", Adham.getUpdateVelocity()[0]);
-            telemetry.addData("Vy", Adham.getUpdateVelocity()[1]);
             telemetry.update();
 
             Driver.localize();
             
         }
-
-        /*
-        double initialX = Adham.getPosition()[0];
-        double initialY = Adham.getPosition()[1];
-
-        delay(2000);
-
-        double changeX = Adham.getPosition()[0] - initialX;
-        double changeY = Adham.getPosition()[1] - initialY;
-
-        double distance = Math.sqrt(changeX * changeX + changeY * changeY);
-
-        telemetry.addData("Drift", distance);
-        telemetry.update();
-         */
         //Make sure nothing is still using the thread
     }
 

@@ -1,6 +1,8 @@
 
 package org.firstinspires.ftc.teamcode.Movement;
 
+import android.util.Log;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
@@ -46,7 +48,7 @@ public class DriveTest extends LinearOpMode {
         //Start Autonomous period
         Adham.startTracking(0, 0, 0);
 
-        Driver.moveToPointOrient(10, 10, 0, 1, 1, 0.9);
+        Driver.testMotors();
 
         //Make sure nothing is still using the thread
     }
@@ -54,4 +56,5 @@ public class DriveTest extends LinearOpMode {
     private void delay(int millis) {
         try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
     }
+
 }

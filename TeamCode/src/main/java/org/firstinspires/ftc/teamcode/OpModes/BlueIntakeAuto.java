@@ -21,10 +21,6 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 public class BlueIntakeAuto extends LinearOpMode {
 
     // Declare OpMode members ======================================================================
-    private DcMotor RightFront;
-    private DcMotor RightBack;
-    private DcMotor LeftFront;
-    private DcMotor LeftBack;
 
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
@@ -41,42 +37,22 @@ public class BlueIntakeAuto extends LinearOpMode {
     // Important Variables =========================================================================
     private int skyPosition;
 
-    private BNO055IMU Imu;
-    private BNO055IMU.Parameters Params;
-
     private void initialize(){
-
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
         // Initialize all objects declared above
-        // Initialize all objects declared above
-        RightFront = hardwareMap.dcMotor.get("driveFrontRight");
-        LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");
-        LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
-        RightBack = hardwareMap.dcMotor.get("driveBackRight");
-
         blockHook = hardwareMap.servo.get("blockGrabberFront");
 
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         intakeRight = hardwareMap.dcMotor.get("intakeRight");
 
         blockHook.setPosition(0.2);
-        Params = new BNO055IMU.Parameters();
-        Params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        Params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        Params.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opMode
-        Params.loggingEnabled      = true;
-        Params.loggingTag          = "IMU";
-        Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        Imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        //==========================================================================================
-        Imu.initialize(Params);
-        Adham = new Odometer2(RightFront, LeftFront, LeftBack, Imu, -1, -1, -1, this);
-        Adham.initialize(0, 0, 0);
+        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
+        Adham.initialize();
 
-        Driver = new Drive(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
+        Driver = new Drive(hardwareMap, Adham, this);
         Driver.initialize();
 
         Intaker = new Intake(intakeLeft, intakeRight);

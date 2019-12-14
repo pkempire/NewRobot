@@ -29,9 +29,9 @@ public class EncoderTest extends LinearOpMode {
         Encoder1 = hardwareMap.dcMotor.get("driveFrontLeft");
         Encoder2 = hardwareMap.dcMotor.get("driveBackLeft");
 
-
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();
+
     }
 
     @Override

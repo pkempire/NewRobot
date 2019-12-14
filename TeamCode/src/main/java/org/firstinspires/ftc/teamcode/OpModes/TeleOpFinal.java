@@ -101,25 +101,25 @@ public class TeleOpFinal extends LinearOpMode {
 
         //SERVOS FROM HARDWARE MAP:
         //Use same naming scheme as motors when available, otherwise, use a logical name
-        blockGripperPaddle = hardwareMap.servo.get("blockGripperPaddle");
-        blockGripperU = hardwareMap.servo.get("blockGripperU");
+        //blockGripperPaddle = hardwareMap.servo.get("blockGripperPaddle");
+        //blockGripperU = hardwareMap.servo.get("blockGripperU");
 
-        flipperServoLeft = hardwareMap.servo.get("flipperServoLeft");
-        flipperServoRight = hardwareMap.servo.get("flipperServoRight");
+        //flipperServoLeft = hardwareMap.servo.get("flipperServoLeft");
+        //flipperServoRight = hardwareMap.servo.get("flipperServoRight");
 
         //this servo (intakeDropper) is continous rotation
-        intakeDropper = hardwareMap.servo.get("intakeDropper");
+        //intakeDropper = hardwareMap.servo.get("intakeDropper");
 
-        foundationClampFront = hardwareMap.servo.get("foundationClampFront");
-        foundationClampBack = hardwareMap.servo.get("foundationClampBack");
+        //foundationClampFront = hardwareMap.servo.get("foundationClampFront");
+        //foundationClampBack = hardwareMap.servo.get("foundationClampBack");
 
-        blockGrabberFront = hardwareMap.servo.get("blockGrabberFront");
-        blockGrabberBack = hardwareMap.servo.get("blockGrabberBack");
+        //blockGrabberFront = hardwareMap.servo.get("blockGrabberFront");
+        //blockGrabberBack = hardwareMap.servo.get("blockGrabberBack");
 
-        liftLimitSwitch = hardwareMap.digitalChannel.get("liftLimitSwitch");
+        //liftLimitSwitch = hardwareMap.digitalChannel.get("liftLimitSwitch");
 
         //Some Housekeeping========================================================================
-        liftLimitSwitch.setMode(DigitalChannel.Mode.INPUT);
+        //liftLimitSwitch.setMode(DigitalChannel.Mode.INPUT);
 
         driveFrontRight.setDirection(DcMotor.Direction.REVERSE);
         driveFrontLeft.setDirection(DcMotor.Direction.REVERSE);
@@ -133,11 +133,11 @@ public class TeleOpFinal extends LinearOpMode {
 
         //Setting Starting Servo Positions ==========================================================
 
-        blockGripperPaddle.setPosition(CLOSED_POSSITION_BLOCK_PADDLE);
-        blockGripperU.setPosition(CLOSED_POSSITION_BLOCK_CLAMP);
+        //blockGripperPaddle.setPosition(CLOSED_POSSITION_BLOCK_PADDLE);
+        //blockGripperU.setPosition(CLOSED_POSSITION_BLOCK_CLAMP);
 
-        flipperServoLeft.setPosition(LEFT_FLIPPER_SERVO_IN);
-        flipperServoRight.setPosition(RIGHT_FLIPPER_SERVO_IN);
+        //flipperServoLeft.setPosition(LEFT_FLIPPER_SERVO_IN);
+        //flipperServoRight.setPosition(RIGHT_FLIPPER_SERVO_IN);
 
         telemetry.addData("Status", "Initialized - Welcome, Operators");
         telemetry.update();
@@ -155,6 +155,7 @@ public class TeleOpFinal extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             TIME++;
+            /*
             telemetry.addData("Digital Touch Status is:", liftLimitSwitch.getState());
             telemetry.addData("Time variable is:", TIME);
             telemetry.addData("Boolean Close variable is:", G2_RIGHT_BUMPER_RELEASED);
@@ -165,7 +166,17 @@ public class TeleOpFinal extends LinearOpMode {
 
             telemetry.addData("Time Boolean is:", ((TIME_G2_RIGHT_BUMPER_RELEASED  + TIME_BETWEEN_BUMPER_AND_CLAMP_LOWER) < TIME));
             telemetry.addData("True/False statement is:", (!gamepad2.right_bumper && ((TIME_G2_RIGHT_BUMPER_RELEASED  + TIME_BETWEEN_BUMPER_AND_CLAMP_LOWER) < TIME)));
+
+             */
             telemetry.update();
+
+            if(gamepad1.right_bumper){
+                intakeLeft.setPower(-0.7);
+                intakeRight.setPower(-0.7);
+            }else{
+                intakeLeft.setPower(0);
+                intakeRight.setPower(0);
+            }
             //DRIVE=================================================================================
 
             y2 = -gamepad1.left_stick_y;
@@ -197,6 +208,7 @@ public class TeleOpFinal extends LinearOpMode {
 
 //VERTICAL EXTRUSION=============================================================================-
             //UNDERPOWRRED
+            /*
             if (gamepad2.dpad_up) {
                 liftRight.setPower(0.8);
                 liftLeft.setPower(0.8);
@@ -223,6 +235,8 @@ public class TeleOpFinal extends LinearOpMode {
                 liftReturning = false;
             }
 
+             */
+
 
 //BLOCK GRIPPER====================================================================================
 /*
@@ -238,7 +252,7 @@ public class TeleOpFinal extends LinearOpMode {
            */
 
 
-
+            /*
             if(gamepad2.right_bumper){ //Opens servo postiions when trigger pressed
                 blockGripperU.setPosition(OPEN_POSSITION_BLOCK_CLAMP);
                 blockGripperPaddle.setPosition(OPEN_POSSITION_BLOCK_PADDLE);
@@ -278,6 +292,8 @@ public class TeleOpFinal extends LinearOpMode {
                 flipperServoLeft.setPosition(LEFT_FLIPPER_SERVO_IN);
                 flipperServoRight.setPosition(RIGHT_FLIPPER_SERVO_IN);
             }
+
+             */
 //INTAKE ===========================================================================================
             //UNDERPOWERED***
             intakeLeft.setPower(-gamepad2.left_stick_y*0.7);
@@ -288,6 +304,7 @@ public class TeleOpFinal extends LinearOpMode {
 
 
             //FOUNDATION CLAMP:
+            /*
             if (gamepad1.left_trigger > 0.2){
                 foundationClampFront.setPosition(0.95);
                 foundationClampBack.setPosition(0.95);
@@ -313,6 +330,8 @@ public class TeleOpFinal extends LinearOpMode {
                 intakeDropper.setPosition(.5);
 
             }
+
+             */
 
 
         }

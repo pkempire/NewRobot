@@ -20,41 +20,19 @@ This is an OpMode to test out controllers.
 public class ControllerTest extends LinearOpMode {
 
     // Declare OpMode members.
-    private DcMotor RightFront;
-    private DcMotor RightBack;
-    private DcMotor LeftFront;
-    private DcMotor LeftBack;
-
     private Odometer2 Adham;
     private ConstantProportional turn;
-
-    private BNO055IMU Imu;
-    private BNO055IMU.Parameters Params;
 
     private void initialize(){
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
         // Initialize all objects declared above
-        RightFront = hardwareMap.dcMotor.get("driveFrontRight");
-        LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");
-        LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
-        RightBack = hardwareMap.dcMotor.get("driveBackRight");
-
-        Params = new BNO055IMU.Parameters();
-        Params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        Params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        Params.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opMode
-        Params.loggingEnabled      = true;
-        Params.loggingTag          = "IMU";
-        Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        Imu = hardwareMap.get(BNO055IMU.class, "imu");
-
-        Imu.initialize(Params);
-        Adham = new Odometer2(RightFront, LeftFront, LeftBack, Imu, -1, -1, -1, this);
-        Adham.initialize(0, 0, 0);
+        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
+        Adham.initialize();
 
         turn = new ConstantProportional(0.6, 30, 0.5);
+
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();
     }
@@ -67,6 +45,7 @@ public class ControllerTest extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
+        Adham.startTracking(0, 0, 0);
 
         double current;
         double target = 90;
@@ -86,12 +65,7 @@ public class ControllerTest extends LinearOpMode {
     }
 
     private void delay(int millis) {
-        if (opModeIsActive()) {
-            for(int x=0;x<millis; x++) {
-                Adham.updateOdometry();
-                try{Thread.sleep(1);}catch(InterruptedException e){e.printStackTrace();}
-            }
-        }
+        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
     }
 
 }

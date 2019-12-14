@@ -27,11 +27,6 @@ public class TeleOpRohan extends LinearOpMode {
     // Declare OpMode members ======================================================================
 
     // Hardware
-    //Drive
-    private DcMotor RightFront;
-    private DcMotor RightBack;
-    private DcMotor LeftFront;
-    private DcMotor LeftBack;
     //Intake
     private DcMotor intakeLeft;
     private DcMotor intakeRight;
@@ -51,8 +46,6 @@ public class TeleOpRohan extends LinearOpMode {
     private Servo foundationClampBack;
     //Misc
     private Servo blockHook;
-    private BNO055IMU Imu;
-    private BNO055IMU.Parameters Params;
 
     // Objects
     private Odometer2 Adham;
@@ -69,11 +62,6 @@ public class TeleOpRohan extends LinearOpMode {
         telemetry.update();
 
         // Initialize all objects declared above
-        RightFront = hardwareMap.dcMotor.get("driveFrontRight");
-        LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");
-        LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
-        RightBack = hardwareMap.dcMotor.get("driveBackRight");
-
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         intakeRight = hardwareMap.dcMotor.get("intakeRight");
         //intakeDropper = hardwareMap.crservo.get("intakeDropper");
@@ -91,22 +79,11 @@ public class TeleOpRohan extends LinearOpMode {
         foundationClampFront = hardwareMap.servo.get("foundationClampFront");
         foundationClampBack = hardwareMap.servo.get("foundationClampBack");
 
-        Params = new BNO055IMU.Parameters();
-        Params.angleUnit = BNO055IMU.AngleUnit.DEGREES;
-        Params.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        Params.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opMode
-        Params.loggingEnabled = true;
-        Params.loggingTag = "IMU";
-        Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        Imu = hardwareMap.get(BNO055IMU.class, "imu");
-
         //==========================================================================================
+        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
+        Adham.initialize();
 
-        Imu.initialize(Params);
-        Adham = new Odometer2(RightFront, LeftFront, LeftBack, Imu, -1, -1, -1, this);
-        Adham.initialize(0, 0, 0);
-
-        Driver = new Drive(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
+        Driver = new Drive(hardwareMap, Adham, this);
         Driver.initialize();
 
         Intaker = new Intake(intakeLeft, intakeRight);
@@ -133,8 +110,9 @@ public class TeleOpRohan extends LinearOpMode {
         waitForStart();
         telemetry.addData("Status", "Running - Good Luck, Operators");
         telemetry.update();
-
+        Adham.startTracking(0, 0, 0);
         // run until the end of the match (driver presses STOP)
+
         int time = 1;
         while (opModeIsActive()) {
 
@@ -149,9 +127,6 @@ public class TeleOpRohan extends LinearOpMode {
             }else if(Ryan.x){
                 Outtake.setGripperState("Clamped");
             }
-
-
-
 
             time++;
         }

@@ -5,6 +5,7 @@ import android.util.Log;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Controllers.Proportional;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
@@ -21,24 +22,28 @@ public class Drive extends Subsystem {
     private DcMotor backLeft;
     private DcMotor backRight;
 
+    private HardwareMap hardwareMap;
+
     private Odometer2 Adhameter;
 
     private LinearOpMode opmode;
 
     private int count;
 
-    public Drive(DcMotor Lf, DcMotor Rf, DcMotor Lb, DcMotor Rb, Odometer2 Odometree, LinearOpMode oppy) {
+    public Drive(HardwareMap hardwareMap, Odometer2 Odometree, LinearOpMode oppy) {
 
-        this.frontLeft = Lf;
-        this.frontRight = Rf;
-        this.backLeft = Lb;
-        this.backRight = Rb;
+        this.hardwareMap = hardwareMap;
         this.Adhameter = Odometree;
         this.opmode = oppy;
 
     }
 
     public void initialize() {
+
+        frontRight = hardwareMap.dcMotor.get("driveFrontRight");
+        frontLeft = hardwareMap.dcMotor.get("driveFrontLeft");
+        backLeft = hardwareMap.dcMotor.get("driveBackLeft");
+        backRight = hardwareMap.dcMotor.get("driveBackRight");
 
         frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);

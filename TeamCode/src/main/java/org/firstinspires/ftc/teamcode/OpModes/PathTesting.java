@@ -62,23 +62,12 @@ public class PathTesting extends LinearOpMode {
         LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
         RightBack = hardwareMap.dcMotor.get("driveBackRight");
 
-        blockHook2 = hardwareMap.servo.get("blockGrabberBack");
-        blockHook2.setPosition(0.9);
-        Params = new BNO055IMU.Parameters();
-        Params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        Params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        Params.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opMode
-        Params.loggingEnabled      = true;
-        Params.loggingTag          = "IMU";
-        Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        Imu = hardwareMap.get(BNO055IMU.class, "imu");
-
         //==========================================================================================
         Imu.initialize(Params);
-        Adham = new Odometer2(RightFront, LeftFront, LeftBack, Imu, -1, -1, -1, this);
-        Adham.initialize(0, 0, 0);
+        Adham = new Odometer2(hardwareMap, Imu, -1, -1, -1, this);
+        Adham.initialize();
 
-        Driver = new Drive(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
+        Driver = new Drive(hardwareMap, Adham, this);
         Driver.initialize();
 
         ImpurePursuit = new PathFollow(Driver);
@@ -106,14 +95,14 @@ public class PathTesting extends LinearOpMode {
         telemetry.addData("Status", "Running");
         telemetry.update();
 
-        /*
+        Adham.startTracking(0, 0, 0);
+
         testPath.addPoint(0, 20, 0, "");
         testPath.addPoint(20, 20, 270, "Intake");
         testPath.addPoint(20, 0, 180, "");
         testPath.addPoint(0, 0, 90, "");
 
         ImpurePursuit.followPathSimple(testPath, 7, 2);
-         */
 
         Driver.moveToPointOrient(10, 10,0, 2, 1, 0.4);
         // run until the end of the match (driver presses STOP)

@@ -8,8 +8,10 @@ or distance sensors. In our case that shouldn't be needed.
 */
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
@@ -25,6 +27,12 @@ public class Odometer2 extends Subsystem{
     private DcMotor rightEnc;
     private DcMotor leftEnc;
     private DcMotor backEnc;
+
+    //IMU
+    private BNO055IMU imu;
+
+    private LinearOpMode opmode;
+    private HardwareMap hardwareMap;
 
     // Outputs
     private double x;
@@ -54,6 +62,11 @@ public class Odometer2 extends Subsystem{
     private double backOmniAdjust;
     private double backOmniExtra;
 
+    // Inverting the encoder readings
+    private double rightEncDir;
+    private double leftEncDir;
+    private double backEncDir;
+
     // Movement vectors
     private double[] posChangeLR = new double[2];
     private double[] posChangeB = new double[2];
@@ -70,34 +83,38 @@ public class Odometer2 extends Subsystem{
     private double gear = 1.333; //How many times does the Omni spin for each spin of the encoder
     private double encScale;
 
-    // Inverting the encoder readings
-    private double rightEncDir;
-    private double leftEncDir;
-    private double backEncDir;
-
-    //IMU
-    private BNO055IMU imu;
-
-    private LinearOpMode opmode;
-
     //3 Encoder objects, The distance from the L and R Omni's to the center, The distance from the back Omni to the center, the radius of the Omni
-    public Odometer2(DcMotor rightEncoder, DcMotor leftEncoder, DcMotor backEncoder, BNO055IMU imu, double RD, double LD, double BD, LinearOpMode oppy){
+    public Odometer2(HardwareMap hardwareMap, double RD, double LD, double BD, LinearOpMode oppy){
 
-        this.rightEnc = rightEncoder;
-        this.leftEnc = leftEncoder;
-        this.backEnc = backEncoder;
+        this.hardwareMap = hardwareMap;
 
         this.rightEncDir = RD;
         this.leftEncDir = LD;
         this.backEncDir = BD;
 
-        this.imu = imu;
-
         this.opmode = oppy;
 
     }
 
-    public void initialize(double X, double Y, double Heading){
+    public void initialize(){
+
+        rightEnc = hardwareMap.dcMotor.get("driveFrontRight");
+        leftEnc = hardwareMap.dcMotor.get("driveFrontLeft");
+        backEnc = hardwareMap.dcMotor.get("driveBackLeft");
+
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        BNO055IMU.Parameters Params = new BNO055IMU.Parameters();
+        Params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
+        Params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        Params.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opMode
+        Params.loggingEnabled      = true;
+        Params.loggingTag          = "IMU";
+        Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
+        imu.initialize(Params);
+
+    }
+
+    public void startTracking(double X, double Y, double Heading) {
 
         x = X;
         y = Y;

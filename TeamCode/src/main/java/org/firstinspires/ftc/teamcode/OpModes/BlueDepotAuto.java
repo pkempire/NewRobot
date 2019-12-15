@@ -30,7 +30,6 @@ public class BlueDepotAuto extends LinearOpMode {
     private MainPipeline pipeline;
     private OpenCvCamera phoneCam;
 
-    private Odometer2 Adham;
     private Drive Driver;
 
     // Important Variables =========================================================================
@@ -42,12 +41,9 @@ public class BlueDepotAuto extends LinearOpMode {
     private void initialize(){
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
-
         // Initialize all objects declared above ===================================================
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
 
-        Driver = new Drive(hardwareMap, Adham, this);
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
         // Vision
@@ -73,6 +69,9 @@ public class BlueDepotAuto extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
+
+        Driver.startTracking(0, 0, 0);
+
         Driver.strafeToPointOrient(-36, 8, 0, 3, 2, 1);
         delay(7);
         scanSkystone();

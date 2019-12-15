@@ -30,7 +30,6 @@ public class PathTesting extends LinearOpMode {
     private DcMotor intakeRight;
 
     private Servo blockHook2;
-    private Odometer2 Adham;
     private Drive Driver;
     private Intake Intaker;
 
@@ -49,13 +48,10 @@ public class PathTesting extends LinearOpMode {
         telemetry.update();
         // Initialize all objects declared above ===================================================
 
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
-
-        Driver = new Drive(hardwareMap, Adham, this);
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
-        ImpurePursuit = new PathFollow(Driver);
+        ImpurePursuit = new PathFollow(Driver, this);
 
         // Vision
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -69,7 +65,6 @@ public class PathTesting extends LinearOpMode {
 
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();
-
     }
 
     @Override
@@ -80,16 +75,12 @@ public class PathTesting extends LinearOpMode {
         telemetry.addData("Status", "Running");
         telemetry.update();
 
-        Adham.startTracking(0, 0, 0);
+        testPath.addPoint(0, 40, 0, "");
+        testPath.addPoint(20, 40, 0, "Intake");
+        testPath.addPoint(20, 0, 0, "");
+        testPath.addPoint(0, 0, 0, "");
 
-        testPath.addPoint(0, 20, 0, "");
-        testPath.addPoint(20, 20, 270, "Intake");
-        testPath.addPoint(20, 0, 180, "");
-        testPath.addPoint(0, 0, 90, "");
-
-        ImpurePursuit.followPathSimple(testPath, 7, 2);
-
-        Driver.moveToPointOrient(10, 10,0, 2, 1, 1);
+        ImpurePursuit.followPath(testPath, 4, 0.8);
         // run until the end of the match (driver presses STOP)
 
     }

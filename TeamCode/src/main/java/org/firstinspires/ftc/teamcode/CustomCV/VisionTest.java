@@ -22,7 +22,6 @@ public class VisionTest extends LinearOpMode {
     private OpenCvCamera phoneCam;
     private MainPipeline pipeline;
 
-    private Odometer2 Adham;
     private Drive Driver;
 
     private void initialize(){
@@ -30,10 +29,7 @@ public class VisionTest extends LinearOpMode {
         telemetry.update();
 
         // Initialize all objects declared above
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
-
-        Driver = new Drive(hardwareMap, Adham, this);
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
         // Vision ==================================================================================
@@ -59,15 +55,16 @@ public class VisionTest extends LinearOpMode {
         telemetry.update();
 
         phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
+        Driver.startTracking(0, 0, 0);
 
         while (opModeIsActive()) {
 
             //telemetry.addData("FPS", String.format("%.2f", phoneCam.getFps()));
             //telemetry.addData("location", pipeline.location);
             //telemetry.addData("type", pipeline.location.getClass());
-            telemetry.addData("X", Adham.getPosition()[0]);
-            telemetry.addData("Y", Adham.getPosition()[1]);
-            telemetry.addData("H", Adham.getHeadingAbsoluteDeg());
+            telemetry.addData("X", Driver.Localizer.getPosition()[0]);
+            telemetry.addData("Y", Driver.Localizer.getPosition()[1]);
+            telemetry.addData("H", Driver.Localizer.getHeadingAbsoluteDeg());
             telemetry.update();
 
             Driver.localize();

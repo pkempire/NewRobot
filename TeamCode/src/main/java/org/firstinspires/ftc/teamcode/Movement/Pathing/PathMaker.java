@@ -31,7 +31,6 @@ public class PathMaker extends LinearOpMode {
     private DcMotor intakeRight;
 
     private Servo blockHook2;
-    private Odometer2 Adham;
     private Drive Driver;
     private Intake Intaker;
 
@@ -53,10 +52,7 @@ public class PathMaker extends LinearOpMode {
         blockHook2 = hardwareMap.servo.get("blockGrabberBack");
         blockHook2.setPosition(0.9);
 
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
-
-        Driver = new Drive(hardwareMap, Adham, this);
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
         ImpurePursuit = new PathFollow(Driver);
@@ -88,9 +84,9 @@ public class PathMaker extends LinearOpMode {
 
         while(opModeIsActive()) {
 
-            double x = Adham.getPosition()[0];
-            double y = Adham.getPosition()[1];
-            double h = Adham.getHeadingAbsoluteDeg();
+            double x = Driver.Localizer.getPosition()[0];
+            double y = Driver.Localizer.getPosition()[1];
+            double h = Driver.Localizer.getHeadingAbsoluteDeg();
 
             telemetry.addData("heading", h);
             telemetry.addData("X", x);

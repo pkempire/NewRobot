@@ -27,7 +27,6 @@ public class BlueIntakeAuto extends LinearOpMode {
 
     private Servo blockHook;
 
-    private Odometer2 Adham;
     private Drive Driver;
     private Intake Intaker;
 
@@ -49,10 +48,7 @@ public class BlueIntakeAuto extends LinearOpMode {
 
         blockHook.setPosition(0.2);
 
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
-
-        Driver = new Drive(hardwareMap, Adham, this);
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
         Intaker = new Intake(intakeLeft, intakeRight);
@@ -81,6 +77,8 @@ public class BlueIntakeAuto extends LinearOpMode {
         telemetry.update();
         //Start Autonomous period
         scanSkystone();
+
+        Driver.startTracking(0, 0, 0);
 
         if(skyPosition == 0) {
             Driver.strafeToPointOrient(60, 40, 0, 2, 1, 0.47);

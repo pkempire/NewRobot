@@ -48,7 +48,6 @@ public class TeleOpRohan extends LinearOpMode {
     private Servo blockHook;
 
     // Objects
-    private Odometer2 Adham;
     private Drive Driver;
     private Intake Intaker;
     private Extrusion Lift;
@@ -80,10 +79,8 @@ public class TeleOpRohan extends LinearOpMode {
         foundationClampBack = hardwareMap.servo.get("foundationClampBack");
 
         //==========================================================================================
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
 
-        Driver = new Drive(hardwareMap, Adham, this);
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
         Intaker = new Intake(intakeLeft, intakeRight);
@@ -110,7 +107,7 @@ public class TeleOpRohan extends LinearOpMode {
         waitForStart();
         telemetry.addData("Status", "Running - Good Luck, Operators");
         telemetry.update();
-        Adham.startTracking(0, 0, 0);
+        Driver.startTracking(0, 0, 0);
         // run until the end of the match (driver presses STOP)
 
         int time = 1;

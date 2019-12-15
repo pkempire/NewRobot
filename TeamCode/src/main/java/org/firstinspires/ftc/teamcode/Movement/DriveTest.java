@@ -20,18 +20,14 @@ import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 public class DriveTest extends LinearOpMode {
 
     // Declare OpMode members.
-    private Odometer2 Adham;
     private Drive Driver;
 
     private void initialize(){
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
-
         // Initialize all objects declared above
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
 
-        Driver = new Drive(hardwareMap, Adham, this);
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
         telemetry.addData("Status: ", "Initialized");
@@ -46,7 +42,7 @@ public class DriveTest extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-        Adham.startTracking(0, 0, 0);
+        Driver.startTracking(0, 0, 0);
 
         Driver.testMotors();
 

@@ -14,7 +14,6 @@ import org.firstinspires.ftc.teamcode.Movement.Drive;
 public class OdometerCalibrate extends LinearOpMode {
     
     // Declare OpMode members.
-    private Odometer2 Adham;
     private Drive Driver;
 
     private void initialize(){
@@ -22,10 +21,7 @@ public class OdometerCalibrate extends LinearOpMode {
         telemetry.update();
 
         // Initialize all objects declared above
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
-
-        Driver = new Drive(hardwareMap, Adham, this);
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
         telemetry.addData("Status", "Initialized");
@@ -39,7 +35,7 @@ public class OdometerCalibrate extends LinearOpMode {
         telemetry.addData("Status", "Running");
         telemetry.update();
         //Start Autonomous period
-        Adham.startTracking(0, 0, 0);
+        Driver.startTracking(0, 0, 0);
 
         telemetry.addData("Instruction", "This is a calibration program for your Odometer");
         telemetry.update();
@@ -58,16 +54,16 @@ public class OdometerCalibrate extends LinearOpMode {
         double backAverage = 0;
         
         // Turn 1
-        double initialHeading = Adham.getHeadingDeg();
-        double initialBack = Adham.getBackReading();
+        double initialHeading = Driver.Localizer.getHeadingDeg();
+        double initialBack = Driver.Localizer.getBackReading();
         
         telemetry.addData("Instruction", "Turn your robot 360 degrees counter-clockwise");
         telemetry.update();
         
         delay(6000);
         
-        double endHeading = Adham.getHeadingDeg();
-        double endBack = Adham.getBackReading();
+        double endHeading = Driver.Localizer.getHeadingDeg();
+        double endBack = Driver.Localizer.getBackReading();
         
         telemetry.addData("Update", "Turn complete");
         telemetry.update();
@@ -81,16 +77,16 @@ public class OdometerCalibrate extends LinearOpMode {
         delay(500);
         
         // Turn 2
-        initialHeading = Adham.getHeadingDeg();
-        initialBack = Adham.getBackReading();
+        initialHeading = Driver.Localizer.getHeadingDeg();
+        initialBack = Driver.Localizer.getBackReading();
         
         telemetry.addData("Instruction", "Turn your robot 360 degrees counter-clockwise");
         telemetry.update();
         
         delay(6000);
         
-        endHeading = Adham.getHeadingDeg();
-        endBack = Adham.getBackReading();
+        endHeading = Driver.Localizer.getHeadingDeg();
+        endBack = Driver.Localizer.getBackReading();
         
         telemetry.addData("Update", "Turn complete");
         telemetry.update();
@@ -104,16 +100,16 @@ public class OdometerCalibrate extends LinearOpMode {
         delay(500);
         
         // Turn 3
-        initialHeading = Adham.getHeadingDeg();
-        initialBack = Adham.getBackReading();
+        initialHeading = Driver.Localizer.getHeadingDeg();
+        initialBack = Driver.Localizer.getBackReading();
         
         telemetry.addData("Instruction", "Turn your robot 360 degrees counter-clockwise");
         telemetry.update();
         
         delay(6000);
         
-        endHeading = Adham.getHeadingDeg();
-        endBack = Adham.getBackReading();
+        endHeading = Driver.Localizer.getHeadingDeg();
+        endBack = Driver.Localizer.getBackReading();
         
         telemetry.addData("Update", "Turn complete");
         telemetry.update();
@@ -129,7 +125,7 @@ public class OdometerCalibrate extends LinearOpMode {
         turnAverage = turnAverage/3;
         backAverage = backAverage/3;
 
-        double robotRad = turnAverage * Adham.getRobotRad() / 360;
+        double robotRad = turnAverage * Driver.Localizer.getRobotRad() / 360;
         double backRad = backAverage / 2 / Math.PI;
         
         telemetry.addData("Update", "Test complete");

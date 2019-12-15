@@ -25,7 +25,6 @@ public class FoundationPaths extends LinearOpMode {
     private DcMotor intakeRight;
 
     private Servo blockHook2;
-    private Odometer2 Adham;
     private Drive Driver;
     private Intake Intaker;
 
@@ -43,12 +42,8 @@ public class FoundationPaths extends LinearOpMode {
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
-        // Initialize all objects declared above
-
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
-
-        Driver = new Drive(hardwareMap, Adham, this);
+        // Initialize all objects declared above ===================================================
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
         // Vision
@@ -71,18 +66,18 @@ public class FoundationPaths extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        // Wait for the game to start (driver presses PLAY)
         initialize();
         waitForStart();
+        telemetry.addData("Status: ", "Running");
+        telemetry.update();
+        //Start Autonomous period
+
+        Driver.startTracking(0, 0, 0);
 
         foundationClampLeft.setPosition(-0.2);
         delay(500);
         foundationClampRight.setPosition(1);
 
-
-        telemetry.addData("Status: ", "Running");
-        telemetry.update();
-        //Start Autonomous period
         //Driver.strafeToPointOrient(-70,237,0, 3,2);
         delay(700);
         telemetry.addData("p", "b4");

@@ -24,16 +24,15 @@ public class Drive extends Subsystem {
 
     private HardwareMap hardwareMap;
 
-    private Odometer2 Adhameter;
+    public Odometer2 Localizer;
 
     private LinearOpMode opmode;
 
     private int count;
 
-    public Drive(HardwareMap hardwareMap, Odometer2 Odometree, LinearOpMode oppy) {
+    public Drive(HardwareMap hardwareMap, LinearOpMode oppy) {
 
         this.hardwareMap = hardwareMap;
-        this.Adhameter = Odometree;
         this.opmode = oppy;
 
     }
@@ -62,8 +61,15 @@ public class Drive extends Subsystem {
 
         count = 0;
 
+        Localizer = new Odometer2(hardwareMap, frontRight, frontLeft, backLeft, -1, -1, -1, opmode);
+        Localizer.initialize();
+
         isRunning = true;
 
+    }
+
+    public void startTracking(double x, double y, double h) {
+        Localizer.startTracking(x, y, h);
     }
 
     public void testMotors() {
@@ -95,7 +101,7 @@ public class Drive extends Subsystem {
 
         while (Math.abs(correction) > 0.1) {
             if(opmode.opModeIsActive()) {
-                correction = turn.getCorrection(direction, Adhameter.getHeadingDeg());
+                correction = turn.getCorrection(direction, Localizer.getHeadingDeg());
 
                 frontLeft.setPower(-correction);
                 backLeft.setPower(-correction);
@@ -117,12 +123,12 @@ public class Drive extends Subsystem {
 
         ConstantProportional turn = new ConstantProportional(0.5, 5, 0.01);
         double correction;
-        double distance = Math.abs(Adhameter.getHeadingDeg() - direction);
+        double distance = Math.abs(Localizer.getHeadingDeg() - direction);
         double minPower = 0.2;
 
         while (distance > threshold) {
             if(opmode.opModeIsActive()) {
-                correction = turn.getCorrection(direction, Adhameter.getHeadingDeg());
+                correction = turn.getCorrection(direction, Localizer.getHeadingDeg());
                 if(Math.abs(correction) < minPower){
                     if(correction < minPower) {
                         correction = minPower;
@@ -136,7 +142,7 @@ public class Drive extends Subsystem {
                 frontRight.setPower( correction);
                 backRight.setPower(correction);
 
-                distance = Math.abs(Adhameter.getHeadingDeg() - direction);
+                distance = Math.abs(Localizer.getHeadingDeg() - direction);
                 localize();
 
             }else{
@@ -156,18 +162,18 @@ public class Drive extends Subsystem {
 
         Proportional orient = new Proportional(0.02, 0.4);
 
-        double Xdiff = x - Adhameter.getPosition()[0];
-        double Ydiff = y - Adhameter.getPosition()[1];
+        double Xdiff = x - Localizer.getPosition()[0];
+        double Ydiff = y - Localizer.getPosition()[1];
         double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
         
         while(distance > posThreshold || Math.abs(orient.getError()) > headThreshold) {
             if (opmode.opModeIsActive()) {
                 
-                Xdiff = x - Adhameter.getPosition()[0];
-                Ydiff = y - Adhameter.getPosition()[1];
+                Xdiff = x - Localizer.getPosition()[0];
+                Ydiff = y - Localizer.getPosition()[1];
                 distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
                 
-                double h = Adhameter.getHeadingDeg();
+                double h = Localizer.getHeadingDeg();
                 
                 double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
                 double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
@@ -216,18 +222,18 @@ public class Drive extends Subsystem {
 
         Proportional orient = new Proportional(0.01, 0.4);
 
-        double Xdiff = x - Adhameter.getPosition()[0];
-        double Ydiff = y - Adhameter.getPosition()[1];
+        double Xdiff = x - Localizer.getPosition()[0];
+        double Ydiff = y - Localizer.getPosition()[1];
         double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
 
         while(distance > posThreshold || Math.abs(orient.getError()) > headThreshold) {
             if (opmode.opModeIsActive()) {
 
-                Xdiff = x - Adhameter.getPosition()[0];
-                Ydiff = y - Adhameter.getPosition()[1];
+                Xdiff = x - Localizer.getPosition()[0];
+                Ydiff = y - Localizer.getPosition()[1];
                 distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
 
-                double h = Adhameter.getHeadingDeg();
+                double h = Localizer.getHeadingDeg();
 
                 double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
                 double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
@@ -270,61 +276,62 @@ public class Drive extends Subsystem {
         isRunning = false;
     }
 
-    public void moveToPointOrient(double targX, double targY, double targHead, double posThresh, double headThresh, double power) {
+    public void moveToPointOrient(double targX, double targY, double targH, double posThresh, double headThresh, double maxSpeed, double power) {
 
         isRunning = true;
 
         count = 0;
 
-        PID holdX = new PID(0.03, 0.0085 ,0, 7, 0.4);
-        PID holdY = new PID(0.03, 0.0085, 0, 7, 0.4);
-
         Proportional orient = new Proportional(0.02, 0.4);
 
-        double Xdiff = targX - Adhameter.getPosition()[0];
-        double Ydiff = targY - Adhameter.getPosition()[1];
-        double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+        double xDist, yDist, distance;
+        double xRelDist, yRelDist, h;
+        double xCorrect, yCorrect, hCorrect;
+        boolean endCondition;
 
-        while(distance > posThresh || Math.abs(orient.getError()) > headThresh) {
-            if (opmode.opModeIsActive()) {
+        xDist = targX - Localizer.getPosition()[0];
+        yDist = targY - Localizer.getPosition()[1];
+        distance = Math.hypot(xDist, yDist);
 
-                Xdiff = targX - Adhameter.getPosition()[0];
-                Ydiff = targY - Adhameter.getPosition()[1];
-                distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+        h = Localizer.getHeadingDeg();
 
-                double h = Adhameter.getHeadingDeg();
+        xRelDist = cos(-h) * xDist - sin(-h) * yDist;
+        yRelDist = sin(-h) * xDist + cos(-h) * yDist;
 
-                double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
-                double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
+        hCorrect = orient.getCorrection(targH, h);
+        xCorrect = power * xRelDist/(Math.abs(xRelDist) + Math.abs(yRelDist));
+        yCorrect = power * yRelDist/(Math.abs(xRelDist) + Math.abs(yRelDist));
 
-                double hCorrect = orient.getCorrection(targHead, h);
-                double xCorrect = holdX.getCorrection(0, XD);
-                double yCorrect = holdY.getCorrection(0, YD);
-
-                frontLeft.setPower(power * (-xCorrect - yCorrect - hCorrect));
-                backLeft.setPower(power * (xCorrect - yCorrect - hCorrect));
-
-                frontRight.setPower(power * (xCorrect - yCorrect + hCorrect));
-                backRight.setPower(power * (-xCorrect - yCorrect + hCorrect));
-
-                localize();
-
-            }else {
-                break;
-            }
+        if(xCorrect > maxSpeed){
+            xCorrect = maxSpeed;
+        }else if(xCorrect < -maxSpeed) {
+            xCorrect = -maxSpeed;
         }
-        frontRight.setPower(0);
-        backRight.setPower(0);
-        frontLeft.setPower(0);
-        backLeft.setPower(0);
+
+        if(yCorrect > maxSpeed){
+            yCorrect = maxSpeed;
+        }else if(yCorrect < -maxSpeed) {
+            yCorrect = -maxSpeed;
+        }
+
+        // X-> Y^
+        frontLeft.setPower((xCorrect + yCorrect - hCorrect));
+        backLeft.setPower((-xCorrect + yCorrect - hCorrect));
+
+        frontRight.setPower((-xCorrect + yCorrect + hCorrect));
+        backRight.setPower((xCorrect + yCorrect + hCorrect));
+
+        endCondition = (distance < posThresh) && (orient.getError() < headThresh);
+        localize();
+
         isRunning = false;
     }
 
     public void moveByAmount(double xChange, double yChange, double headingChange, double threshold) {
 
-        double x = Adhameter.getPosition()[0];
-        double y = Adhameter.getPosition()[1];
-        double heading = Adhameter.getHeadingAbsoluteDeg();
+        double x = Localizer.getPosition()[0];
+        double y = Localizer.getPosition()[1];
+        double heading = Localizer.getHeadingAbsoluteDeg();
         strafeToPointOrient(x + xChange, y + yChange, heading + headingChange, threshold, 1, 1);
 
     }
@@ -332,9 +339,9 @@ public class Drive extends Subsystem {
     // Utility Methods =============================================================================
 
     public void localize() {
-        Adhameter.updateOdometry();
+        Localizer.calculate();
         if(count%6 == 0) {
-            Adhameter.integrate();
+            Localizer.integrate();
         }
         count++;
     }
@@ -381,7 +388,7 @@ public class Drive extends Subsystem {
             lb = (y2 + x2) * powerScale;
 
         }else {
-            h = Adhameter.getHeadingAbsoluteDeg();
+            h = Localizer.getHeadingAbsoluteDeg();
             diff = y1 - y2;
             x = x1 + x2;
             y = y1 + y2;

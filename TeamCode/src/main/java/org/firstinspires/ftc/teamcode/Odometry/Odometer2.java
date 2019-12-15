@@ -5,6 +5,17 @@ Odometry means using sensors to track the movement of a robot. In this case, we 
 encoders on Omni's on the bottom of the robot. In the real world, Odometry like this is prone to
 inaccuracy over time so it is usually  coupled with an external positioning system such as cameras
 or distance sensors. In our case that shouldn't be needed.
+
+ Underside of Robot
+RightEnc      LeftEnc  *left and right are swapped because we are looking at the underside of the robot
+//--------------\\
+| []          [] |
+| []          [] |
+|                |
+|                |
+|     [====]     |
+\\--------------//
+  BackEnc^
 */
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -31,6 +42,7 @@ public class Odometer2 extends Subsystem{
     //IMU
     private BNO055IMU imu;
 
+    // Housekeeping
     private LinearOpMode opmode;
     private HardwareMap hardwareMap;
 
@@ -84,23 +96,26 @@ public class Odometer2 extends Subsystem{
     private double encScale;
 
     //3 Encoder objects, The distance from the L and R Omni's to the center, The distance from the back Omni to the center, the radius of the Omni
-    public Odometer2(HardwareMap hardwareMap, double RD, double LD, double BD, LinearOpMode oppy){
+    public Odometer2(HardwareMap hardwareMap, DcMotor rightEnc, DcMotor leftEnc, DcMotor backEnc, double RD, double LD, double BD, LinearOpMode oppy){
 
-        this.hardwareMap = hardwareMap;
+        this.rightEnc = rightEnc;
+        this.leftEnc = leftEnc;
+        this.backEnc = backEnc;
 
         this.rightEncDir = RD;
         this.leftEncDir = LD;
         this.backEncDir = BD;
 
+        this.hardwareMap = hardwareMap;
         this.opmode = oppy;
 
     }
 
     public void initialize(){
 
-        rightEnc = hardwareMap.dcMotor.get("driveFrontRight");
-        leftEnc = hardwareMap.dcMotor.get("driveFrontLeft");
-        backEnc = hardwareMap.dcMotor.get("driveBackLeft");
+        rightEnc.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        leftEnc.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        backEnc.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         BNO055IMU.Parameters Params = new BNO055IMU.Parameters();
@@ -145,7 +160,7 @@ public class Odometer2 extends Subsystem{
 
     }
 
-    public void updateOdometry(){
+    public void calculate(){
 
         if(opmode.opModeIsActive()){
 
@@ -173,6 +188,7 @@ public class Odometer2 extends Subsystem{
 
                 xOffestLR = leftChange/headingChange;
 
+                // "Similar circles" then trig to get dimensions of the triangle
                 posChangeLR[0] = Math.cos(headingChange) * (xOffestLR + robotRad) - (xOffestLR + robotRad);
                 posChangeLR[1] = Math.sin(headingChange) * (xOffestLR + robotRad);
 
@@ -182,6 +198,7 @@ public class Odometer2 extends Subsystem{
 
                 xOffestLR = rightChange/headingChange;
 
+                // "Similar circles" then trig to get dimensions of the triangle
                 posChangeLR[0] = (xOffestLR + robotRad) - Math.cos(headingChange) * (xOffestLR + robotRad);
                 posChangeLR[1] = Math.sin(headingChange) * (xOffestLR + robotRad);
 
@@ -191,17 +208,19 @@ public class Odometer2 extends Subsystem{
 
             headingChange = heading - headingLastVal;
 
+            // Calculating how much of the change was due to the robot turning
             backOmniAdjust = backRad * headingChange;
+            // Subtract that from the reading to find horizontal distance
             backOmniExtra = backChange - backOmniAdjust;
 
             posChangeB[0] = Math.cos(headingChange) * backOmniExtra;
             posChangeB[1] = Math.sin(headingChange) * backOmniExtra;
 
-            // Add the two vectors together
+            // Add the two vectors together to get a total relative movement vector
             totalPosChange[0] = posChangeLR[0] + posChangeB[0];
             totalPosChange[1] = posChangeLR[1] + posChangeB[1];
 
-            // Rotate the vector
+            // Rotate the vector so it becomes global
             rotatedMovement[0] = totalPosChange[0] * Math.cos(headingLastVal) - totalPosChange[1] * Math.sin(headingLastVal);
             rotatedMovement[1] = totalPosChange[0] * Math.sin(headingLastVal) + totalPosChange[1] * Math.cos(headingLastVal);
 
@@ -214,7 +233,6 @@ public class Odometer2 extends Subsystem{
 
     public void integrate(){
         // Integrating the calculated vector. In other words, choosing a new "lastPosition"
-
         lastX = x;
         lastY = y;
 
@@ -228,7 +246,7 @@ public class Odometer2 extends Subsystem{
 
     public void update() {
         // Calculate and integrate
-        updateOdometry();
+        calculate();
         integrate();
 
     }

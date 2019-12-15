@@ -27,7 +27,6 @@ public class RedDepotAuto extends LinearOpMode {
 
     private Servo blockHook;
 
-    private Odometer2 Adham;
     private Drive Driver;
     private Intake Intaker;
 
@@ -41,14 +40,11 @@ public class RedDepotAuto extends LinearOpMode {
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
-        // Initialize all objects declared above
+        // Initialize all objects declared above ===================================================
         blockHook = hardwareMap.servo.get("blockGrabberFront");
         blockHook.setPosition(0.2);
 
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
-
-        Driver = new Drive(hardwareMap, Adham, this);
+        Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
         // Vision
@@ -67,12 +63,14 @@ public class RedDepotAuto extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        // Wait for the game to start (driver presses PLAY)
         initialize();
         waitForStart();
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
+
+        Driver.startTracking(0, 0, 0);
+
         Driver.strafeToPointOrient(-40, -14, 0, 3, 2, 1);
         delay(7);
         scanSkystone();

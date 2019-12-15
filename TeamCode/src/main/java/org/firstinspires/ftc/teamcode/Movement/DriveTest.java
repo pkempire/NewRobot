@@ -42,10 +42,13 @@ public class DriveTest extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-        Driver.startTracking(0, 0, 0);
-
         Driver.testMotors();
 
+        Driver.startTracking(0, 0, 0);
+
+        while(opModeIsActive()) {
+            Driver.moveToPointOrient(0, 30, 0, 0, 0, 0.5, 1);
+        }
         //Make sure nothing is still using the thread
     }
 

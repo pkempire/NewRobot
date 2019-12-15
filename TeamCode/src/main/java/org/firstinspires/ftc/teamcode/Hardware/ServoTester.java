@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.OpModes;
+package org.firstinspires.ftc.teamcode.Hardware;
 
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -36,6 +36,7 @@ public class ServoTester extends LinearOpMode {
 
             testServo.setPosition(gamepad1.left_stick_y);
 
+            telemetry.addData("Servo Position", gamepad1.left_stick_y);
             telemetry.update();
         }
     }

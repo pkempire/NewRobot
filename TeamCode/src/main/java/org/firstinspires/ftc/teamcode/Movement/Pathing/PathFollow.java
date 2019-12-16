@@ -36,7 +36,7 @@ public class PathFollow {
 
         // Loop through all points in path
         for(int i=0; i<Path.getLength()-2; i++) {
-            // Find the line connecting every two points
+            // Find the line connecting every two consecutive points
             RobotPoint startLine = Path.getPoint(i);
             RobotPoint endLine = Path.getPoint(1+1);
 

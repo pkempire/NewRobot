@@ -35,17 +35,17 @@ public class PathFollow {
         RobotPoint followPoint;
 
         // Loop through all points in path
-        for(int i=0; i<Path.getLength()-2; i++) {
+        for(int i=0; i<Path.getLength()-1; i++) {
             // Find the line connecting every two consecutive points
             RobotPoint startLine = Path.getPoint(i);
             RobotPoint endLine = Path.getPoint(1+1);
 
             // Find the rectangle to which the line is a diagonal
-            double minX = startLine.x < endLine.x ? startLine.x : endLine.x;
-            double maxX = startLine.x > endLine.x ? startLine.x : endLine.x;
+            double minX = (startLine.x < endLine.x ? startLine.x : endLine.x) - radius;
+            double maxX = (startLine.x > endLine.x ? startLine.x : endLine.x) + radius;
 
-            double minY = startLine.y < endLine.y ? startLine.y : endLine.y;
-            double maxY = startLine.y > endLine.y ? startLine.y : endLine.y;
+            double minY = (startLine.y < endLine.y ? startLine.y : endLine.y) - radius;
+            double maxY = (startLine.y > endLine.y ? startLine.y : endLine.y) + radius;
 
             // Check if the robot is in that rectangle
             if(robotLocation.x > minX && robotLocation.x < maxX){

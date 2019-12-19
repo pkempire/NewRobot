@@ -20,7 +20,7 @@ This is an OpMode to test out controllers.
 public class ControllerTest extends LinearOpMode {
 
     // Declare OpMode members.
-    private Odometer2 Adham;
+    private Drive drive;
     private ConstantProportional turn;
 
     private void initialize(){
@@ -28,10 +28,11 @@ public class ControllerTest extends LinearOpMode {
         telemetry.update();
 
         // Initialize all objects declared above
-        Adham = new Odometer2(hardwareMap, -1, -1, -1, this);
-        Adham.initialize();
 
         turn = new ConstantProportional(0.6, 30, 0.5);
+
+        drive = new Drive(hardwareMap, this);
+        drive.initialize();
 
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();
@@ -45,20 +46,20 @@ public class ControllerTest extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-        Adham.startTracking(0, 0, 0);
+        drive.startTracking(0, 0, 0);
 
         double current;
         double target = 90;
 
         while(opModeIsActive()) {
 
-            current = Adham.getHeadingAbsoluteDeg();
+            current = drive.Localizer.getHeadingAbsoluteDeg();
 
             telemetry.addData("current ", current);
             telemetry.addData("correction ", turn.getCorrection(target, current));
             telemetry.update();
 
-            Adham.updateOdometry();
+            drive.Localizer.update();
         }
 
         //Make sure nothing is still using the thread

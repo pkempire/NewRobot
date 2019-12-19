@@ -42,18 +42,29 @@ public class DriveTest extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-        Driver.testMotors();
-
         Driver.startTracking(0, 0, 0);
 
+        Driver.strafeToPointOrient(30, 30, 0, 3,2, 1);
+        /*
         while(opModeIsActive()) {
-            Driver.moveToPointOrient(0, 30, 0, 0, 0, 0.5, 1);
+            Driver.moveToPointOrient(10, 10, 0, 0, 0, 0.4, 0.8);
+            Driver.localize();
+
+            telemetry.addData("xCorrect", Driver.xCorrectTelem);
+            telemetry.addData("yCorrect", Driver.yCorrectTelem);
+            telemetry.addData("hCorrect", Driver.headingCorrectTelem);
+            telemetry.addData("X", Driver.Localizer.getPosition()[0]);
+            telemetry.addData("Y", Driver.Localizer.getPosition()[1]);
+            telemetry.update();
         }
+        */
         //Make sure nothing is still using the thread
     }
 
     private void delay(int millis) {
         try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
     }
+
+
 
 }

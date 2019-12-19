@@ -55,7 +55,7 @@ public class PathMaker extends LinearOpMode {
         Driver = new Drive(hardwareMap, this);
         Driver.initialize();
 
-        ImpurePursuit = new PathFollow(Driver);
+        ImpurePursuit = new PathFollow(Driver, this);
 
         // Vision
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());

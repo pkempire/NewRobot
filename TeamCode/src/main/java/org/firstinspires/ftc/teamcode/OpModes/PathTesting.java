@@ -16,10 +16,13 @@ import org.firstinspires.ftc.teamcode.Hardware.Intake;
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Movement.Pathing.PathFollow;
 import org.firstinspires.ftc.teamcode.Movement.Pathing.RobotPath;
+import org.firstinspires.ftc.teamcode.Movement.Pathing.RobotPoint;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
+
+import java.util.ArrayList;
 
 
 @Autonomous(name="D-Path Testing", group="Linear Opmode")
@@ -74,13 +77,26 @@ public class PathTesting extends LinearOpMode {
         waitForStart();
         telemetry.addData("Status", "Running");
         telemetry.update();
+        Driver.startTracking(0 ,0 ,0);
 
-        testPath.addPoint(0, 40, 0, "");
-        testPath.addPoint(20, 40, 0, "Intake");
-        testPath.addPoint(20, 0, 0, "");
-        testPath.addPoint(0, 0, 0, "");
+        RobotPoint line1 = new RobotPoint(0, 10, 0, "");
+        RobotPoint line2 = new RobotPoint(0 ,100, 0, "");
 
-        ImpurePursuit.followPath(testPath, 4, 0.8);
+        while(opModeIsActive()) {
+            RobotPoint location = new RobotPoint(Driver.Localizer.getPosition()[0], Driver.Localizer.getPosition()[1], 0, "");
+            ArrayList<RobotPoint> intersections = ImpurePursuit.lineCircleIntersect(location, 6, line1, line2);
+            for(int i=0; i<intersections.size(); i++) {
+                double x = intersections.get(i).x;
+                double y = intersections.get(i).y;
+                telemetry.addData("New Intersection", i);
+                telemetry.addData("IntersectionX", x);
+                telemetry.addData("IntersectionY", y);
+            }
+            telemetry.addData("Position", Driver.Localizer.getPosition());
+            telemetry.update();
+            Driver.localize();
+        }
+
         // run until the end of the match (driver presses STOP)
 
     }

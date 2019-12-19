@@ -29,6 +29,10 @@ public class Drive extends Subsystem {
     private LinearOpMode opmode;
 
     private int count;
+    // Telemetry Variables
+    public double xCorrectTelem = 0;
+    public double yCorrectTelem = 0;
+    public double headingCorrectTelem = 0;
 
     public Drive(HardwareMap hardwareMap, LinearOpMode oppy) {
 
@@ -320,6 +324,11 @@ public class Drive extends Subsystem {
 
         frontRight.setPower((-xCorrect + yCorrect + hCorrect));
         backRight.setPower((xCorrect + yCorrect + hCorrect));
+
+        // Telemetry
+        xCorrectTelem = xCorrect;
+        yCorrectTelem = yCorrect;
+        headingCorrectTelem = hCorrect;
 
         endCondition = (distance < posThresh) && (orient.getError() < headThresh);
         localize();

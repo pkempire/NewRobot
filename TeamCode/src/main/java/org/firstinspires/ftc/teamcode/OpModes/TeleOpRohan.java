@@ -42,8 +42,8 @@ public class TeleOpRohan extends LinearOpMode {
     private Servo blockGrabberFront;
     private Servo blockGrabberBack;
     //Foundation
-    private Servo foundationClampFront;
-    private Servo foundationClampBack;
+    private Servo foundationClampRight;
+    private Servo foundationClampLeft;
     //Misc
     private Servo blockHook;
 
@@ -56,6 +56,9 @@ public class TeleOpRohan extends LinearOpMode {
     private Gamepad Miles;
     private Gamepad Ryan;
 
+    //Important Variables
+    private boolean clampedF;
+
     private void initialize() {
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
@@ -63,11 +66,12 @@ public class TeleOpRohan extends LinearOpMode {
         // Initialize all objects declared above
         intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         intakeRight = hardwareMap.dcMotor.get("intakeRight");
-        //intakeDropper = hardwareMap.crservo.get("intakeDropper");
 
+        /*
         liftRight = hardwareMap.dcMotor.get("liftRight");
         liftLeft = hardwareMap.dcMotor.get("liftLeft");
         liftLimitSwitch = hardwareMap.digitalChannel.get("liftLimitSwitch");
+         */
 
         blockGrabberFront = hardwareMap.servo.get("blockGrabberFront");
         blockGrabberBack = hardwareMap.servo.get("blockGrabberBack");
@@ -75,8 +79,8 @@ public class TeleOpRohan extends LinearOpMode {
         flipperServoLeft = hardwareMap.servo.get("flipperServoLeft");
         flipperServoRight = hardwareMap.servo.get("flipperServoRight");
 
-        foundationClampFront = hardwareMap.servo.get("foundationClampFront");
-        foundationClampBack = hardwareMap.servo.get("foundationClampBack");
+        foundationClampRight = hardwareMap.servo.get("foundationClampRight");
+        foundationClampLeft = hardwareMap.servo.get("foundationClampLeft");
 
         //==========================================================================================
 
@@ -86,12 +90,18 @@ public class TeleOpRohan extends LinearOpMode {
         Intaker = new Intake(intakeLeft, intakeRight);
         Intaker.initialize(-1, 1);
 
+        /*
         Lift = new Extrusion(liftLeft, liftRight, 10000, 0, liftLimitSwitch, this);
         Lift.setPidConstants(0.5, 0.1, 0.3);
         Lift.initialize(0, 0.6);
+        */
 
         Outtake = new Outtake(Lift, blockGrabberFront, blockGrabberBack, flipperServoRight, flipperServoLeft);
-        Outtake.initialize(0.5, 0, 0, 0.5);
+        Outtake.initialize(0.7, 0.33, 0.89, 0.31);
+
+        foundationClampLeft.setPosition(0.74);
+        foundationClampRight.setPosition(0.26);
+        clampedF = false;
 
         Ryan = gamepad2;
         Miles = gamepad1;
@@ -115,9 +125,9 @@ public class TeleOpRohan extends LinearOpMode {
 
             Driver.handleDrive(Miles, false);
 
-            Intaker.intakeManual(Ryan);
+            toggleClamp(Miles.a);
 
-            if(Ryan.a) {
+            if(Ryan.y) {
                 Outtake.setGripperState("Receive");
             }else if(Ryan.b) {
                 Outtake.setGripperState("Deposit");
@@ -125,7 +135,30 @@ public class TeleOpRohan extends LinearOpMode {
                 Outtake.setGripperState("Clamped");
             }
 
+            Outtake.flipManual(Ryan.left_bumper, toBool(Ryan.left_trigger, 0.2));
+
             time++;
+        }
+    }
+
+    private void toggleClamp(boolean trigger) {
+        if(trigger){
+            clampedF = !clampedF;
+        }
+        if(clampedF){
+            foundationClampRight.setPosition(0.76);
+            foundationClampLeft.setPosition(0.24);
+        }else {
+            foundationClampRight.setPosition(0.26);
+            foundationClampLeft.setPosition(0.74);
+        }
+    }
+
+    private boolean toBool(float f, double thresh) {
+        if(f > thresh) {
+            return true;
+        }else{
+            return false;
         }
     }
 

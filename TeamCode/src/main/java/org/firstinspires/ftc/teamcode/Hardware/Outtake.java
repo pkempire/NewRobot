@@ -42,8 +42,9 @@ public class Outtake extends Subsystem {
     }
 
     // Utility Methods =============================================================================
-    public void setFlipperPosition(double position) {
+    public void setFlipperPosition(double position) { //Position is of the left
         //position flipped means [pivot=======block] (the arm is level with ground and pointing out)
+
         if(position < flipped) {
             position = flipped;
         }else if (position > inside){
@@ -60,19 +61,19 @@ public class Outtake extends Subsystem {
         double front, back;
         if(state == "Receive") {
             front = dropped;
-            back = 1-clamped;
+            back = clamped;
         }else if(state == "Clamped") {
             front = clamped;
-            back = 1-clamped;
+            back = clamped;
         }else if(state == "Deposited") {
             front = clamped;
-            back = 1-dropped;
+            back = dropped;
         }else if(state == "Open"){
-            back = 1-dropped;
             front = dropped;
+            back = dropped;
         }else {
             front = dropped;
-            back = 1-dropped;
+            back = dropped;
         }
         GripperFront.setPosition(front);
         GripperBack.setPosition(back);
@@ -93,12 +94,12 @@ public class Outtake extends Subsystem {
 
     }
 
-    public void flipManual(boolean trigger){
+    public void flipManual(boolean flipTrigger, boolean inTrigger){
         isRunning = true;
-        if(trigger) {
+        if(flipTrigger) {
             setGripperState("Clamped");
             setFlipperPosition(flipped);
-        }else {
+        }else if(inTrigger){
             setFlipperPosition(inside);
             setGripperState("Receive");
         }

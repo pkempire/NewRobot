@@ -69,9 +69,11 @@ public class BlueDepotAuto extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
-
         Driver.startTracking(0, 0, 0);
 
+        Driver.testMotors();
+
+        /*
         Driver.strafeToPointOrient(-36, 8, 0, 3, 2, 1);
         delay(7);
         scanSkystone();
@@ -131,6 +133,7 @@ public class BlueDepotAuto extends LinearOpMode {
         //Make sure nothing is still using the thread - End Autonomous period
         //park
         Driver.strafeToPointOrient(-62, 99, 0, 3.5, 3, 1);
+         */
     }
 
     private void scanSkystone(){

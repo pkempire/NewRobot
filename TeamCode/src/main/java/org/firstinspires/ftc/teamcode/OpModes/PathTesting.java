@@ -70,6 +70,7 @@ public class PathTesting extends LinearOpMode {
         telemetry.update();
     }
 
+
     @Override
     public void runOpMode() {
         // Wait for the game to start (driver presses PLAY)
@@ -79,23 +80,9 @@ public class PathTesting extends LinearOpMode {
         telemetry.update();
         Driver.startTracking(0 ,0 ,0);
 
-        RobotPoint line1 = new RobotPoint(0, 10, 0, "");
-        RobotPoint line2 = new RobotPoint(0 ,100, 0, "");
+        Driver.testMotors();
 
-        while(opModeIsActive()) {
-            RobotPoint location = new RobotPoint(Driver.Localizer.getPosition()[0], Driver.Localizer.getPosition()[1], 0, "");
-            ArrayList<RobotPoint> intersections = ImpurePursuit.lineCircleIntersect(location, 6, line1, line2);
-            for(int i=0; i<intersections.size(); i++) {
-                double x = intersections.get(i).x;
-                double y = intersections.get(i).y;
-                telemetry.addData("New Intersection", i);
-                telemetry.addData("IntersectionX", x);
-                telemetry.addData("IntersectionY", y);
-            }
-            telemetry.addData("Position", Driver.Localizer.getPosition());
-            telemetry.update();
-            Driver.localize();
-        }
+
 
         // run until the end of the match (driver presses STOP)
 

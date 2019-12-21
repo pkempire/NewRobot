@@ -9,10 +9,11 @@ public class Proportional extends Controller {
 
     private double pGain;
     private double lim;
+
     private double error = 1000;
 
     public Proportional(double p_Gain, double limit) {
-        
+
         this.pGain = p_Gain;
         this.lim = limit;
 
@@ -22,14 +23,14 @@ public class Proportional extends Controller {
 
         error = target - current;
         double correction = error * pGain;
-        
+
         if(correction > lim) {
             correction = lim;
         }
         if(correction < -lim) {
             correction = -lim;
         }
-        
+
         return correction;
     }
 

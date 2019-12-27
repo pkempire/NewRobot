@@ -145,8 +145,8 @@ public class Drive2 extends Subsystem {
 
         count = 0;
 
-        PID holdFar = new PID(0.02, 0.000, 0.00, 0, 0.4);
-        PID holdNear = new PID(0.017, 0.001, 0.04, 10, 0.4);
+        PID holdFar = new PID(0.015, 0.000, 0.00, 0, 0.4);
+        PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4);
 
         Proportional orient = new Proportional(0.02, 0.4);
 
@@ -180,7 +180,7 @@ public class Drive2 extends Subsystem {
                     yCorrect = holdNear.getCorrection(0, YD);
                 }
 
-                double power = 1.1;
+                double power = 1.15;
 
                 double finalfl = (power * (-xCorrect - yCorrect - hCorrect));
 
@@ -220,13 +220,13 @@ public class Drive2 extends Subsystem {
         isRunning = false;
     }
 
-    public void strafeToPointOrient2(double x, double y, double heading, double posThreshold, double headThreshold) { // Verified
+    public void strafeToPointOrientFast(double x, double y, double heading, double posThreshold, double headThreshold) { // Verified
         isRunning = true;
 
         count = 0;
 
-        PID holdX = new PID(0.005, 0.009 ,0, 7, 0.4);
-        PID holdY = new PID(0.005, 0.009, 0, 7, 0.4);
+        PID holdX = new PID(0.002, 0.001 ,0, 7, 0.4);
+        PID holdY = new PID(0.002, 0.001, 0, 7, 0.4);
 
         Proportional orient = new Proportional(0.01, 0.4);
 
@@ -250,11 +250,23 @@ public class Drive2 extends Subsystem {
                 double xCorrect = holdX.getCorrection(0, XD);
                 double yCorrect = holdY.getCorrection(0, YD);
 
-                frontLeft.setPower(0.7 * (-xCorrect - yCorrect - hCorrect));
-                backLeft.setPower(0.7 * (xCorrect - yCorrect - hCorrect));
+                double power = 1.1;
 
-                frontRight.setPower(0.7 * (xCorrect - yCorrect + hCorrect));
-                backRight.setPower(0.7 * (-xCorrect - yCorrect + hCorrect));
+                double finalfl = (power * (-xCorrect - yCorrect - hCorrect));
+
+                double finalbl = (power * (xCorrect - yCorrect - hCorrect));
+
+                double finalfr = (power * (xCorrect - yCorrect + hCorrect));
+
+                double finalbr = (power * (-xCorrect - yCorrect + hCorrect));
+
+
+
+                frontLeft.setPower(finalfl);
+                backLeft.setPower(finalbl);
+
+                frontRight.setPower(finalfr);
+                backRight.setPower(finalbr);
 
                 localize();
                 String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
@@ -287,6 +299,7 @@ public class Drive2 extends Subsystem {
 
         Proportional orient = new Proportional(0.02, 0.4);
 
+        double initialDistance = Math.hypot(targX - Adhameter.getPosition()[0], targY - Adhameter.getPosition()[1]);
         double xDist, yDist, distance;
         double xRelDist, yRelDist, h;
         double xCorrect, yCorrect, hCorrect;
@@ -307,8 +320,8 @@ public class Drive2 extends Subsystem {
             }
 
             hCorrect = orient.getCorrection(targH, h);
-            xCorrect = power * xRelDist/(Math.abs(xRelDist) + Math.abs(yRelDist));
-            yCorrect = power * yRelDist/(Math.abs(xRelDist) + Math.abs(yRelDist));
+            xCorrect = power * xRelDist/(Math.abs(xRelDist) + Math.abs(yRelDist)) ;
+            yCorrect = power * yRelDist/(Math.abs(xRelDist) + Math.abs(yRelDist)) ;
 
             if(xCorrect > maxSpeed){
                 xCorrect = maxSpeed;

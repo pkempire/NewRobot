@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 
 import org.firstinspires.ftc.teamcode.Subsystem;
 
-@Autonomous(name="O-Encoder Test", group="Linear Opmode")
+@Autonomous(name="O-Encoder Test Robot V2", group="Linear Opmode")
 
 public class EncoderTest extends LinearOpMode {
 
@@ -16,18 +16,18 @@ public class EncoderTest extends LinearOpMode {
     private DcMotor Encoder1;
     private DcMotor Encoder2;
 
-    private final double omniRadius = 1.875; //Radius of Omni wheels
-    private final double gearing = 1.333; //How many times does the Omni spin for each spin of the encoder
-    private final double ticksPerRotation = 1440;
+    private final double omniRadius = 2.3622; //Radius of Omni wheels
+    private final double gearing = 1.0; //How many times does the Omni spin for each spin of the encoder
+    private final double ticksPerRotation = 8192;
 
     private void initialize(){
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
         // Initialize all objects declared above
-        Encoder = hardwareMap.dcMotor.get("driveFrontRight");
-        Encoder1 = hardwareMap.dcMotor.get("driveFrontLeft");
-        Encoder2 = hardwareMap.dcMotor.get("driveBackLeft");
+        Encoder = hardwareMap.dcMotor.get("intakeRight"); //Right
+        Encoder1 = hardwareMap.dcMotor.get("intakeLeft"); //Left
+        Encoder2 = hardwareMap.dcMotor.get("driveBackLeft"); //Back
 
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();

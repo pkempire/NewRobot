@@ -1,30 +1,26 @@
-
-package org.firstinspires.ftc.teamcode.Movement;
-
-import android.util.Log;
+package org.firstinspires.ftc.teamcode.OdometeryTesting;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-import org.firstinspires.ftc.teamcode.Controllers.PID;
-import org.firstinspires.ftc.teamcode.Controllers.Proportional;
-import org.firstinspires.ftc.teamcode.Movement.Drive;
-import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
+import org.firstinspires.ftc.teamcode.Movement.Drive2;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 
-@Autonomous(name="D-Drive Test", group="Linear Opmode")
+@Autonomous(name="O-Odometer Test Encoder", group="Linear Opmode")
 
-public class DriveTest extends LinearOpMode {
+public class OdometerTest2 extends LinearOpMode {
 
     // Declare OpMode members.
     private DcMotor RightFront;
     private DcMotor RightBack;
     private DcMotor LeftFront;
     private DcMotor LeftBack;
+
+    private DcMotor RightEncoder;
+    private DcMotor LeftEncoder;
 
     private Odometer34 Adham;
     private Drive2 Driver;
@@ -50,8 +46,11 @@ public class DriveTest extends LinearOpMode {
         LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
         RightBack = hardwareMap.dcMotor.get("driveBackRight");
 
+        RightEncoder = hardwareMap.dcMotor.get("intakeRight");
+        LeftEncoder = hardwareMap.dcMotor.get("intakeLeft");
+
         Imu.initialize(Params);
-        Adham = new Odometer34(RightFront, LeftFront, LeftBack, Imu, -1, -1, -1, this);
+        Adham = new Odometer34(RightEncoder, LeftEncoder, LeftBack, Imu, -1, 1, -1, this);
         Adham.initialize(0, 0, 0);
 
         Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
@@ -59,42 +58,31 @@ public class DriveTest extends LinearOpMode {
 
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();
-
     }
 
     @Override
     public void runOpMode() {
+        // Wait for the game to start (driver presses PLAY)
         initialize();
         waitForStart();
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
 
-        Driver.strafeToPointOrient(17,72,-90,2,1);
-        delay(900);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(205,72,-90,2.5,2);
-        delay(800);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(17,72,-90,2,1);
-        delay(900);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(205,72,-90,2.5,2);
-        delay(800);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(17,72,-90,2.5,1);
-        delay(900);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(205,72,-90,2.5,2);
-        delay(100);
-        //Make sure nothing is still using the thread
+        while(opModeIsActive()) {
+            telemetry.addData("Right", Adham.getRightReading());
+            telemetry.addData("Left", Adham.getLeftReading());
+            telemetry.addData("Back", Adham.getBackReading());
+            telemetry.update();
 
+            Driver.localize();
+            
+        }
+        //Make sure nothing is still using the thread
     }
 
     private void delay(int millis) {
         try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
     }
-
-
 
 }

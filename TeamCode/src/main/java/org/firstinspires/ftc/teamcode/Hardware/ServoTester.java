@@ -13,14 +13,14 @@ public class ServoTester extends LinearOpMode {
 
     // Declare OpMode members.
     private Servo testServo;
-    private Servo testServo2;
+
     private void initialize(){
         // Initialize all objects declared above
         testServo = hardwareMap.servo.get("testServo");
-        testServo2 = hardwareMap.servo.get("testServo2");
+
 
         testServo.setPosition(0);
-        testServo2.setPosition(0);
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
     }
@@ -36,6 +36,7 @@ public class ServoTester extends LinearOpMode {
         telemetry.update();
 
         double r = 0;
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
 
@@ -46,10 +47,12 @@ public class ServoTester extends LinearOpMode {
                 r = r - 0.0005;
             }
 
+
+
             testServo.setPosition(r);
-            testServo2.setPosition(1-r);
-            telemetry.addData("servo Position", testServo.getPosition());
-            telemetry.addData("left Position2", testServo2.getPosition());
+
+            telemetry.addData("Servo 1 Position", testServo.getPosition());
+
             telemetry.update();
         }
     }

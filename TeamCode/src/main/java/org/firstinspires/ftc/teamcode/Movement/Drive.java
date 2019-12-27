@@ -21,6 +21,8 @@ public class Drive extends Subsystem {
     private DcMotor frontRight;
     private DcMotor backLeft;
     private DcMotor backRight;
+    private DcMotor intakeLeft;
+    private DcMotor intakeRight;
 
     private HardwareMap hardwareMap;
 
@@ -42,7 +44,8 @@ public class Drive extends Subsystem {
     }
 
     public void initialize() {
-
+        intakeLeft = hardwareMap.dcMotor.get("intakeLeft");
+        intakeRight = hardwareMap.dcMotor.get("intakeRight");
         frontRight = hardwareMap.dcMotor.get("driveFrontRight");
         frontLeft = hardwareMap.dcMotor.get("driveFrontLeft");
         backLeft = hardwareMap.dcMotor.get("driveBackLeft");
@@ -52,6 +55,9 @@ public class Drive extends Subsystem {
         frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        intakeLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        intakeRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         frontRight.setPower(0);
         frontLeft.setPower(0);
@@ -65,7 +71,7 @@ public class Drive extends Subsystem {
 
         count = 0;
 
-        Localizer = new Odometer2(hardwareMap, frontRight, frontLeft, backLeft, -1, -1, -1, opmode);
+        Localizer = new Odometer2(hardwareMap, intakeRight, intakeLeft, backLeft, 1, -1, 1, opmode);
         Localizer.initialize();
 
         isRunning = true;

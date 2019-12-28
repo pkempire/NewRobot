@@ -428,7 +428,7 @@ public class Drive2 extends Subsystem {
     // Utility Methods =============================================================================
 
     public void localize() {
-        Adhameter.updateOdometry();
+        Adhameter.calculate();
         if(count%6 == 0) {
             Adhameter.integrate();
         }
@@ -439,7 +439,6 @@ public class Drive2 extends Subsystem {
         int limit = (int)(millis/2);
         for(int x=0;x<limit; x++) {
             if (opmode.opModeIsActive()) {
-                localize();
                 try{Thread.sleep(2);}catch(InterruptedException e){e.printStackTrace();}
             }else {
                 break;

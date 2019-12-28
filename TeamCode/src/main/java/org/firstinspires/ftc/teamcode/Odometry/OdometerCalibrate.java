@@ -53,7 +53,8 @@ public class OdometerCalibrate extends LinearOpMode {
 
         Imu.initialize(Params);
         Adham = new Odometer34(Encoder, Encoder1, Encoder2, Imu, -1, 1, -1, this);
-        Adham.initialize(0, 0, 0);
+        Adham.initialize();
+        Adham.startTracking(0, 0, 0);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -75,12 +76,14 @@ public class OdometerCalibrate extends LinearOpMode {
         
         telemetry.addData("Instruction", "Turn your robot 360 degrees counter-clockwise.");
         telemetry.update();
+
         delay(10000);
+
         telemetry.addData("Update", "Turn complete. Make sure your robot did not move during the turn");
         telemetry.update();
         delay(500);
 
-        Adham.updateOdometry();
+        Adham.calculate();
 
         double endHeading = Adham.getHeadingDeg();
         double endBack = Adham.getBackReading();
@@ -89,8 +92,6 @@ public class OdometerCalibrate extends LinearOpMode {
         backChange = endBack - initialBack;
         
         delay(500);
-
-        Adham.updateOdometry();
 
         double robotRad = (Adham.getRightReading()-Adham.getLeftReading()) / (4*headingChange/360*Math.PI);
         double backRad = backChange / 2 / Math.PI;

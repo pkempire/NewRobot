@@ -52,7 +52,7 @@ public class DriveTest extends LinearOpMode {
 
         Imu.initialize(Params);
         Adham = new Odometer34(RightFront, LeftFront, LeftBack, Imu, -1, -1, -1, this);
-        Adham.initialize(0, 0, 0);
+        Adham.initialize();
 
         Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
         Driver.initialize();
@@ -69,6 +69,7 @@ public class DriveTest extends LinearOpMode {
         telemetry.addData("Status: ", "Running");
         telemetry.update();
         //Start Autonomous period
+        Adham.startTracking(0, 0, 0);
 
         Driver.strafeToPointOrient(17,72,-90,2,1);
         delay(900);

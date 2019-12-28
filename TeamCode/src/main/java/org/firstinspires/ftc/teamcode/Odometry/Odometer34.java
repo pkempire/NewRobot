@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Subsystem;
 
-public class Odometer34 extends Subsystem{
+public class Odometer34 extends Odometer{
 
     // Declare all objects needed for Odometry
 
@@ -97,15 +97,7 @@ public class Odometer34 extends Subsystem{
 
     }
 
-    public void initialize(double X, double Y, double Heading){
-
-        x = X;
-        y = Y;
-        lastX = x;
-        lastY = y;
-
-        headingOffset = Heading;
-        headingLastVal = 0;
+    public void initialize(){
 
         encScale = encdrRad*2*Math.PI/ticksPerRotation*gear;
 
@@ -128,7 +120,19 @@ public class Odometer34 extends Subsystem{
 
     }
 
-    public void updateOdometry(){
+    public void startTracking(double X, double Y, double Heading){
+
+        x = X;
+        y = Y;
+        lastX = x;
+        lastY = y;
+
+        headingOffset = Heading;
+        headingLastVal = 0;
+
+    }
+
+    public void calculate(){
 
         if(opmode.opModeIsActive()){
 
@@ -209,7 +213,7 @@ public class Odometer34 extends Subsystem{
     }
 
     public void update() {
-        updateOdometry();
+        calculate();
         integrate();
 
     }

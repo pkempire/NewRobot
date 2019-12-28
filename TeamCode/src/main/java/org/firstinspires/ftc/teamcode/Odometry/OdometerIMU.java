@@ -29,7 +29,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
-public class Odometer2 extends Odometer{
+public class OdometerIMU extends Odometer{
 
     // Declare all objects needed for Odometry
 
@@ -69,7 +69,12 @@ public class Odometer2 extends Odometer{
     private double backChange;
     private double headingChange;
 
-    private double xOffestLR;
+    private double leftOmniAdjust;
+    private double leftOmniExtra;
+
+    private double rightOmniAdjust;
+    private double rightOmniExtra;
+
     private double backOmniAdjust;
     private double backOmniExtra;
 
@@ -90,12 +95,12 @@ public class Odometer2 extends Odometer{
     private double robotRad = 12.66; //16.56; // Radius of the robot (Left to Right / 2)
     private double backRad = 9.669; //0.9; // Distance from the center to the back Omni
     private final double encdrRad = 2.3622; // Radius of the Omni wheel
-    private final double ticksPerRotation = 8192; //How many ticks are in 1 revolution of the encoder FAX
+    private final double ticksPerRotation = 8192; //How many ticks are in 1 revolution of the encoder - FAX
     private double gear = 1.0; //How many times does the Omni spin for each spin of the encoder
     private double encScale;
 
     //3 Encoder objects, The distance from the L and R Omni's to the center, The distance from the back Omni to the center, the radius of the Omni
-    public Odometer2(HardwareMap hardwareMap, DcMotor rightEnc, DcMotor leftEnc, DcMotor backEnc, double RD, double LD, double BD, LinearOpMode oppy){
+    public OdometerIMU(DcMotor rightEnc, DcMotor leftEnc, DcMotor backEnc, BNO055IMU imu, double RD, double LD, double BD, LinearOpMode oppy){
 
         this.rightEnc = rightEnc;
         this.leftEnc = leftEnc;
@@ -105,7 +110,7 @@ public class Odometer2 extends Odometer{
         this.leftEncDir = LD;
         this.backEncDir = BD;
 
-        this.hardwareMap = hardwareMap;
+        this.imu = imu;
         this.opmode = oppy;
 
     }
@@ -115,16 +120,6 @@ public class Odometer2 extends Odometer{
         rightEnc.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         leftEnc.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         backEnc.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        imu = hardwareMap.get(BNO055IMU.class, "imu");
-        BNO055IMU.Parameters Params = new BNO055IMU.Parameters();
-        Params.angleUnit           = BNO055IMU.AngleUnit.DEGREES;
-        Params.accelUnit           = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
-        Params.calibrationDataFile = "BNO055IMUCalibration.json"; // see the calibration sample opMode
-        Params.loggingEnabled      = true;
-        Params.loggingTag          = "IMU";
-        Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
-        imu.initialize(Params);
 
     }
 
@@ -175,42 +170,20 @@ public class Odometer2 extends Odometer{
             leftChange = left - leftLastVal;
             backChange = back - backLastVal;
 
-            // Calculating the position-change-vector from Left+Right encoders
             headingChange = heading - headingLastVal;
 
-            if(headingChange == 0) { // RobotHardware has gone straight/not moved
-
-                posChangeLR[0] = 0;
-                posChangeLR[1] = rightChange;
-
-            }else if(Math.abs(rightChange) < Math.abs(leftChange)){ // l is on inside - verified
-
-                xOffestLR = leftChange/headingChange;
-
-                // "Similar circles" then trig to get dimensions of the triangle
-                posChangeLR[0] = Math.cos(headingChange) * (xOffestLR + robotRad) - (xOffestLR + robotRad);
-                posChangeLR[1] = Math.sin(headingChange) * (xOffestLR + robotRad);
-
-            }else{ //r is on inside - verified
-
-                headingChange = headingLastVal - heading;
-
-                xOffestLR = rightChange/headingChange;
-
-                // "Similar circles" then trig to get dimensions of the triangle
-                posChangeLR[0] = (xOffestLR + robotRad) - Math.cos(headingChange) * (xOffestLR + robotRad);
-                posChangeLR[1] = Math.sin(headingChange) * (xOffestLR + robotRad);
-
-            }
-
-            //Calculating the position-change-vector from back encoder
-
-            headingChange = heading - headingLastVal;
-
-            // Calculating how much of the change was due to the robot turning
-            backOmniAdjust = backRad * headingChange;
-            // Subtract that from the reading to find horizontal distance
+            // Calculating the position-change-vector from Left encoder
+            leftOmniAdjust = robotRad * headingChange; //negative if headingChange is positive
+            leftOmniExtra = leftChange - leftOmniAdjust;
+            // Calculating the position-change-vector from Right encoder
+            rightOmniAdjust = robotRad * headingChange; //positive if headingChange is positive
+            rightOmniExtra = rightChange - rightOmniAdjust;
+            // Calculating the position-change-vector from Back encoder
+            backOmniAdjust = backRad * headingChange; //negative if headingChange is positive
             backOmniExtra = backChange - backOmniAdjust;
+
+            posChangeLR[0] = Math.cos(headingChange) * (leftOmniExtra + rightOmniExtra)/2;
+            posChangeLR[1] = Math.sin(headingChange) * (leftOmniExtra + rightOmniExtra)/2;
 
             posChangeB[0] = Math.cos(headingChange) * backOmniExtra;
             posChangeB[1] = Math.sin(headingChange) * backOmniExtra;
@@ -255,7 +228,7 @@ public class Odometer2 extends Odometer{
         Orientation angles = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         double d = AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle);
 
-        return d % 360;
+        return (d+360)%360;
     }
 
     public double[] getUpdateRelVelocity() {

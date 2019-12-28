@@ -8,6 +8,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.Controllers.Proportional;
+import org.firstinspires.ftc.teamcode.Odometry.Odometer;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 
 import org.firstinspires.ftc.teamcode.Controllers.ConstantProportional;

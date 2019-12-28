@@ -16,7 +16,7 @@ public class EncoderTest extends LinearOpMode {
     private DcMotor Encoder1;
     private DcMotor Encoder2;
 
-    private final double omniRadius = 2.3622; //Radius of Omni wheels
+    private final double omniRadius = 3.0; //Radius of Omni wheels
     private final double gearing = 1.0; //How many times does the Omni spin for each spin of the encoder
     private final double ticksPerRotation = 8192;
 

@@ -59,7 +59,7 @@ public class TeleOpFinal extends LinearOpMode {
     private int TIME = 0;
     private int lastPressedFlipper = 0; //0 is in position , 1 is out position
     private int liftAverage = 0;
-    private int liftMax = 1300;
+    private int liftMax = 1425;
     private int liftGoal = 0;
     private int blocklevel = 0; //first level corresponds to second block. 0th level is first block.
     private boolean slidesResetting = false;
@@ -70,14 +70,7 @@ public class TeleOpFinal extends LinearOpMode {
     private boolean liftAtBottom = true;
     private int grabberState = 0;
     private boolean liftManualMode = false;
-
-
-
-
-
-
-
-
+    
     private void initialize(){
         // Initialize all objects declared above
         //MOTOR NAMING SCHEME FOR HARDWARE MAP:
@@ -313,6 +306,18 @@ public class TeleOpFinal extends LinearOpMode {
                     dpadUpPressed = false;
                     slidesRunning = true;
                 }
+                if (gamepad2.dpad_down) {
+                    dpadDownPressed = true;
+                }
+                if (!gamepad2.dpad_down && dpadDownPressed){
+                    dpadDownPressed = false;
+                    liftGoal = liftGoal-50;
+                    if (liftGoal < 0){
+                        liftGoal = 0;
+                    }
+                }
+
+
                 if (liftGoal - liftAverage > 100 && slidesRunning) {
                     liftRight.setPower(-0.6);
                     liftLeft.setPower(-0.6);

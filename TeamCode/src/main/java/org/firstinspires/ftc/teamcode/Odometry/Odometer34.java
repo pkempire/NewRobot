@@ -32,6 +32,7 @@ public class Odometer34 extends Odometer{
     private double lastX;
     private double lastY;
     private double heading;
+    private double headingContinuous;
     private double headingOffset;
     private double[] position = {0, 0};
 
@@ -63,9 +64,9 @@ public class Odometer34 extends Odometer{
     public boolean isRunning = true;
 
     //Important constants
-    private double robotRad = 15; // Radius of the robot (Left to Right / 2)
-    private double backRad = 9; // Distance from the center to the back Omni
-    private final double encdrRad = 2.3622; // Radius of the Omni wheel
+    private double robotRad = 16.02; // Radius of the robot (Left to Right / 2)
+    private double backRad = -6.24; // Distance from the center to the back Omni -6.24
+    private final double encdrRad = 3.0; // Radius of the Omni wheel
     private final double ticksPerRotation = 8192; //How many ticks are in 1 revolution of the encoder FAX
     private double gear = 1.0; //How many times does the Omni spin for each spin of the encoder
     private double encScale;
@@ -129,6 +130,7 @@ public class Odometer34 extends Odometer{
 
         headingOffset = Heading;
         headingLastVal = 0;
+        headingContinuous = 0;
 
     }
 
@@ -178,6 +180,15 @@ public class Odometer34 extends Odometer{
 
             headingChange = heading - headingLastVal;
 
+            //Fixing wrap-around issue - make headingChange less than 360
+            if (heading - headingLastVal < -3){
+                headingChange = heading - headingLastVal + 2*Math.PI;
+            }else if (heading - headingLastVal > 3) {
+                headingChange = heading - headingLastVal - 2*Math.PI;
+            }else{
+                headingChange = heading - headingLastVal;
+            }
+
             backOmniAdjust = backRad * headingChange;
             backOmniExtra = backChange - backOmniAdjust;
 
@@ -195,6 +206,7 @@ public class Odometer34 extends Odometer{
             x = lastX + rotatedMovement[0];
             y = lastY + rotatedMovement[1];
 
+            headingContinuous += headingChange;
 
         }
     }
@@ -223,7 +235,7 @@ public class Odometer34 extends Odometer{
         Orientation angles = imu.getAngularOrientation().toAxesReference(AxesReference.INTRINSIC).toAxesOrder(AxesOrder.ZYX);
         double d = AngleUnit.DEGREES.fromUnit(angles.angleUnit, angles.firstAngle);
 
-        return d % 360;
+        return (d+360) % 360;
     }
 
     public double getRightReading() {
@@ -243,7 +255,7 @@ public class Odometer34 extends Odometer{
     }
 
     public double getHeadingDeg() {
-        return Math.toDegrees(heading);
+        return Math.toDegrees(headingContinuous); //feeds a continous heading to the drive class
     }
 
     public double getHeadingAbsoluteDeg() { return Math.toDegrees(heading) % 360;

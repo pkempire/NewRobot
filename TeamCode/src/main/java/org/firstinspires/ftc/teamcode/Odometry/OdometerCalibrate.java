@@ -52,7 +52,7 @@ public class OdometerCalibrate extends LinearOpMode {
         Encoder2 = hardwareMap.dcMotor.get("driveBackLeft");
 
         Imu.initialize(Params);
-        Adham = new Odometer34(Encoder, Encoder1, Encoder2, Imu, -1, 1, -1, this);
+        Adham = new Odometer34(Encoder, Encoder1, Encoder2, Imu, 1, -1, 1, this);
         Adham.initialize();
         Adham.startTracking(0, 0, 0);
 
@@ -94,7 +94,7 @@ public class OdometerCalibrate extends LinearOpMode {
         delay(500);
 
         double robotRad = (Adham.getRightReading()-Adham.getLeftReading()) / (4*headingChange/360*Math.PI);
-        double backRad = backChange / 2 / Math.PI;
+        double backRad = backChange * 360/headingChange / (2 * Math.PI); //2 x PI x r = circumference
 
         delay(5000);
         telemetry.addData("Update", "Test complete");

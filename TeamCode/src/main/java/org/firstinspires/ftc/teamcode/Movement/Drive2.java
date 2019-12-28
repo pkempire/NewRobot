@@ -28,6 +28,12 @@ public class Drive2 extends Subsystem {
 
     private int count;
 
+    public boolean telem0;
+    public boolean telem1;
+    public double telem2;
+    public double telem3;
+
+
     public Drive2(DcMotor Lf, DcMotor Rf, DcMotor Lb, DcMotor Rb, Odometer34 Odometree, LinearOpMode oppy) {
 
         this.frontLeft = Lf;
@@ -155,6 +161,7 @@ public class Drive2 extends Subsystem {
         double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
 
         while(distance > posThreshold || Math.abs(orient.getError()) > headThreshold) {
+
             if (opmode.opModeIsActive()) {
 
                 Xdiff = x - Adhameter.getPosition()[0];
@@ -163,6 +170,7 @@ public class Drive2 extends Subsystem {
                 distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
 
                 double h = Adhameter.getHeadingDeg();
+
 
                 double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
                 double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
@@ -197,7 +205,7 @@ public class Drive2 extends Subsystem {
                 backRight.setPower(finalbr);
 
                 localize();
-         /*
+
                 String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
                 Log.d("FTC", logStr);
                 Log.d("FTC", "distance: " + distance);
@@ -207,7 +215,6 @@ public class Drive2 extends Subsystem {
                 Log.d("FTC","xDiff: " + Xdiff);
                 Log.d("FTC","yDiff: " + Ydiff);
                 Log.d("FTC","------------------------------------");
-*/
 
             }else {
                 break;
@@ -349,7 +356,49 @@ public class Drive2 extends Subsystem {
         isRunning = false;
     }
 
+    public void moveToPoint(double targX, double targY, double targH, double posThresh, double headThresh) {
+
+        isRunning = true;
+
+        count = 0;
+
+        Proportional orient = new Proportional(0.02, 0.4);
+
+        double initialDistance = Math.hypot(targX - Adhameter.getPosition()[0], targY - Adhameter.getPosition()[1]);
+        double xDist, yDist, distance, h;
+        double targSpeed, scale;
+        double targVX, targVY, hCorrect;
+        boolean endCondition;
+
+        VelocityCurve velocityCurve = new VelocityCurve(0.7, 0.2, 5, 5, initialDistance+10, "P");
+
+        do{
+            xDist = targX - Adhameter.getPosition()[0];
+            yDist = targY - Adhameter.getPosition()[1];
+            distance = Math.hypot(xDist, yDist);
+            h = Adhameter.getHeadingDeg();
+
+            targSpeed = velocityCurve.getOutput(distance);
+            scale = targSpeed/distance;
+
+            targVX = xDist * scale;
+            targVY = yDist * scale;
+
+            hCorrect = orient.getCorrection(targH, h);
+
+            setGlobalVelocity(targVX, targVY, hCorrect);
+
+            endCondition = (distance < posThresh) && (Math.abs(orient.getError()) < headThresh);
+            localize();
+        }while(!endCondition);
+
+        setGlobalVelocity(0, 0, 0);
+
+        isRunning = false;
+    }
+
     public void moveByAmount(double xChange, double yChange, double headingChange) {
+
         double x = Adhameter.getPosition()[0];
         double y = Adhameter.getPosition()[1];
         double heading = Adhameter.getHeadingAbsoluteDeg();
@@ -357,75 +406,25 @@ public class Drive2 extends Subsystem {
 
     }
 
-    public void goToPointStraight(double x, double y, double threshold) {
-        isRunning = true;
-
-        double Xdiff = x - Adhameter.getPosition()[0];
-        double Ydiff = y - Adhameter.getPosition()[1];
-        double direction;
-        double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
-
-        while (distance > threshold) {
-            if (opmode.opModeIsActive()) {
-
-                Xdiff = y - Adhameter.getPosition()[0];
-                Ydiff = x - Adhameter.getPosition()[1];
-                direction = Math.toDegrees(Math.atan(Ydiff/Xdiff));
-                distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
-
-                pointInDirectionRough((direction-90), 10);
-
-                frontLeft.setPower(0.5);
-                backLeft.setPower(0.5);
-                frontRight.setPower(0.5);
-                backRight.setPower(0.5);
-
-                delay(500);
-                localize();
-
-            }else {
-                break;
-            }
-        }
-        isRunning = false;
-    }
-
-    public void goToPointCurve(double x, double y, double power, double threshold) {
-        isRunning = true;
-
-        double Xdiff = x - Adhameter.getPosition()[0];
-        double Ydiff = y - Adhameter.getPosition()[1];
-        double direction;
-        double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
-
-        Proportional orient = new Proportional(0.02, 0.9 - power);
-
-        while (distance > threshold) {
-            if (opmode.opModeIsActive()) {
-
-                Xdiff = y - Adhameter.getPosition()[0];
-                Ydiff = x - Adhameter.getPosition()[1];
-                direction = Math.toDegrees(Math.atan(Ydiff/Xdiff));
-                distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
-
-                double correct = orient.getCorrection(direction, Adhameter.getHeadingDeg());
-
-                frontLeft.setPower(power - correct);
-                backLeft.setPower(power - correct);
-
-                frontRight.setPower(power + correct);
-                backRight.setPower(power + correct);
-
-                localize();
-
-            }else {
-                break;
-            }
-        }
-        isRunning = false;
-    }
-
     // Utility Methods =============================================================================
+
+    public void setGlobalVelocity(double xVel, double yVel, double hVel) {
+        double h = Adhameter.getHeadingDeg();
+
+        double xRelVel = cos(-h) * xVel - sin(-h) * yVel;
+        double yRelVel = sin(-h) * xVel + cos(-h) * yVel;
+
+        double xMotor = xRelVel * 1;
+        double yMotor = yRelVel * 1;
+        double hMotor = hVel * 1;
+
+        // X -> Y ^ H e
+        frontLeft.setPower((xMotor + yMotor - hMotor));
+        backLeft.setPower((-xMotor + yMotor - hMotor));
+
+        frontRight.setPower((-xMotor + yMotor + hMotor));
+        backRight.setPower((xMotor + yMotor + hMotor));
+    }
 
     public void localize() {
         Adhameter.calculate();

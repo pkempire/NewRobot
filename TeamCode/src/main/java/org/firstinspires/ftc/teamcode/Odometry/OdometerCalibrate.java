@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Movement.Drive2;
@@ -26,15 +27,13 @@ public class OdometerCalibrate extends LinearOpMode {
     private BNO055IMU Imu;
     private BNO055IMU.Parameters Params;
 
-    private DcMotor Encoder;
-    private DcMotor Encoder1;
-    private DcMotor Encoder2;
+    private DcMotor LeftEncoder;
+    private DcMotor RightEncoder;
 
-    private DcMotor intakeRight;
-    private DcMotor intakeLeft;
+    private ElapsedTime runtime;
 
     private void initialize(){
-        telemetry.addData("Status", "Initializing");
+        telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
         // Initialize all objects declared above
@@ -47,14 +46,23 @@ public class OdometerCalibrate extends LinearOpMode {
         Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         Imu = hardwareMap.get(BNO055IMU.class, "imu");
 
-        Encoder = hardwareMap.dcMotor.get("intakeRight");
-        Encoder1 = hardwareMap.dcMotor.get("intakeLeft");
-        Encoder2 = hardwareMap.dcMotor.get("driveBackLeft");
+        RightFront = hardwareMap.dcMotor.get("driveFrontRight");
+        LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");
+        LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
+        RightBack = hardwareMap.dcMotor.get("driveBackRight");
+
+        RightEncoder = hardwareMap.dcMotor.get("intakeRight");
+        LeftEncoder = hardwareMap.dcMotor.get("intakeLeft");
 
         Imu.initialize(Params);
-        Adham = new Odometer34(Encoder, Encoder1, Encoder2, Imu, 1, -1, 1, this);
+        // Normal bot is (RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this);
+        Adham = new Odometer34(LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this);
         Adham.initialize();
-        Adham.startTracking(0, 0, 0);
+
+        Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
+        Driver.initialize();
+
+        runtime = new ElapsedTime();
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -67,6 +75,9 @@ public class OdometerCalibrate extends LinearOpMode {
         telemetry.addData("Status", "Running");
         telemetry.update();
         //Start Autonomous period
+        runtime.startTime();
+        Adham.startTracking(0, 0, 0);
+
         double headingChange;
         double backChange;
 
@@ -79,10 +90,6 @@ public class OdometerCalibrate extends LinearOpMode {
 
         delay(10000);
 
-        telemetry.addData("Update", "Turn complete. Make sure your robot did not move during the turn");
-        telemetry.update();
-        delay(500);
-
         Adham.calculate();
 
         double endHeading = Adham.getHeadingDeg();
@@ -90,15 +97,16 @@ public class OdometerCalibrate extends LinearOpMode {
 
         headingChange = endHeading - initialHeading;
         backChange = endBack - initialBack;
-        
-        delay(500);
 
-        double robotRad = (Adham.getRightReading()-Adham.getLeftReading()) / (4*headingChange/360*Math.PI);
-        double backRad = backChange * 360/headingChange / (2 * Math.PI); //2 x PI x r = circumference
+        telemetry.addData("Update", "Turn complete.");
+        telemetry.update();
+        delay(900);
 
-        delay(5000);
+        double robotRad = (Adham.getRightReading()-Adham.getLeftReading()) / (4*Math.PI);
+        double backRad = backChange * 360/headingChange / 2 / Math.PI; //2 x PI x r = circumference
         telemetry.addData("Update", "Test complete");
         telemetry.addData("Your robot radius is ", robotRad);
+        telemetry.addData("Your back wheel rolled ", backChange);
         telemetry.addData("Your back radius is ", backRad);
         telemetry.update();
 

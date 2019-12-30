@@ -50,7 +50,9 @@ public class OdometerTest2 extends LinearOpMode {
         LeftEncoder = hardwareMap.dcMotor.get("intakeLeft");
 
         Imu.initialize(Params);
-        Adham = new Odometer34(RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this);
+        // Normal bot is (RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this);
+        // Inverted bot is (LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this);
+        Adham = new Odometer34(LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this);
         Adham.initialize();
 
         Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);

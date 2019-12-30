@@ -76,14 +76,11 @@ public class DriveTest extends LinearOpMode {
         //Start Autonomous period
         Adham.startTracking(0, 0, 0);
 
-        Driver.testMotors();
-        delay(2000);
-        Driver.testMotors();
-        delay(2000);
-        Driver.testMotors();
-        delay(2000);
+        Driver.strafeToPointOrient(30, 30, 0, 2, 3);
+        telemetry.addData("First movement completed", "finally");
+        //Driver.moveToPoint(15,15,0,3,2);
 
-        Driver.strafeToPointOrient(30, 0, 30, 2, 1);
+        //Driver.strafeToPointOrient(0,0,0,2 ,1);
 
         /*
         Driver.strafeToPointOrient(17,72,-90,2,1);

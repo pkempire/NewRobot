@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Subsystem;
 
-public class Odometer34 extends Odometer{
+public class OdometerKaden extends Odometer{
 
     // Declare all objects needed for Odometry
 
@@ -83,7 +83,7 @@ public class Odometer34 extends Odometer{
     private LinearOpMode opmode;
 
     //3 Encoder objects, The distance from the L and R Omni's to the center, The distance from the back Omni to the center, the radius of the Omni
-    public Odometer34(DcMotor rightEncoder, DcMotor leftEncoder, DcMotor backEncoder, BNO055IMU imu, double RD, double LD, double BD, LinearOpMode oppy){
+    public OdometerKaden(DcMotor rightEncoder, DcMotor leftEncoder, DcMotor backEncoder, BNO055IMU imu, double RD, double LD, double BD, LinearOpMode oppy){
 
         this.rightEnc = rightEncoder;
         this.leftEnc = leftEncoder;
@@ -152,58 +152,22 @@ public class Odometer34 extends Odometer{
 
             headingChange = heading - headingLastVal;
 
-            if (headingChange < -3){ // For example 355 to 2 degrees
-                headingChange = 2*Math.PI + headingChange;
-                crossed = true;
-            }else if (headingChange > 3) { // For example 2 to 355 degrees
-                headingChange = -2*Math.PI + headingChange;
-                crossed = true;
-            }else{
-                crossed = false;
-            }
-
-            //Calculating the position-change-vector from Left+Right encoders
-
-            if(headingChange == 0) { // RobotHardware has gone straight/not moved
-
-                posChangeLR[0] = 0;
-                posChangeLR[1] = (rightChange + leftChange) / 2;
-
-            }else if(Math.abs(rightChange) < Math.abs(leftChange)){ //l is on inside - verified
-
-                xOffestLR = leftChange/headingChange;
-
-                posChangeLR[0] = Math.cos(headingChange) * (xOffestLR + robotRad) - (xOffestLR + robotRad);
-                posChangeLR[1] = Math.sin(headingChange) * (xOffestLR + robotRad);
-
-            }else{ //r is on inside - verified
-
-                xOffestLR = rightChange/(-headingChange);
-
-                posChangeLR[0] = (xOffestLR + robotRad) - Math.cos(-headingChange) * (xOffestLR + robotRad);
-                posChangeLR[1] = Math.sin(-headingChange) * (xOffestLR + robotRad);
-
-            }
-
-            //Calculating the position-change-vector from back encoder
-            backOmniAdjust = backRad * headingChange;
-            backOmniExtra = backChange - backOmniAdjust;
-
-            posChangeB[0] = Math.cos(headingChange) * backOmniExtra;
-            posChangeB[1] = Math.sin(headingChange) * backOmniExtra;
 
             //Add the two vectors together
-            totalPosChange[0] = posChangeLR[0] + posChangeB[0];
+            totalPosChange[0] = robotRad + leftChange;
             totalPosChange[1] = posChangeLR[1] + posChangeB[1];
 
-            //Rotate the vector;
-            rotatedMovement[0] = totalPosChange[0] * Math.cos(headingLastVal) - totalPosChange[1] * Math.sin(headingLastVal);
-            rotatedMovement[1] = totalPosChange[0] * Math.sin(headingLastVal) + totalPosChange[1] * Math.cos(headingLastVal);
+            x = lastX + totalPosChange[0];
+            y = lastY + totalPosChange[1];
 
-            x = lastX + rotatedMovement[0];
-            y = lastY + rotatedMovement[1];
+            lastX = x;
+            lastY = y;
 
-            headingContinuous += headingChange;
+            rightLastVal = right;
+            leftLastVal = left;
+            backLastVal = back;
+
+            headingLastVal = heading;
 
         }
     }
@@ -252,7 +216,7 @@ public class Odometer34 extends Odometer{
     }
 
     public double getHeadingDeg() {
-        return Math.toDegrees(heading); //feeds a continuous heading to the drive class
+        return Math.toDegrees(headingContinuous); //feeds a continuous heading to the drive class
     }
 
     public double getHeadingRaw() {

@@ -70,7 +70,7 @@ public class TeleOpFinal extends LinearOpMode {
     private boolean liftAtBottom = true;
     private int grabberState = 0;
     private boolean liftManualMode = false;
-    
+
     private void initialize(){
         // Initialize all objects declared above
         //MOTOR NAMING SCHEME FOR HARDWARE MAP:
@@ -430,11 +430,11 @@ public class TeleOpFinal extends LinearOpMode {
                     lastPressedFlipper = 1; //0 is in the chassis, 1 is out of the chassis
                 }
                 if (lastPressedFlipper == 0) {
-                    flipperServoLeft.setPosition(0.31);
-                    flipperServoRight.setPosition(0.69);
+                    flipperServoLeft.setPosition(0.25);//.31
+                    flipperServoRight.setPosition(0.75);//.69
                 } else if (lastPressedFlipper == 1) {
-                    flipperServoLeft.setPosition(0.89);
-                    flipperServoRight.setPosition(0.11);
+                    flipperServoLeft.setPosition(0.89);//.89
+                    flipperServoRight.setPosition(0.11);//.11
                 }
 
 

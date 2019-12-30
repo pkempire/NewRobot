@@ -52,7 +52,8 @@ public class OdometerTest extends LinearOpMode {
         LeftEncoder = hardwareMap.dcMotor.get("intakeLeft");
 
         Imu.initialize(Params);
-        Adham = new Odometer34(RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this);
+        // Normal bot is (RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this);
+        Adham = new Odometer34(LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this);
         Adham.initialize();
 
         Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
@@ -73,13 +74,18 @@ public class OdometerTest extends LinearOpMode {
         Adham.startTracking(0, 0, 0);
 
         while(opModeIsActive()) {
-            telemetry.addData("heading", Adham.getHeadingAbsoluteDeg());
+            telemetry.addData("heading", Adham.getHeadingRaw());
             telemetry.addData("X", Adham.getPosition()[0]);
             telemetry.addData("Y", Adham.getPosition()[1]);
+            telemetry.addData("HeadingChange", Math.toDegrees(Adham.getHeadingChange()));
+            telemetry.addData("ContinuousHeading", Math.toDegrees(Adham.getHeadingDeg()));
+            telemetry.addData("CrossedHeading0", Adham.crossed);
+            telemetry.addData("Front Left Omni", Adham.getLeftReading());
+            telemetry.addData("Front Right Omni", Adham.getRightReading());
+            telemetry.addData("Back Omni", Adham.getBackReading());
             telemetry.update();
 
-            //Driver.localize();
-            Adham.update();
+            Driver.localize();
             
         }
         //Make sure nothing is still using the thread

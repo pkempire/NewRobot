@@ -62,10 +62,10 @@ public class Drive2 extends Subsystem {
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         count = 0;
 
@@ -151,10 +151,11 @@ public class Drive2 extends Subsystem {
 
         count = 0;
 
-        PID holdFar = new PID(0.015, 0.000, 0.00, 0, 0.4);
-        PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4);
+        PID holdFar = new PID(0.024, 0.000, 0.00, 0, 0.4);
+       // PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4); //PID controller used on previous robot
+        PID holdNear = new PID(0.012, 0.02, 0.0, 5, 0.4);//PID tuned by Miles and Nate. Not working yet.
 
-        Proportional orient = new Proportional(0.02, 0.4);
+        Proportional orient = new Proportional(0.02, 0.4);//P used on previous robot
 
         double Xdiff = x - Adhameter.getPosition()[0];
         double Ydiff = y - Adhameter.getPosition()[1];
@@ -169,7 +170,7 @@ public class Drive2 extends Subsystem {
 
                 distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
 
-                double h = Adhameter.getHeadingDeg();
+                double h = Adhameter.getHeadingDeg(); //uses continous heading created in odometer34. not verified.
 
 
                 double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
@@ -180,7 +181,7 @@ public class Drive2 extends Subsystem {
                 double xCorrect;
                 double yCorrect;
 
-                if (distance > 10) {
+                if (distance > 25) {//used to be 10. Miles and Nate set to 0 to essentially disable for now
                     xCorrect = holdFar.getCorrection(0, XD);
                     yCorrect = holdFar.getCorrection(0, YD);
                 } else {
@@ -188,7 +189,7 @@ public class Drive2 extends Subsystem {
                     yCorrect = holdNear.getCorrection(0, YD);
                 }
 
-                double power = 1.15;
+                double power = 1.05;
 
                 double finalfl = (power * (-xCorrect - yCorrect - hCorrect));
 
@@ -428,9 +429,13 @@ public class Drive2 extends Subsystem {
 
     public void localize() {
         Adhameter.calculate();
-        if(count%6 == 0) {
+        //Adhameter.integrate(); // MUST INTEGRATE EVERY LOOP (or else strafeToPointOrient fails)
+        /*
+        if(count%3 == 0) {
             Adhameter.integrate();
         }
+        */
+
         count++;
     }
 
@@ -476,34 +481,22 @@ public class Drive2 extends Subsystem {
         x2 = -driver.left_stick_x;
         y2 = -driver.left_stick_y;
 
-        if(!fieldCentric) {
+        if(fieldCentric) {
+
+            setGlobalVelocity(x1, y1, x2);
+
+        }else {
             rf = (y1 + x1) * powerScale;
             rb = (y1 - x1) * powerScale;
             lf = (y2 - x2) * powerScale;
             lb = (y2 + x2) * powerScale;
 
-        }else {
-            h = Adhameter.getHeadingAbsoluteDeg();
-            diff = y1 - y2;
-            x = x1 + x2;
-            y = y1 + y2;
-
-            //rotate movement vector clockwise by heading
-            double X = cos(-h) * x - sin(-h) * y;
-            double Y = sin(-h) * x + cos(-h) * y;
-
-            rf = (Y + X + diff/2) * powerScale;
-            rb = (Y - X + diff/2) * powerScale;
-            lf = (Y - X - diff/2) * powerScale;
-            lb = (Y + X - diff/2) * powerScale;
+            frontLeft.setPower(lf);
+            backLeft.setPower(lb);
+            frontRight.setPower(rf);
+            backRight.setPower(rb);
 
         }
-
-        frontLeft.setPower(lf);
-        backLeft.setPower(lb);
-        frontRight.setPower(rf);
-        backRight.setPower(rb);
-
     }
 
 }

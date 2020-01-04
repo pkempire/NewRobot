@@ -125,17 +125,19 @@ public class BlueTeamFullAuto extends LinearOpMode {
         telemetry.update();
 
         //Put Arm Half Down
-        autoFlipperLeft.setPosition(.42);
+        autoFlipperLeft.setPosition(.39);
         //Open Grabber
         autoGrabberLeft.setPosition(.65);
 
+        delay(400);
+
         //GRAB FIRST BLOCK
         if(skyPosition == 0) { //Skystone Closest To Wall
-            Driver.strafeToPointOrient(11, 69, 270, 1, 1,1); //closest to field wall
+            Driver.strafeToPointOrient(11, 68, 270, 1, 1,.95); //closest to field wall
         }else if(skyPosition == 1) { //Center Skystone
-            Driver.strafeToPointOrient(-6, 69, 270, 1, 1,1);
+            Driver.strafeToPointOrient(-6, 68, 270, 1, 1,.95);
         }else if(skyPosition == 2) { //Furthest Skystone From Wall
-            Driver.strafeToPointOrient(-30, 69, 270, 1, 1,1); //furthest from field wall
+            Driver.strafeToPointOrient(-30, 68, 270, 1, 1,.95); //furthest from field wall
 
         }
         grabBlock();
@@ -153,39 +155,39 @@ public class BlueTeamFullAuto extends LinearOpMode {
         Driver.strafeToPointLong(0,65,270,50,3,1.15); //RETURNING SPECIAL THRESH MOVEMENT
         delay(20);
 
-        autoFlipperLeft.setPosition(.42); //put arm half down
+        autoFlipperLeft.setPosition(.39); //put arm half down
         autoGrabberLeft.setPosition(.65); //open grabber
         delay(20);
 
         //GRAB SECOND BLOCK
         if(skyPosition == 0) { //Skystone Closest To Wall
-            Driver.strafeToPointOrient(65,64,270,1,1, 1.05); //go to 72
+            Driver.strafeToPointOrient(63,63,270,1,1, 1.05); //go to 72
             delay(20);
-            Driver.strafeToPointOrient(68,76,270,1,1, 1.05);
+            Driver.strafeToPointOrient(68,75,270,1,1, 1.05);
             grabBlock();
 
         }else if(skyPosition == 1) { //Center Skystone
-            Driver.strafeToPointOrient(53,64,270,1,1, 1.05);
+            Driver.strafeToPointOrient(53,62,270,1,1, 1.05);
             delay(20);
-            Driver.strafeToPointOrient(53,76,270,1,1, 1.05);
+            Driver.strafeToPointOrient(53,75,270,1,1, 1.05);
             grabBlock();
 
         }else if(skyPosition == 2) { //Furthest Skystone From Wall
-            Driver.strafeToPointOrient(28,64,270,1,1, 1.05);
+            Driver.strafeToPointOrient(28,62,270,1,1, 1.05);
             delay(20);
-            Driver.strafeToPointOrient(28,76,270,1,1, 1.05);
+            Driver.strafeToPointOrient(28,75,270,1,1, 1.05);
             grabBlock();
 
         }
 
         //Go Under Sky-bridge
-        Driver.strafeToPointLong(-110,60,270,30,1,1.15);
+        Driver.strafeToPointLong(-110,64,270,30,1,1.15);
         delay(20);
 
         //Go to Foundation
         Driver.strafeToPointOrient(-175,65,270,3,2, 1.05);
 
-        Driver.strafeToPointOrient(-205,78,270,2,1, 1.1);
+        Driver.strafeToPointOrient(-205,76,270,2,1, 1.1);
 
         depositBlock();
 
@@ -199,14 +201,14 @@ public class BlueTeamFullAuto extends LinearOpMode {
         delay(20);
 
         //Back up into foundation
-        Driver.driveStraight(.25,-1,42);
+        Driver.driveStraight(.25,-1,35);
 
         //Clamp
         foundationClampLeft.setPosition(0.255);
         foundationClampRight.setPosition(0.75);
         delay(350);
 
-        Driver.strafeToPointOrientFoundation(-160,62,270,5,5); //take foundation into second-to-final position
+        Driver.strafeToPointOrientFoundation(-160,60,270,5,4); //take foundation into second-to-final position
         delay(20);
 
         //Un-Clamp
@@ -238,10 +240,10 @@ public class BlueTeamFullAuto extends LinearOpMode {
 
     private void grabBlock(){ //must prime arm (open & put fully down) before grabbing
         autoFlipperLeft.setPosition(.25); //put arm fully down
-        delay(250); //350
+        delay(350); //350
         autoGrabberLeft.setPosition(.23); //grab stone
-        delay(300);
-        autoFlipperLeft.setPosition(.77); // arm up
+        delay(400);
+        autoFlipperLeft.setPosition(.74); // arm up
     }
 
     private void depositBlock(){
@@ -250,7 +252,7 @@ public class BlueTeamFullAuto extends LinearOpMode {
         delay(300);
         autoGrabberLeft.setPosition(.65); //open grabber
         delay(250);
-        autoFlipperLeft.setPosition(.77); // arm up
+        autoFlipperLeft.setPosition(.74); // arm up
         autoGrabberLeft.setPosition(.23); //grabber closed
     }
 

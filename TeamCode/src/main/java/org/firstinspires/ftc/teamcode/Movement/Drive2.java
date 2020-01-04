@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.Movement;
 
+import android.content.ContentProviderOperation;
 import android.util.Log;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -62,10 +63,10 @@ public class Drive2 extends Subsystem {
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         count = 0;
 
@@ -146,37 +147,323 @@ public class Drive2 extends Subsystem {
         isRunning = false;
     }
 
-    public void strafeToPointOrient(double x, double y, double heading, double posThreshold, double headThreshold) { // Verified
+    public void strafeToPointOrient(double x, double y, double heading, double posThreshold, double headThreshold, double power) { // Verified
         isRunning = true;
 
         count = 0;
 
-        PID holdFar = new PID(0.024, 0.000, 0.00, 0, 0.4);
-       // PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4); //PID controller used on previous robot
-        PID holdNear = new PID(0.012, 0.02, 0.0, 5, 0.4);//PID tuned by Miles and Nate. Not working yet.
+        PID holdFar = new PID(0.022, 0.000, 0.00, 0, 0.4);
+        //PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4); //PID controller used on previous robot
+        PID holdNear = new PID(0.013, 0.02, 0.01, 5, 0.4);//PID tuned by Miles and Nate. Not working yet.
 
         Proportional orient = new Proportional(0.02, 0.4);//P used on previous robot
 
-        double Xdiff = x - Adhameter.getPosition()[0];
-        double Ydiff = y - Adhameter.getPosition()[1];
+        double Xdiff = 500;
+        double Ydiff = 500;
         double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+        double h = 10000;
+        double hDistance, direction;
 
         while(distance > posThreshold || Math.abs(orient.getError()) > headThreshold) {
 
             if (opmode.opModeIsActive()) {
 
+                localize();
+
                 Xdiff = x - Adhameter.getPosition()[0];
                 Ydiff = y - Adhameter.getPosition()[1];
 
+                h = Adhameter.getHeadingDeg();
+
                 distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
 
-                double h = Adhameter.getHeadingDeg(); //uses continous heading created in odometer34. not verified.
+                //Figure out the smallest arc
+                hDistance = heading - h;
+                if(hDistance%360 < 180){ // Clockwise
+                    direction = 1;
+                }else{ // Counter-clockwise
+                    direction = -1;
+                }
 
+                double hCorrect = direction * (-orient.getCorrection(0, hDistance));
 
                 double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
                 double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
 
-                double hCorrect = orient.getCorrection(heading, h);
+                double xCorrect;
+                double yCorrect;
+
+                if (distance > 15) {//used to be 10. Miles and Nate set to 0 to essentially disable for now
+                    xCorrect = holdFar.getCorrection(0, XD);
+                    yCorrect = holdFar.getCorrection(0, YD);
+                } else {
+                    xCorrect = holdNear.getCorrection(0, XD);
+                    yCorrect = holdNear.getCorrection(0, YD);
+                }
+
+
+                double finalfl = (power * (-xCorrect - yCorrect - hCorrect));
+
+                double finalbl = (power * (xCorrect - yCorrect - hCorrect));
+
+                double finalfr = (power * (xCorrect - yCorrect + hCorrect));
+
+                double finalbr = (power * (-xCorrect - yCorrect + hCorrect));
+
+                frontLeft.setPower(finalfl);
+                backLeft.setPower(finalbl);
+
+                frontRight.setPower(finalfr);
+                backRight.setPower(finalbr);
+
+                //localize();
+/*
+                String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
+                Log.d("FTC", logStr);
+                Log.d("FTC", "distance: " + distance);
+                Log.d("FTC", "xCorrect: " + xCorrect);
+                Log.d("FTC","yCorrect: " + yCorrect);
+                Log.d("FTC","xCorrect: " + xCorrect);
+                Log.d("FTC","xDiff: " + Xdiff);
+                Log.d("FTC","yDiff: " + Ydiff);
+                Log.d("FTC","------------------------------------");
+*/
+            }else {
+                break;
+            }
+        }
+        frontRight.setPower(0);
+        backRight.setPower(0);
+        frontLeft.setPower(0);
+        backLeft.setPower(0);
+        isRunning = false;
+    }
+
+
+    public void strafeToPointBlock(double x, double y, double heading, double posThreshold, double headThreshold, double power) { // Verified
+        isRunning = true;
+
+        count = 0;
+
+        PID holdFar = new PID(0.022, 0.000, 0.00, 0, 0.4);
+        //PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4); //PID controller used on previous robot
+        PID holdNear = new PID(0.015, 0.013, 0.01, 7, 0.4);//PID tuned by Miles and Nate. Not working yet.
+
+        Proportional orient = new Proportional(0.02, 0.4);//P used on previous robot
+
+        double Xdiff = 500;
+        double Ydiff = 500;
+        double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+        double h = 10000;
+        double hDistance, direction;
+
+        while(distance > posThreshold || Math.abs(orient.getError()) > headThreshold) {
+
+            if (opmode.opModeIsActive()) {
+
+                localize();
+
+                Xdiff = x - Adhameter.getPosition()[0];
+                Ydiff = y - Adhameter.getPosition()[1];
+
+                h = Adhameter.getHeadingDeg();
+
+                distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+
+                //Figure out the smallest arc
+                hDistance = heading - h;
+                if(hDistance%360 < 180){ // Clockwise
+                    direction = 1;
+                }else{ // Counter-clockwise
+                    direction = -1;
+                }
+
+                double hCorrect = direction * (-orient.getCorrection(0, hDistance));
+
+                double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
+                double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
+
+                double xCorrect;
+                double yCorrect;
+
+                if (distance > 15) {//used to be 10. Miles and Nate set to 0 to essentially disable for now
+                    xCorrect = holdFar.getCorrection(0, XD);
+                    yCorrect = holdFar.getCorrection(0, YD);
+                } else {
+                    xCorrect = holdNear.getCorrection(0, XD);
+                    yCorrect = holdNear.getCorrection(0, YD);
+                }
+
+
+                double finalfl = (power * (-xCorrect - yCorrect - hCorrect));
+
+                double finalbl = (power * (xCorrect - yCorrect - hCorrect));
+
+                double finalfr = (power * (xCorrect - yCorrect + hCorrect));
+
+                double finalbr = (power * (-xCorrect - yCorrect + hCorrect));
+
+                frontLeft.setPower(finalfl);
+                backLeft.setPower(finalbl);
+
+                frontRight.setPower(finalfr);
+                backRight.setPower(finalbr);
+
+                //localize();
+/*
+                String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
+                Log.d("FTC", logStr);
+                Log.d("FTC", "distance: " + distance);
+                Log.d("FTC", "xCorrect: " + xCorrect);
+                Log.d("FTC","yCorrect: " + yCorrect);
+                Log.d("FTC","xCorrect: " + xCorrect);
+                Log.d("FTC","xDiff: " + Xdiff);
+                Log.d("FTC","yDiff: " + Ydiff);
+                Log.d("FTC","------------------------------------");
+*/
+            }else {
+                break;
+            }
+        }
+        frontRight.setPower(0);
+        backRight.setPower(0);
+        frontLeft.setPower(0);
+        backLeft.setPower(0);
+        isRunning = false;
+    }
+
+    public void strafeToPointLong(double x, double y, double heading, double posThreshold, double headThreshold, double power) { // Verified
+        isRunning = true;
+
+        count = 0;
+
+        PID holdFar = new PID(0.03, 0.000, 0.00, 0, 0.4);
+        //PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4); //PID controller used on previous robot
+        PID holdNear = new PID(0.01, 0, 0.005, 5, 0.4);//PID tuned by Miles and Nate. Not working yet.
+
+        Proportional orient = new Proportional(0.03, 0.4);//P used on previous robot
+
+        double Xdiff = 500;
+        double Ydiff = 500;
+        double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+        double h = 10000;
+        double hDistance, direction;
+
+        while(distance > posThreshold || Math.abs(orient.getError()) > headThreshold) {
+
+            if (opmode.opModeIsActive()) {
+
+                localize();
+
+                Xdiff = x - Adhameter.getPosition()[0];
+                Ydiff = y - Adhameter.getPosition()[1];
+
+                h = Adhameter.getHeadingDeg();
+
+                distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+
+                //Figure out the smallest arc
+                hDistance = heading - h;
+                if(hDistance%360 < 180){ // Clockwise
+                    direction = 1;
+                }else{ // Counter-clockwise
+                    direction = -1;
+                }
+
+                double hCorrect = direction * (-orient.getCorrection(0, hDistance));
+
+                double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
+                double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
+
+                double xCorrect;
+                double yCorrect;
+
+                if (distance > 15) {//used to be 10. Miles and Nate set to 0 to essentially disable for now
+                    xCorrect = holdFar.getCorrection(0, XD);
+                    yCorrect = holdFar.getCorrection(0, YD);
+                } else {
+                    xCorrect = holdNear.getCorrection(0, XD);
+                    yCorrect = holdNear.getCorrection(0, YD);
+                }
+
+                double finalfl = (power * (-xCorrect - yCorrect - hCorrect));
+
+                double finalbl = (power * (xCorrect - yCorrect - hCorrect));
+
+                double finalfr = (power * (xCorrect - yCorrect + hCorrect));
+
+                double finalbr = (power * (-xCorrect - yCorrect + hCorrect));
+
+                frontLeft.setPower(finalfl);
+                backLeft.setPower(finalbl);
+
+                frontRight.setPower(finalfr);
+                backRight.setPower(finalbr);
+
+                //localize();
+/*
+                String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
+                Log.d("FTC", logStr);
+                Log.d("FTC", "distance: " + distance);
+                Log.d("FTC", "xCorrect: " + xCorrect);
+                Log.d("FTC","yCorrect: " + yCorrect);
+                Log.d("FTC","xCorrect: " + xCorrect);
+                Log.d("FTC","xDiff: " + Xdiff);
+                Log.d("FTC","yDiff: " + Ydiff);
+                Log.d("FTC","------------------------------------");
+*/
+            }else {
+                break;
+            }
+        }
+        frontRight.setPower(0);
+        backRight.setPower(0);
+        frontLeft.setPower(0);
+        backLeft.setPower(0);
+        isRunning = false;
+    }
+
+    public void strafeToPointOrientFast(double x, double y, double heading, double posThreshold, double headThreshold) { // Verified
+        isRunning = true;
+
+        count = 0;
+
+        PID holdFar = new PID(0.025, 0.000, 0.00, 0, 0.4);
+        //PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4); //PID controller used on previous robot
+        PID holdNear = new PID(0.02, 0.05, 0.005, 5, 0.4);//PID tuned by Miles and Nate. Not working yet.
+
+        Proportional orient = new Proportional(0.02, 0.4);//P used on previous robot
+
+        double Xdiff = 500;
+        double Ydiff = 500;
+        double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+        double h = 10000;
+        double hDistance, direction;
+
+        while(distance > posThreshold || Math.abs(orient.getError()) > headThreshold) {
+
+            if (opmode.opModeIsActive()) {
+
+                localize();
+
+                Xdiff = x - Adhameter.getPosition()[0];
+                Ydiff = y - Adhameter.getPosition()[1];
+
+                h = Adhameter.getHeadingDeg();
+
+                distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+
+                //Figure out the smallest arc
+                hDistance = heading - h;
+                if(hDistance%360 < 180){ // Clockwise
+                    direction = 1;
+                }else{ // Counter-clockwise
+                    direction = -1;
+                }
+                double hCorrect = direction * (-orient.getCorrection(0, hDistance));
+
+                double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
+                double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
 
                 double xCorrect;
                 double yCorrect;
@@ -205,8 +492,8 @@ public class Drive2 extends Subsystem {
                 frontRight.setPower(finalfr);
                 backRight.setPower(finalbr);
 
-                localize();
-
+                //localize();
+/*
                 String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
                 Log.d("FTC", logStr);
                 Log.d("FTC", "distance: " + distance);
@@ -216,7 +503,7 @@ public class Drive2 extends Subsystem {
                 Log.d("FTC","xDiff: " + Xdiff);
                 Log.d("FTC","yDiff: " + Ydiff);
                 Log.d("FTC","------------------------------------");
-
+*/
             }else {
                 break;
             }
@@ -228,55 +515,69 @@ public class Drive2 extends Subsystem {
         isRunning = false;
     }
 
-    public void strafeToPointOrientFast(double x, double y, double heading, double posThreshold, double headThreshold) { // Verified
+    public void strafeToPointOrientFoundation(double x, double y, double heading, double posThreshold, double headThreshold) { // Verified
         isRunning = true;
 
         count = 0;
 
-        PID holdX = new PID(0.002, 0.001 ,0, 7, 0.4);
-        PID holdY = new PID(0.002, 0.001, 0, 7, 0.4);
+        Proportional holdFar = new Proportional(0.035, 0.4);
+        //PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4); //PID controller used on previous robot
+        PID holdNear = new PID(0.02, 0.06, 0.0, 10, 0.42);//PID tuned by Miles and Nate. Not working yet.
 
-        Proportional orient = new Proportional(0.01, 0.4);
+        Proportional orient = new Proportional(0.02, 0.4);//P used on previous robot
 
-        double Xdiff = x - Adhameter.getPosition()[0];
-        double Ydiff = y - Adhameter.getPosition()[1];
+        double Xdiff = 500;
+        double Ydiff = 500;
         double distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
+        double h = 1000;
+        double hDistance, direction;
+        double power = 1.0;
+        double hCorrect;
+        double XD;
+        double YD;
+        double xCorrect;
+        double yCorrect;
 
         while(distance > posThreshold || Math.abs(orient.getError()) > headThreshold) {
+
             if (opmode.opModeIsActive()) {
+
+                localize();
 
                 Xdiff = x - Adhameter.getPosition()[0];
                 Ydiff = y - Adhameter.getPosition()[1];
+
+                h = Adhameter.getHeadingDeg();
+
                 distance = Math.sqrt(Xdiff * Xdiff + Ydiff * Ydiff);
 
-                double h = Adhameter.getHeadingDeg();
+                //Figure out the smallest arc
+                hDistance = heading - h;
+                if(hDistance%360 < 180){ // Clockwise
+                    direction = 1;
+                }else{ // Counter-clockwise
+                    direction = -1;
+                }
 
-                double XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
-                double YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
+                hCorrect = direction * (-orient.getCorrection(0, hDistance));
 
-                double hCorrect = orient.getCorrection(heading, h);
-                double xCorrect = holdX.getCorrection(0, XD);
-                double yCorrect = holdY.getCorrection(0, YD);
+                XD = cos(-h) * Xdiff - sin(-h) * Ydiff;
+                YD = sin(-h) * Xdiff + cos(-h) * Ydiff;
 
-                double power = 1.1;
+                if (distance > 25) {//used to be 10. Miles and Nate set to 0 to essentially disable for now
+                    xCorrect = holdFar.getCorrection(0, XD);
+                    yCorrect = holdFar.getCorrection(0, YD);
+                } else {
+                    xCorrect = holdNear.getCorrection(0, XD);
+                    yCorrect = holdNear.getCorrection(0, YD);
+                }
 
-                double finalfl = (power * (-xCorrect - yCorrect - hCorrect));
+                frontLeft.setPower((power * (-xCorrect - yCorrect - hCorrect)));
+                backLeft.setPower((power * (xCorrect - yCorrect - hCorrect)));
 
-                double finalbl = (power * (xCorrect - yCorrect - hCorrect));
-
-                double finalfr = (power * (xCorrect - yCorrect + hCorrect));
-
-                double finalbr = (power * (-xCorrect - yCorrect + hCorrect));
-
-
-
-                frontLeft.setPower(finalfl);
-                backLeft.setPower(finalbl);
-
-                frontRight.setPower(finalfr);
-                backRight.setPower(finalbr);
-
-                localize();
+                frontRight.setPower((power * (xCorrect - yCorrect + hCorrect)));
+                backRight.setPower((power * (-xCorrect - yCorrect + hCorrect)));
+/*
                 String logStr = "posThreshold "+posThreshold+ "targetX: "+x +"targetY: " + y;
                 Log.d("FTC", logStr);
                 Log.d("FTC", "distance: " + distance);
@@ -286,8 +587,7 @@ public class Drive2 extends Subsystem {
                 Log.d("FTC","xDiff: " + Xdiff);
                 Log.d("FTC","yDiff: " + Ydiff);
                 Log.d("FTC","------------------------------------");
-
-
+*/
             }else {
                 break;
             }
@@ -298,6 +598,7 @@ public class Drive2 extends Subsystem {
         backLeft.setPower(0);
         isRunning = false;
     }
+
 
     public void moveToPointOrient(double targX, double targY, double targH, double posThresh, double headThresh, double maxSpeed, double power) {
 
@@ -357,6 +658,29 @@ public class Drive2 extends Subsystem {
         isRunning = false;
     }
 
+    public void driveStraight(double magnitude, double direction, double gameTicks) {
+        double counter = 0;
+        double emergencyCounter = 10000;
+        while (counter < gameTicks && opmode.opModeIsActive()) {
+            localize();
+            if(counter < emergencyCounter) {
+                frontRight.setPower(magnitude * direction);
+                frontLeft.setPower(magnitude * direction);
+                backRight.setPower(magnitude * direction);
+                backLeft.setPower(magnitude * direction);
+
+                counter++;
+
+            } else {
+                break;
+            }
+        }
+        frontRight.setPower(0);
+        backRight.setPower(0);
+        frontLeft.setPower(0);
+        backLeft.setPower(0);
+    }
+
     public void moveToPoint(double targX, double targY, double targH, double posThresh, double headThresh) {
 
         isRunning = true;
@@ -403,7 +727,7 @@ public class Drive2 extends Subsystem {
         double x = Adhameter.getPosition()[0];
         double y = Adhameter.getPosition()[1];
         double heading = Adhameter.getHeadingAbsoluteDeg();
-        strafeToPointOrient(x + xChange, y + yChange, heading + headingChange, 2, 2);
+        strafeToPointOrient(x + xChange, y + yChange, heading + headingChange, 2, 2, 1.05);
 
     }
 
@@ -419,6 +743,8 @@ public class Drive2 extends Subsystem {
         double yMotor = yRelVel * 1;
         double hMotor = hVel * 1;
 
+        localize();
+
         // X -> Y ^ H e
         frontLeft.setPower((xMotor + yMotor - hMotor));
         backLeft.setPower((-xMotor + yMotor - hMotor));
@@ -428,26 +754,12 @@ public class Drive2 extends Subsystem {
     }
 
     public void localize() {
-        Adhameter.calculate();
-        //Adhameter.integrate(); // MUST INTEGRATE EVERY LOOP (or else strafeToPointOrient fails)
-        /*
-        if(count%3 == 0) {
-            Adhameter.integrate();
-        }
-        */
-
+        Adhameter.update();
         count++;
     }
 
     private void delay(int millis) {
-        int limit = (int)(millis/2);
-        for(int x=0;x<limit; x++) {
-            if (opmode.opModeIsActive()) {
-                try{Thread.sleep(2);}catch(InterruptedException e){e.printStackTrace();}
-            }else {
-                break;
-            }
-        }
+        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
     }
 
     private double cos(double theta) {

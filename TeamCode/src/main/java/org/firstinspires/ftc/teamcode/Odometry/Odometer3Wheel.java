@@ -17,7 +17,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.teamcode.Subsystem;
 
-public class OdometerKaden extends Odometer{
+public class Odometer3Wheel extends Odometer{
 
     // Declare all objects needed for Odometry
 
@@ -65,11 +65,11 @@ public class OdometerKaden extends Odometer{
     public boolean isRunning = true;
 
     //Important constants
-    private double robotRad = 16.02; // Radius of the robot (Left to Right / 2) = 16.02
-    private double backRad = 10.7; // Distance from the center to the back Omni = -6.24
-    private final double encdrRad = 3; // Radius of the Omni wheel !!!!!!!! this used to be = 3.0
-    private final double ticksPerRotation = 8192; //How many ticks are in 1 revolution of the encoder FAX
-    private double gear = 1.0; //How many times does the Omni spin for each spin of the encoder
+    private double robotRad = 16.02; // Radius of the robot (Left to Right / 2) => 16.02
+    private double backRad = -10.7; // Distance from the center to the back Omni => -6.24 //radius should be negative for a forward robot.
+    private final double encdrRad = 3; // Radius of the Omni wheel => 3.0
+    private final double ticksPerRotation = 8192; //How many ticks are in 1 revolution of the encoder => FAX
+    private double gear = 1.0; //How many times does the Omni spin for each spin of the encoder => FAX
     private double encScale;
 
     // Inverting the encoder readings
@@ -83,7 +83,7 @@ public class OdometerKaden extends Odometer{
     private LinearOpMode opmode;
 
     //3 Encoder objects, The distance from the L and R Omni's to the center, The distance from the back Omni to the center, the radius of the Omni
-    public OdometerKaden(DcMotor rightEncoder, DcMotor leftEncoder, DcMotor backEncoder, BNO055IMU imu, double RD, double LD, double BD, LinearOpMode oppy){
+    public Odometer3Wheel(DcMotor rightEncoder, DcMotor leftEncoder, DcMotor backEncoder, BNO055IMU imu, double RD, double LD, double BD, LinearOpMode oppy){
 
         this.rightEnc = rightEncoder;
         this.leftEnc = leftEncoder;
@@ -131,7 +131,7 @@ public class OdometerKaden extends Odometer{
 
         headingOffset = Heading;
         headingLastVal = 0;
-        headingContinuous = 0;
+        headingContinuous = Math.toRadians(headingOffset);
 
     }
 
@@ -144,7 +144,7 @@ public class OdometerKaden extends Odometer{
             back = backEnc.getCurrentPosition() * encScale * backEncDir;
 
             // Calculates direction
-            heading = Math.toRadians(getImuHeading());
+            heading = ((right-left)/2)/robotRad;
 
             rightChange = right - rightLastVal;
             leftChange = left - leftLastVal;
@@ -152,22 +152,58 @@ public class OdometerKaden extends Odometer{
 
             headingChange = heading - headingLastVal;
 
+            if (headingChange < -3){ // For example 355 to 2 degrees
+                headingChange = 2*Math.PI + headingChange;
+                crossed = true;
+            }else if (headingChange > 3) { // For example 2 to 355 degrees
+                headingChange = -2*Math.PI + headingChange;
+                crossed = true;
+            }else{
+                crossed = false;
+            }
+
+            //Calculating the position-change-vector from Left+Right encoders
+
+            if(headingChange == 0) { // RobotHardware has gone straight/not moved
+
+                posChangeLR[0] = 0;
+                posChangeLR[1] = (rightChange + leftChange) / 2;
+
+            }else if(Math.abs(rightChange) < Math.abs(leftChange)){ //l is on inside - verified
+
+                xOffestLR = leftChange/headingChange;
+
+                posChangeLR[0] = Math.cos(headingChange) * (xOffestLR + robotRad) - (xOffestLR + robotRad);
+                posChangeLR[1] = Math.sin(headingChange) * (xOffestLR + robotRad);
+
+            }else{ //r is on inside - verified
+
+                xOffestLR = rightChange/(-headingChange);
+
+                posChangeLR[0] = (xOffestLR + robotRad) - Math.cos(-headingChange) * (xOffestLR + robotRad);
+                posChangeLR[1] = Math.sin(-headingChange) * (xOffestLR + robotRad);
+
+            }
+
+            //Calculating the position-change-vector from back encoder
+            backOmniAdjust = backRad * headingChange;
+            backOmniExtra = backChange - backOmniAdjust;
+
+            posChangeB[0] = Math.cos(headingChange) * backOmniExtra;
+            posChangeB[1] = Math.sin(headingChange) * backOmniExtra;
 
             //Add the two vectors together
-            totalPosChange[0] = robotRad + leftChange;
+            totalPosChange[0] = posChangeLR[0] + posChangeB[0];
             totalPosChange[1] = posChangeLR[1] + posChangeB[1];
 
-            x = lastX + totalPosChange[0];
-            y = lastY + totalPosChange[1];
+            //Rotate the vector;
+            rotatedMovement[0] = totalPosChange[0] * Math.cos(headingLastVal) - totalPosChange[1] * Math.sin(headingLastVal);
+            rotatedMovement[1] = totalPosChange[0] * Math.sin(headingLastVal) + totalPosChange[1] * Math.cos(headingLastVal);
 
-            lastX = x;
-            lastY = y;
+            x = lastX + rotatedMovement[0];
+            y = lastY + rotatedMovement[1];
 
-            rightLastVal = right;
-            leftLastVal = left;
-            backLastVal = back;
-
-            headingLastVal = heading;
+            headingContinuous += headingChange;
 
         }
     }
@@ -216,11 +252,11 @@ public class OdometerKaden extends Odometer{
     }
 
     public double getHeadingDeg() {
-        return Math.toDegrees(headingContinuous); //feeds a continuous heading to the drive class
+        return Math.toDegrees(heading);
     }
 
-    public double getHeadingRaw() {
-        return Math.toDegrees(heading);
+    public double getHeadingContinuous() {
+        return Math.toDegrees(headingContinuous);
     }
 
     public double getHeadingAbsoluteDeg() {

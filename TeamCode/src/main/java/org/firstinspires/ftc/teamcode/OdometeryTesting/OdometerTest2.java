@@ -3,14 +3,17 @@ package org.firstinspires.ftc.teamcode.OdometeryTesting;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Movement.Drive2;
+import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 
-@Autonomous(name="O-Odometer Test Encoder", group="Linear Opmode")
-
+@Autonomous(name="Odometer Test Experiment", group="Linear Opmode")
+@Disabled
 public class OdometerTest2 extends LinearOpMode {
 
     // Declare OpMode members.
@@ -23,6 +26,7 @@ public class OdometerTest2 extends LinearOpMode {
     private DcMotor LeftEncoder;
 
     private Odometer34 Adham;
+    private Odometer34 oldAdham;
     private Drive2 Driver;
     private BNO055IMU Imu;
     private BNO055IMU.Parameters Params;
@@ -40,6 +44,7 @@ public class OdometerTest2 extends LinearOpMode {
         Params.loggingTag          = "IMU";
         Params.accelerationIntegrationAlgorithm = new JustLoggingAccelerationIntegrator();
         Imu = hardwareMap.get(BNO055IMU.class, "imu");
+        Imu.initialize(Params);
 
         RightFront = hardwareMap.dcMotor.get("driveFrontRight");
         LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");
@@ -49,10 +54,10 @@ public class OdometerTest2 extends LinearOpMode {
         RightEncoder = hardwareMap.dcMotor.get("intakeRight");
         LeftEncoder = hardwareMap.dcMotor.get("intakeLeft");
 
-        Imu.initialize(Params);
-        // Normal bot is (RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this);
-        // Inverted bot is (LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this);
-        Adham = new Odometer34(LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this);
+        //oldAdham = new Odometer34(RightFront, LeftFront,LeftBack,Imu,-1,-1,-1,this); //tracking for V1 robot
+
+        Adham = new Odometer34(RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this); // Forward facing robot
+        // Adham = new Odometer34(LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this); // Backwards facing robot
         Adham.initialize();
 
         Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
@@ -73,13 +78,17 @@ public class OdometerTest2 extends LinearOpMode {
         Adham.startTracking(0, 0, 0);
 
         while(opModeIsActive()) {
-            telemetry.addData("Right", Adham.getRightReading());
+            telemetry.addData("heading", Adham.getHeadingDeg());
+            telemetry.addData("X", Adham.getPosition()[0]);
+            telemetry.addData("Y", Adham.getPosition()[1]);
             telemetry.addData("Left", Adham.getLeftReading());
-            telemetry.addData("Back", Adham.getBackReading());
+            telemetry.addData("Right", Adham.getRightReading());
+            telemetry.addData("Horizontal", Adham.getBackReading());
             telemetry.update();
 
-            Driver.localize();
-            
+            Adham.calculate();
+            //delay(100);
+
         }
         //Make sure nothing is still using the thread
     }

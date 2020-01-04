@@ -17,7 +17,7 @@ This is an OpMode to test out controllers.
  */
 
 @Autonomous(name="Controller Test", group="Linear Opmode")
-
+@Disabled
 public class ControllerTest extends LinearOpMode {
 
     // Declare OpMode members.

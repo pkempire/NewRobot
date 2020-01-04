@@ -24,7 +24,7 @@ import org.openftc.easyopencv.OpenCvInternalCamera;
 
 
 @TeleOp(name="D-Path Maker", group="Linear Opmode")
-
+@Disabled
 public class PathMaker extends LinearOpMode {
     // Declare OpMode members ======================================================================
     private DcMotor intakeLeft;

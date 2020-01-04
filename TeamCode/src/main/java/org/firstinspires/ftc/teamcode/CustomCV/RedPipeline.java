@@ -7,7 +7,7 @@ import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 import org.openftc.easyopencv.OpenCvPipeline;
 
-public class MainPipeline extends OpenCvPipeline {
+public class RedPipeline extends OpenCvPipeline {
 
     private Mat mat0;
     private Mat mat1;
@@ -23,20 +23,20 @@ public class MainPipeline extends OpenCvPipeline {
     private Scalar WHITE = new Scalar(255,255,255);
     private Scalar RED = new Scalar(255, 0, 0);
 
-    //X is actually Y
+    //X is actually Y //40
     private double cx0 = 135;
-    private double cy0 = 210;
+    private double cy0 = 245;
 
     private double cx1 = 135;
-    private double cy1 = 150;
+    private double cy1 = 185;
 
-    private double cx2 = 135;
-    private double cy2 = 90;
+    private double cx2 = 132;
+    private double cy2 = 125;
 
     private int r = 6;
     private int strokeWidth = 3;
 
-    public SkystoneLocation location = SkystoneLocation.right;
+    public RedLocation location = RedLocation.right;
 
     @Override
     public Mat processFrame(Mat frame)
@@ -72,20 +72,20 @@ public class MainPipeline extends OpenCvPipeline {
         double val2 = Core.sumElems(mat2).val[0] + Core.sumElems(mat2).val[1] + Core.sumElems(mat2).val[2];
 
         if (val0 < val1 && val0 < val2) {
-            location = SkystoneLocation.right;
+            location = RedLocation.right;
         } else if (val1 < val0 && val1 < val2) {
-            location = SkystoneLocation.middle;
+            location = RedLocation.middle;
         } else {
-            location = SkystoneLocation.left;
+            location = RedLocation.left;
         }
 
         Scalar s0 = WHITE;
         Scalar s1 = WHITE;
         Scalar s2 = WHITE;
 
-        if (location == SkystoneLocation.right) {
+        if (location == RedLocation.right) {
             s0 = RED;
-        } else if (location == SkystoneLocation.left) {
+        } else if (location == RedLocation.left) {
             s2 = RED;
         } else {
             s1 = RED;
@@ -99,12 +99,12 @@ public class MainPipeline extends OpenCvPipeline {
         return frame;
     }
 
-    public int getSkystonePosition() {
-        if(location == SkystoneLocation.left) {
+    public int getRedPosition() {
+        if(location == RedLocation.left) {
             return 0;
-        }else if(location == SkystoneLocation.middle) {
+        }else if(location == RedLocation.middle) {
             return 1;
-        }else if(location == SkystoneLocation.right) {
+        }else if(location == RedLocation.right) {
             return 2;
         }else{
             return 404;

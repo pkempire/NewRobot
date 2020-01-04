@@ -45,6 +45,14 @@ public class TeleOpFinal extends LinearOpMode {
     private Servo blockGrabberFront;
     private Servo blockGrabberBack;
 
+    //auto servos
+    private Servo autoFlipperLeft;
+    private Servo autoFlipperRight;
+    private Servo autoGrabberLeft;
+    private Servo autoGrabberRight;
+
+    private Servo capstone;
+
 
 
 
@@ -102,8 +110,14 @@ public class TeleOpFinal extends LinearOpMode {
         foundationClampLeft = hardwareMap.servo.get("foundationClampLeft");
         foundationClampRight = hardwareMap.servo.get("foundationClampRight");
 
-        //blockGrabberFront = hardwareMap.servo.get("blockGrabberFront");
-        //blockGrabberBack = hardwareMap.servo.get("blockGrabberBack");
+        //auto servos:
+        autoFlipperLeft = hardwareMap.servo.get("autoFlipperLeft");
+        autoFlipperRight = hardwareMap.servo.get("autoFlipperRight");
+        autoGrabberLeft = hardwareMap.servo.get("autoGrabberLeft");
+        autoGrabberRight = hardwareMap.servo.get("autoGrabberRight");
+
+        capstone = hardwareMap.servo.get("capstone");
+
 
         leftLiftLimitSwitch = hardwareMap.digitalChannel.get("leftLiftLimitSwitch");
         rightLiftLimitSwitch = hardwareMap.digitalChannel.get("rightLiftLimitSwitch");
@@ -395,16 +409,16 @@ public class TeleOpFinal extends LinearOpMode {
                 }
 
                 if (grabberState == 0) {
-                    blockGrabberFront.setPosition(0.33);
+                    blockGrabberFront.setPosition(0.35);
                     blockGrabberBack.setPosition(0.7);
                 }
                 if (grabberState == 1) {
-                    blockGrabberBack.setPosition(0.33);
-                    blockGrabberFront.setPosition(0.33);
+                    blockGrabberBack.setPosition(0.35);
+                    blockGrabberFront.setPosition(0.35);
                 }
                 if (grabberState == 2) {
-                    blockGrabberFront.setPosition(0.7);
-                    blockGrabberBack.setPosition(0.7);
+                    blockGrabberFront.setPosition(0.7); //note: for gobilda servos, increase turns servo Clockwise
+                    blockGrabberBack.setPosition(0.7);//Clockwise: viewing from infront servo, track direction of arm
                 }
   /*
             if(gamepad2.right_bumper){ //Opens servo postiions when trigger pressed
@@ -420,7 +434,7 @@ public class TeleOpFinal extends LinearOpMode {
                 blockGrabberBack.setPosition(0.7);
             }
 */
-//BLOCK FLIPPER=====================================================================================
+            //BLOCK FLIPPER=====================================================================================
 
                 if (gamepad2.left_trigger > 0.2) {
                     lastPressedFlipper = 0; //0 is in the chassis, 1 is out of the chassis
@@ -438,16 +452,12 @@ public class TeleOpFinal extends LinearOpMode {
                 }
 
 
-//INTAKE ===========================================================================================
+                //INTAKE ===========================================================================================
                 //
                 intakeLeft.setPower(-gamepad2.left_stick_y * 0.8);
                 intakeRight.setPower(gamepad2.right_stick_y * 0.8);
 
-
-                //BACK WALL SERVOS======================================================================
-
-
-                //FOUNDATION CLAMP:
+                //FOUNDATION CLAMP--=============================================================
 
                 if (gamepad1.left_bumper) {
                     foundationClampLeft.setPosition(0.245);
@@ -456,21 +466,35 @@ public class TeleOpFinal extends LinearOpMode {
                     foundationClampLeft.setPosition(0.745);
                     foundationClampRight.setPosition(0.26);
                 }
-                //BLOCK GRABBERS:
+                //AUTO BLOCK GRABBERS=============================================================
+                    if (gamepad1.x){
+                        autoFlipperRight.setPosition(.635); //flipper down
+                        autoFlipperLeft.setPosition(.375);
+                    }
+                    else{
+                        autoFlipperRight.setPosition(.2); //flipper up
+                        autoFlipperLeft.setPosition(.77);
+                    }
+                    if (gamepad1.y){
+                        autoGrabberRight.setPosition(.4); //grabbers open
+                        autoGrabberLeft.setPosition(.65);
+                    }else{
+                        autoGrabberRight.setPosition(.75); //grabbers closed
+                        autoGrabberLeft.setPosition(.25); //grabbers closed
+                    }
 
+                //CAPSTONE==========================================================================
 
-                //INTAKE DEPLOY SERVO
-                //**UNDERPOWERED**
-
+                    if(gamepad1.right_trigger > 0.2){
+                        capstone.setPosition(.25); //capstone down
+                    }else{
+                        capstone.setPosition(.68);//capstone up
+                    }
 
             }
-
-
         }
 
-
     }
-
 
 
 

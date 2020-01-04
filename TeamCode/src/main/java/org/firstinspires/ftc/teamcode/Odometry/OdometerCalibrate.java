@@ -13,7 +13,7 @@ import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Movement.Drive2;
 
 @Autonomous(name="Odometer Calibration Robot V2", group="Linear Opmode")
-//@Disabled
+@Disabled
 public class OdometerCalibrate extends LinearOpMode {
 
     // Declare OpMode members.
@@ -55,8 +55,8 @@ public class OdometerCalibrate extends LinearOpMode {
         LeftEncoder = hardwareMap.dcMotor.get("intakeLeft");
 
         Imu.initialize(Params);
-        // Normal bot is (RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this);
-        Adham = new Odometer34(LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this);
+        Adham = new Odometer34(RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this); // Forwards Robot
+        // Adham = new Odometer34(LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this); // Backwards Robot
         Adham.initialize();
 
         Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
@@ -88,7 +88,7 @@ public class OdometerCalibrate extends LinearOpMode {
         telemetry.addData("Instruction", "Turn your robot 360 degrees counter-clockwise.");
         telemetry.update();
 
-        delay(10000);
+        delay(40000);
 
         Adham.calculate();
 
@@ -104,6 +104,7 @@ public class OdometerCalibrate extends LinearOpMode {
 
         double robotRad = (Adham.getRightReading()-Adham.getLeftReading()) / (4*Math.PI);
         double backRad = backChange * 360/headingChange / 2 / Math.PI; //2 x PI x r = circumference
+
         telemetry.addData("Update", "Test complete");
         telemetry.addData("Your robot radius is ", robotRad);
         telemetry.addData("Your back wheel rolled ", backChange);

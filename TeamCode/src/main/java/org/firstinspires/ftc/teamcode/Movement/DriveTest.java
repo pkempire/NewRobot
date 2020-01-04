@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 
 @Autonomous(name="Drive Test - Robot V2", group="Linear Opmode")
-
+@Disabled
 public class DriveTest extends LinearOpMode {
 
     // Declare OpMode members.
@@ -52,6 +52,7 @@ public class DriveTest extends LinearOpMode {
         LeftFront = hardwareMap.dcMotor.get("driveFrontLeft");
         LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
         RightBack = hardwareMap.dcMotor.get("driveBackRight");
+
         IntakeLeft = hardwareMap.dcMotor.get("intakeLeft");
         IntakeRight = hardwareMap.dcMotor.get("intakeRight");
 
@@ -76,46 +77,21 @@ public class DriveTest extends LinearOpMode {
         //Start Autonomous period
         Adham.startTracking(0, 0, 0);
 
-        Driver.strafeToPointOrient(30, 30, 0, 2, 3);
-        telemetry.addData("First movement completed", "finally");
-        //Driver.moveToPoint(15,15,0,3,2);
+        Driver.strafeToPointOrient(30, 30, 0, 1, 1,1.05);
+        telemetry.addData("heading", Adham.getHeadingDeg());
+        telemetry.addData("X", Adham.getPosition()[0]);
+        telemetry.addData("Y", Adham.getPosition()[1]);
+        telemetry.update();
 
-        //Driver.strafeToPointOrient(0,0,0,2 ,1);
+        delay(1000);
 
-        /*
-        Driver.strafeToPointOrient(17,72,-90,2,1);
-        delay(900);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(205,72,-90,2.5,2);
-        delay(800);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(17,72,-90,2,1);
-        delay(900);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(205,72,-90,2.5,2);
-        delay(800);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(17,72,-90,2.5,1);
-        delay(900);
-        Driver.strafeToPointOrient(99,58,-90,4,2);
-        Driver.strafeToPointOrient(205,72,-90,2.5,2);
-        delay(100);
-        */
         //Make sure nothing is still using the thread
 
     }
 
-
-    private double cos(double theta) {
-        return Math.cos(Math.toRadians(theta));
-    }
-
-    private double sin(double theta) {
-        return Math.sin(Math.toRadians(theta));
-    }
-
     private void delay(int millis) {
-        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
+        if(opModeIsActive()){
+            try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
+        }
     }
-
 }

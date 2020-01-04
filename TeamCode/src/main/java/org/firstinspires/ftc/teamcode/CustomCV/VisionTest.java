@@ -16,21 +16,17 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
 @TeleOp(name="V-Vision Test", group = "Linear Opmode")
-
+@Disabled
 public class VisionTest extends LinearOpMode {
 
     private OpenCvCamera phoneCam;
     private MainPipeline pipeline;
-
-    private Drive Driver;
 
     private void initialize(){
         telemetry.addData("Status: ", "Initializing");
         telemetry.update();
 
         // Initialize all objects declared above
-        Driver = new Drive(hardwareMap, this);
-        Driver.initialize();
 
         // Vision ==================================================================================
         int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
@@ -55,19 +51,13 @@ public class VisionTest extends LinearOpMode {
         telemetry.update();
 
         phoneCam.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-        Driver.startTracking(0, 0, 0);
 
         while (opModeIsActive()) {
 
-            //telemetry.addData("FPS", String.format("%.2f", phoneCam.getFps()));
-            //telemetry.addData("location", pipeline.location);
-            //telemetry.addData("type", pipeline.location.getClass());
-            telemetry.addData("X", Driver.Localizer.getPosition()[0]);
-            telemetry.addData("Y", Driver.Localizer.getPosition()[1]);
-            telemetry.addData("H", Driver.Localizer.getHeadingAbsoluteDeg());
+            telemetry.addData("FPS", String.format("%.2f", phoneCam.getFps()));
+            telemetry.addData("location", pipeline.location);
+            telemetry.addData("type", pipeline.location.getClass());
             telemetry.update();
-
-            Driver.localize();
         }
     }
 }

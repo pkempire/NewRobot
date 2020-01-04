@@ -65,11 +65,14 @@ public class Odometer34 extends Odometer{
     public boolean isRunning = true;
 
     //Important constants
-    private double robotRad = 16.02; // Radius of the robot (Left to Right / 2) = 16.02
-    private double backRad = 10.7; // Distance from the center to the back Omni = -6.24
-    private final double encdrRad = 3; // Radius of the Omni wheel !!!!!!!! this used to be = 3.0
-    private final double ticksPerRotation = 8192; //How many ticks are in 1 revolution of the encoder FAX
-    private double gear = 1.0; //How many times does the Omni spin for each spin of the encoder
+
+    //NEW ROBOT CONSTANTS: robotRad = 16.02/15.97 ; backRad = -6.24/-10/-12 ; encdrRad = 3 ; ticksPerRotation = 8192; gear = 1.0
+    //OLD ROBOT CONSTANTS: robotRad = 16.56 ; backRad = 0.9 ; encdrRad = 1.876 ; ticksPerRotation = 1440 ; gear = 1.333
+    private double robotRad = 16.02; // Radius of the robot (Left to Right / 2) => 16.02 //15.95
+    private double backRad =-6.24; // Distance from the center to the back Omni => -6.24 //radius should be negative for a forward robot.
+    private final double encdrRad = 3; // Radius of the Omni wheel => 3.0
+    private final double ticksPerRotation = 8192; //How many ticks are in 1 revolution of the encoder => FAX
+    private double gear = 1.0; //How many times does the Omni spin for each spin of the encoder => FAX
     private double encScale;
 
     // Inverting the encoder readings
@@ -131,7 +134,7 @@ public class Odometer34 extends Odometer{
 
         headingOffset = Heading;
         headingLastVal = 0;
-        headingContinuous = 0;
+        headingContinuous = Math.toRadians(headingOffset);
 
     }
 
@@ -161,6 +164,8 @@ public class Odometer34 extends Odometer{
             }else{
                 crossed = false;
             }
+
+            headingContinuous += headingChange;
 
             //Calculating the position-change-vector from Left+Right encoders
 
@@ -192,6 +197,7 @@ public class Odometer34 extends Odometer{
             posChangeB[0] = Math.cos(headingChange) * backOmniExtra;
             posChangeB[1] = Math.sin(headingChange) * backOmniExtra;
 
+
             //Add the two vectors together
             totalPosChange[0] = posChangeLR[0] + posChangeB[0];
             totalPosChange[1] = posChangeLR[1] + posChangeB[1];
@@ -202,8 +208,6 @@ public class Odometer34 extends Odometer{
 
             x = lastX + rotatedMovement[0];
             y = lastY + rotatedMovement[1];
-
-            headingContinuous += headingChange;
 
         }
     }
@@ -252,11 +256,11 @@ public class Odometer34 extends Odometer{
     }
 
     public double getHeadingDeg() {
-        return Math.toDegrees(heading); //feeds a continuous heading to the drive class
+        return Math.toDegrees(heading);
     }
 
-    public double getHeadingRaw() {
-        return Math.toDegrees(heading);
+    public double getHeadingContinuous() {
+        return Math.toDegrees(headingContinuous);
     }
 
     public double getHeadingAbsoluteDeg() {

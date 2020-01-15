@@ -17,7 +17,7 @@ import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 
 @Autonomous(name="Drive Test - Robot V2", group="Linear Opmode")
-@Disabled
+
 public class DriveTest extends LinearOpMode {
 
     // Declare OpMode members.
@@ -76,15 +76,17 @@ public class DriveTest extends LinearOpMode {
         telemetry.update();
         //Start Autonomous period
         Adham.startTracking(0, 0, 0);
+        while(opModeIsActive()){
 
-        Driver.strafeToPointOrient(30, 30, 0, 1, 1,1.05);
-        telemetry.addData("heading", Adham.getHeadingDeg());
-        telemetry.addData("X", Adham.getPosition()[0]);
-        telemetry.addData("Y", Adham.getPosition()[1]);
-        telemetry.update();
+            telemetry.addData("heading", Adham.getHeadingDeg());
+            telemetry.addData("X", Adham.getPosition()[0]);
+            telemetry.addData("Y", Adham.getPosition()[1]);
+            telemetry.addData("LoopTime", Driver.getLoopTime() );
+            telemetry.update();
+        }
 
-        delay(1000);
 
+        delay(10000);
         //Make sure nothing is still using the thread
 
     }

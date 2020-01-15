@@ -134,26 +134,26 @@ public class RedTeamFullAuto extends LinearOpMode {
 
         //GRAB FIRST BLOCK
         if(skyPosition == 2) { //Skystone Closest To Wall
-            Driver.strafeToPointOrient(-13, 66, 90, 1, 1,.85); //closest to field wall
+            Driver.strafeToPointOrient(-13, 66, 90, 1, 1,.85,0.008, 0.02, 0.01, 5); //closest to field wall
         }else if(skyPosition == 1) { //Center Skystone
-            Driver.strafeToPointOrient(6, 66, 90, 1, 1,.85);
+            Driver.strafeToPointOrient(6, 66, 90, 1, 1,.85,0.008, 0.02, 0.01, 5);
         }else if(skyPosition == 0) { //Furthest Skystone From Wall
-            Driver.strafeToPointOrient(28, 66, 90, 1, 1,.85); //furthest from field wall
+            Driver.strafeToPointOrient(28, 66, 90, 1, 1,.85,0.008, 0.02, 0.01, 5); //furthest from field wall
         }
         grabBlock();
         telemetry.addData("First skystone aquired.  ", "I think.");
 
         //Go Under Bridge
-        Driver.strafeToPointOrient(110,57,90,30,1,1.15);
+        Driver.strafeToPointOrient(110,57,90,30,1,1.15,0.008, 0.02, 0.01, 5);
         delay(20);
 
         //Go To Foundation
-        Driver.strafeToPointOrient(228,76,90,3,1,1.05);
+        Driver.strafeToPointOrient(228,76,90,3,1,1.05,0.008, 0.02, 0.01, 5);
 
         depositBlock();
         delay(20);
 
-        Driver.strafeToPointOrient(0,65,90,50,3,1.15); //RETURNING SPECIAL THRESH MOVEMENT
+        Driver.strafeToPointOrient(0,65,90,50,3,1.15,0.008, 0.02, 0.01, 5); //RETURNING SPECIAL THRESH MOVEMENT
         delay(20);
 
         autoFlipperRight.setPosition(.58); //flipper half down
@@ -164,33 +164,33 @@ public class RedTeamFullAuto extends LinearOpMode {
 
         //GRAB SECOND BLOCK
         if(skyPosition == 2) { //Skystone Closest To Wall
-            Driver.strafeToPointOrient(-60,58,90,1,1, 0.95); //go to 72
+            Driver.strafeToPointOrient(-60,58,90,1,1, 0.95,0.008, 0.02, 0.01, 5); //go to 72
             delay(20);
-            Driver.strafeToPointOrient(-68.5,72,90,1,1, 1.05);
+            Driver.strafeToPointOrient(-68.5,72,90,1,1, 1.05,0.008, 0.02, 0.01, 5);
             grabBlock();
 
         }else if(skyPosition == 1) { //Center Skystone
-            Driver.strafeToPointOrient(-53,58,90,1,1, 0.95);
+            Driver.strafeToPointOrient(-53,58,90,1,1, 0.95,0.008, 0.02, 0.01, 5);
             delay(20);
-            Driver.strafeToPointOrient(-54,72,90,1,1, 1.05);
+            Driver.strafeToPointOrient(-54,72,90,1,1, 1.05,0.008, 0.02, 0.01, 5);
             grabBlock();
 
         }else if(skyPosition == 0) { //Furthest Skystone From Wall
 
-            Driver.strafeToPointOrient(-28,58,90,1,1, 0.94);
+            Driver.strafeToPointOrient(-28,58,90,1,1, 0.94,0.008, 0.02, 0.01, 5);
             delay(20);
-            Driver.strafeToPointOrient(-34,75,90,1,1, 1.05);
+            Driver.strafeToPointOrient(-34,75,90,1,1, 1.05,0.008, 0.02, 0.01, 5);
             grabBlock();
         }
 
         //Go Under Sky-bridge
-        Driver.strafeToPointOrient(110,56,90,30,1,1.15);
+        Driver.strafeToPointOrient(110,56,90,30,1,1.15,0.008, 0.02, 0.01, 5);
         delay(20);
 
         //Go to Foundation
-        Driver.strafeToPointOrient(175,65,90,3,2, 1.05);
+        Driver.strafeToPointOrient(175,65,90,3,2, 1.05,0.008, 0.02, 0.01, 5);
 
-        Driver.strafeToPointOrient(211,79,90,2,1, 1.1);
+        Driver.strafeToPointOrient(211,79,90,2,1, 1.1,0.008, 0.02, 0.01, 5);
 
         depositBlock();
 
@@ -200,7 +200,7 @@ public class RedTeamFullAuto extends LinearOpMode {
         delay(250);
 
         //Align with foundation - still far apart
-        Driver.strafeToPointOrient(218,68,180,3,3, 1.05);
+        Driver.strafeToPointOrient(218,68,180,3,3, 1.05,0.008, 0.02, 0.01, 5);
         delay(20);
 
         //Back up into foundation
@@ -223,7 +223,7 @@ public class RedTeamFullAuto extends LinearOpMode {
         delay(20);
 
         //Park
-        Driver.strafeToPointOrient(100,66,90,3 ,2,1.05);
+        Driver.strafeToPointOrient(100,66,90,3 ,2,1.05,0.008, 0.02, 0.01, 5);
 
     }
 

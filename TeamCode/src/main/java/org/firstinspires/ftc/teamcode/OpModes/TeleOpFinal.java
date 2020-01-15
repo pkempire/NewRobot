@@ -279,6 +279,7 @@ public class TeleOpFinal extends LinearOpMode {
                 if (gamepad2.a) {
                     slidesResetting = true;
                     slidesRunning = false;
+                    lastPressedFlipper = 0; //changes flipper position to inside robot
                     liftGoal = 0;
                     blocklevel = 0;
                 }
@@ -314,8 +315,9 @@ public class TeleOpFinal extends LinearOpMode {
                     if (blocklevel == 3){liftGoal =  710;}  if (blocklevel == 4){liftGoal =  875;}  if (blocklevel == 5){liftGoal =  1065;}
                     if (blocklevel == 6){liftGoal =  1225;} // if (blocklevel == 7){liftGoal = liftGoal + }  if (blocklevel == 8){liftGoal = liftGoal + }
                     blocklevel = blocklevel + 1;
+                    lastPressedFlipper = 2; //sets the flipper to upright position when dpadUp is pressed.
                     if (liftGoal > liftMax) {
-                        liftGoal = liftMax;
+                        liftGoal = liftMax; //makes sure the slides don't exceed the max encoder position.
                     }
                     dpadUpPressed = false;
                     slidesRunning = true;
@@ -450,6 +452,10 @@ public class TeleOpFinal extends LinearOpMode {
                     flipperServoLeft.setPosition(0.89);//.89
                     flipperServoRight.setPosition(0.11);//.11
                 }
+                else if (lastPressedFlipper == 2) { //middle position. Lift Code sets the variable to 2.
+                    flipperServoLeft.setPosition(0.35);//.89
+                    flipperServoRight.setPosition(0.65);//.11
+                }
 
 
                 //INTAKE ===========================================================================================
@@ -460,8 +466,8 @@ public class TeleOpFinal extends LinearOpMode {
                 //FOUNDATION CLAMP--=============================================================
 
                 if (gamepad1.left_bumper) {
-                    foundationClampLeft.setPosition(0.245);
-                    foundationClampRight.setPosition(0.76);
+                    foundationClampLeft.setPosition(0.275); //updated positions, not updated in auto yet. Should help with traction issue.
+                    foundationClampRight.setPosition(0.73);
                 } else {
                     foundationClampLeft.setPosition(0.745);
                     foundationClampRight.setPosition(0.26);
@@ -469,11 +475,12 @@ public class TeleOpFinal extends LinearOpMode {
                 //AUTO BLOCK GRABBERS=============================================================
                     if (gamepad1.x){
                         autoFlipperRight.setPosition(.635); //flipper down
-                        autoFlipperLeft.setPosition(.375);
+                        autoFlipperLeft.setPosition(.25); //put arm fully down
                     }
+
                     else{
                         autoFlipperRight.setPosition(.2); //flipper up
-                        autoFlipperLeft.setPosition(.77);
+                        autoFlipperLeft.setPosition(.6);
                     }
                     if (gamepad1.y){
                         autoGrabberRight.setPosition(.4); //grabbers open

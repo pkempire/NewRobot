@@ -81,13 +81,10 @@ public class OdometerTest2 extends LinearOpMode {
             telemetry.addData("heading", Adham.getHeadingDeg());
             telemetry.addData("X", Adham.getPosition()[0]);
             telemetry.addData("Y", Adham.getPosition()[1]);
-            telemetry.addData("Left", Adham.getLeftReading());
-            telemetry.addData("Right", Adham.getRightReading());
-            telemetry.addData("Horizontal", Adham.getBackReading());
             telemetry.update();
 
             Adham.calculate();
-            //delay(100);
+            delay(30);
 
         }
         //Make sure nothing is still using the thread

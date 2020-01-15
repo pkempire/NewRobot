@@ -68,9 +68,9 @@ public class Odometer34 extends Odometer{
 
     //NEW ROBOT CONSTANTS: robotRad = 16.02/15.97 ; backRad = -6.24/-10/-12 ; encdrRad = 3 ; ticksPerRotation = 8192; gear = 1.0
     //OLD ROBOT CONSTANTS: robotRad = 16.56 ; backRad = 0.9 ; encdrRad = 1.876 ; ticksPerRotation = 1440 ; gear = 1.333
-    private double robotRad = 16.02; // Radius of the robot (Left to Right / 2) => 16.02 //15.95
+    private double robotRad = 16.1; // Radius of the robot (Left to Right / 2) => 16.02 //15.95
     private double backRad =-6.24; // Distance from the center to the back Omni => -6.24 //radius should be negative for a forward robot.
-    private final double encdrRad = 3; // Radius of the Omni wheel => 3.0
+    private final double encdrRad = 2.4; // Radius of the Omni wheel => 3.0
     private final double ticksPerRotation = 8192; //How many ticks are in 1 revolution of the encoder => FAX
     private double gear = 1.0; //How many times does the Omni spin for each spin of the encoder => FAX
     private double encScale;
@@ -226,8 +226,8 @@ public class Odometer34 extends Odometer{
     }
 
     public void update() {
-        calculate();
         integrate();
+        calculate();
 
     }
 

@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 @TeleOp(name="Servo Tester", group="Linear Opmode")
-@Disabled
+
 public class ServoTester extends LinearOpMode {
 
     // Declare OpMode members.
@@ -46,8 +46,6 @@ public class ServoTester extends LinearOpMode {
             if (gamepad1.dpad_down){
                 r = r - 0.0005;
             }
-
-
 
             testServo.setPosition(r);
 

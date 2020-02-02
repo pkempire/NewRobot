@@ -15,7 +15,6 @@ public class ConstantProportional extends Controller {
     private double error = 1000;
 
     public ConstantProportional(double constant, double p_Range, double p_Gain) {
-
         this.constant = constant;
         this.pGain = p_Gain;
         this.pRange = p_Range;

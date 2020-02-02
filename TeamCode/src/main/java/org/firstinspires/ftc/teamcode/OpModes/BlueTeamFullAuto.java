@@ -129,29 +129,30 @@ public class BlueTeamFullAuto extends LinearOpMode {
         autoFlipperLeft.setPosition(.3);
         //Open Grabber
         autoGrabberLeft.setPosition(.65);
+        delay(700);
 
         //GRAB FIRST BLOCK
         if(skyPosition == 0) { //Skystone Closest To Wall
-            Driver.strafeToPointOrient(11, 68, 270, 1, 1,.95,0.008, 0.02, 0.01, 5); //closest to field wall
+            Driver.strafeToPointOrient(11, 68, 270, 1, 1,.95,0.009, 0.03, 0.01, 5); //closest to field wall
         }else if(skyPosition == 1) { //Center Skystone
-            Driver.strafeToPointOrient(-6, 68, 270, 1, 1,.95,0.008, 0.02, 0.01, 5);
+            Driver.strafeToPointOrient(-6, 68, 270, 1, 1,.95,0.009, 0.03, 0.01, 5);
         }else if(skyPosition == 2) { //Furthest Skystone From Wall
-            Driver.strafeToPointOrient(-30, 68, 270, 1, 1,.95,0.008, 0.02, 0.01, 5); //furthest from field wall
+            Driver.strafeToPointOrient(-30, 68, 270, 1, 1,.95,0.009, 0.03, 0.01, 5); //furthest from field wall
 
         }
         grabBlock();
 
         //Go Under Bridge
-        Driver.strafeToPointOrient(-110,60,270,30,1,1.15,0.008, 0.02, 0.01, 5);
+        Driver.strafeToPointOrient(-110,60,270,30,1,1.15,0.008, 0.03, 0.01, 5);
         delay(20);
 
         //Go To Foundation
-        Driver.strafeToPointOrient(-228,76,270,3,1,1.05,0.008, 0.02, 0.01, 5);
+        Driver.strafeToPointOrient(-228,76,270,3,1,1.05,0.008, 0.03, 0.01, 5);
 
         depositBlock();
         delay(20);
 
-        Driver.strafeToPointOrient(0,65,270,50,3,1.15,0.008, 0.02, 0.01, 5); //RETURNING SPECIAL THRESH MOVEMENT
+        Driver.strafeToPointOrient(0,65,270,50,3,1.15,0.008, 0.03, 0.01, 5); //RETURNING SPECIAL THRESH MOVEMENT
         delay(20);
 
         autoFlipperLeft.setPosition(.3); //put arm half down
@@ -160,21 +161,21 @@ public class BlueTeamFullAuto extends LinearOpMode {
 
         //GRAB SECOND BLOCK
         if(skyPosition == 0) { //Skystone Closest To Wall
-            Driver.strafeToPointOrient(63,63,270,1,1, 1.05,0.008, 0.02, 0.01, 5); //go to 72
+            Driver.strafeToPointOrient(63,63,270,1,1, 1.05,0.009, 0.02, 0.01, 5); //go to 72
             delay(20);
-            Driver.strafeToPointOrient(68,75,270,1,1, 1.05,0.008, 0.02, 0.01, 5);
+            Driver.strafeToPointOrient(68,75,270,1,1, 1.05,0.009, 0.02, 0.01, 5);
             grabBlock();
 
         }else if(skyPosition == 1) { //Center Skystone
             Driver.strafeToPointOrient(53,62,270,1,1, 1.05,0.008, 0.02, 0.01, 5);
             delay(20);
-            Driver.strafeToPointOrient(53,75,270,1,1, 1.05,0.008, 0.02, 0.01, 5);
+            Driver.strafeToPointOrient(53,75,270,1,1, 1.05,0.008, 0.03, 0.01, 5);
             grabBlock();
 
         }else if(skyPosition == 2) { //Furthest Skystone From Wall
-            Driver.strafeToPointOrient(28,62,270,1,1, 1.05,0.008, 0.02, 0.01, 5);
+            Driver.strafeToPointOrient(28,62,270,1,1, 1.05,0.008, 0.03, 0.01, 5);
             delay(20);
-            Driver.strafeToPointOrient(28,75,270,1,1, 1.05,0.008, 0.02, 0.01, 5);
+            Driver.strafeToPointOrient(28,75,270,1,1, 1.05,0.008, 0.03, 0.01, 5);
             grabBlock();
 
         }

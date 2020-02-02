@@ -36,6 +36,7 @@ public class Proportional extends Controller {
 
     @Override
     public double getError() {
+
         return error;
     }
 }

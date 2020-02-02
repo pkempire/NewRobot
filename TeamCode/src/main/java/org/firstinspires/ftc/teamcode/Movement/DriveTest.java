@@ -76,18 +76,22 @@ public class DriveTest extends LinearOpMode {
         telemetry.update();
         //Start Autonomous period
         Adham.startTracking(0, 0, 0);
-        while(opModeIsActive()){
 
-            telemetry.addData("heading", Adham.getHeadingDeg());
-            telemetry.addData("X", Adham.getPosition()[0]);
-            telemetry.addData("Y", Adham.getPosition()[1]);
-            telemetry.addData("LoopTime", Driver.getLoopTime() );
-            telemetry.update();
-        }
+        // Original Paths
+        /* 3.3
+        Driver.moveToPointPD(25,117,0,15,2);
+        Driver.moveToPointPD(-14,245,0,10,2);
+         */
 
+        /* 3.5
+        Driver.moveToPointConstant(0.5, 23, 107, 0, 10, 2);
+        Driver.moveToPointConstants(-11, 234, 0, 5, 2);
+         */
 
-        delay(10000);
-        //Make sure nothing is still using the thread
+        /*
+        Driver.moveToPointConstantP(0.75, 50, 0.01, 25, 117, 0, 15, 1.5);
+        Driver.moveToPointConstantP(0.75, 50, 0.01, -14, 245, 0, 10, 1.5);
+        */
 
     }
 

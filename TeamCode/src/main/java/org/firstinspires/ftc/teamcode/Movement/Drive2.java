@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.Controllers.GatedConstant;
 import org.firstinspires.ftc.teamcode.Controllers.Proportional;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 
@@ -65,10 +66,10 @@ public class Drive2 extends Subsystem {
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         count = 0;
 
@@ -154,12 +155,12 @@ public class Drive2 extends Subsystem {
 
         count = 0;
 
-        PID holdFar = new PID(0.03, 0.000, 0.00, 0, 0.4);
+        PID holdFar = new PID(0.03, 0.000, 0.00, 0, 0.7, 0);
         //PID holdNear = new PID(0.008, 0.02, 0.01, 5, 0.4);
 
-        PID holdNear = new PID (P, I, D, i_limit,0.4 );
+        PID holdNear = new PID (P, I, D, i_limit,0.35, 0);
 
-        PID orient = new PID(0.012, 0,0,0,0.4);
+        PID orient = new PID(0.0205, 0,0.01,0,0.5, 0);
 
 
         double Xdiff = 500;
@@ -197,7 +198,7 @@ public class Drive2 extends Subsystem {
                 double xCorrect;
                 double yCorrect;
 
-                if (distance > 15) {//used to be 10. Miles and Nate set to 0 to essentially disable for now
+                if (distance > 10) {//used to be 10. Miles and Nate set to 0 to essentially disable for now
                     xCorrect = holdFar.getCorrection(0, XD);
                     yCorrect = holdFar.getCorrection(0, YD);
                 } else {
@@ -263,7 +264,7 @@ public class Drive2 extends Subsystem {
 
         Proportional holdFar = new Proportional(0.035, 0.4);
         //PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4); //PID controller used on previous robot
-        PID holdNear = new PID(0.02, 0.06, 0.0, 10, 0.42);//PID tuned by Miles and Nate. Not working yet.
+        PID holdNear = new PID(0.02, 0.06, 0.0, 10, 0.42, 0);//PID tuned by Miles and Nate. Not working yet.
 
         Proportional orient = new Proportional(0.02, 0.4);//P used on previous robot
 
@@ -340,65 +341,6 @@ public class Drive2 extends Subsystem {
         isRunning = false;
     }
 
-
-    public void moveToPointOrient(double targX, double targY, double targH, double posThresh, double headThresh, double maxSpeed, double power) {
-
-        isRunning = true;
-
-        count = 0;
-
-        Proportional orient = new Proportional(0.02, 0.4);
-
-        double initialDistance = Math.hypot(targX - Adhameter.getPosition()[0], targY - Adhameter.getPosition()[1]);
-        double xDist, yDist, distance;
-        double xRelDist, yRelDist, h;
-        double xCorrect, yCorrect, hCorrect;
-        boolean endCondition;
-
-        do{
-            xDist = targX - Adhameter.getPosition()[0];
-            yDist = targY - Adhameter.getPosition()[1];
-            distance = Math.hypot(xDist, yDist);
-
-            h = Adhameter.getHeadingDeg();
-
-            xRelDist = cos(-h) * xDist - sin(-h) * yDist;
-            yRelDist = sin(-h) * xDist + cos(-h) * yDist;
-
-            if(distance < 8) {
-                power = 0.4;
-            }
-
-            hCorrect = orient.getCorrection(targH, h);
-            xCorrect = power * xRelDist/(Math.abs(xRelDist) + Math.abs(yRelDist)) ;
-            yCorrect = power * yRelDist/(Math.abs(xRelDist) + Math.abs(yRelDist)) ;
-
-            if(xCorrect > maxSpeed){
-                xCorrect = maxSpeed;
-            }else if(xCorrect < -maxSpeed) {
-                xCorrect = -maxSpeed;
-            }
-
-            if(yCorrect > maxSpeed){
-                yCorrect = maxSpeed;
-            }else if(yCorrect < -maxSpeed) {
-                yCorrect = -maxSpeed;
-            }
-
-            // X-> Y^
-            frontLeft.setPower((xCorrect + yCorrect - hCorrect));
-            backLeft.setPower((-xCorrect + yCorrect - hCorrect));
-
-            frontRight.setPower((-xCorrect + yCorrect + hCorrect));
-            backRight.setPower((xCorrect + yCorrect + hCorrect));
-
-            endCondition = (distance < posThresh) && (orient.getError() < headThresh);
-            localize();
-        }while(!endCondition);
-
-        isRunning = false;
-    }
-
     public void driveStraight(double magnitude, double direction, double gameTicks) {
         double counter = 0;
         double emergencyCounter = 10000;
@@ -422,13 +364,103 @@ public class Drive2 extends Subsystem {
         backLeft.setPower(0);
     }
 
-    public void moveToPoint(double targX, double targY, double targH, double posThresh, double headThresh) {
+    public void moveToPointConstants(double near, double far, double thresh, double targX, double targY, double targH, double posThresh, double headThresh) {
 
         isRunning = true;
 
         count = 0;
 
-        Proportional orient = new Proportional(0.02, 0.4);
+        Proportional orient = new Proportional(0.02, 0.3);
+
+        double xDist, yDist, distance, h;
+        double targSpeed, scale;
+        double targVX, targVY, hCorrect;
+        boolean endCondition;
+
+        //0.6, 0.25, 40
+        GatedConstant velocityFinder = new GatedConstant(far, near, thresh);
+
+        do{
+            localize();
+            xDist = targX - Adhameter.getPosition()[0];
+            yDist = targY - Adhameter.getPosition()[1];
+            distance = Math.hypot(xDist, yDist);
+            h = Adhameter.getHeadingContinuous();
+
+            targSpeed = Math.abs(velocityFinder.getCorrection(0, distance));
+            scale = targSpeed/distance;
+
+            targVX = xDist * scale;
+            targVY = yDist * scale;
+            // Verified ^
+
+            hCorrect = orient.getCorrection(targH, h);
+
+            setGlobalVelocity(targVX, targVY, hCorrect); //hCorrect
+
+            endCondition = (distance < posThresh) && (Math.abs(orient.getError()) < headThresh);
+
+        }while(!endCondition && opmode.opModeIsActive());
+
+        setGlobalVelocity(0, 0, 0);
+        delay(10);
+
+        isRunning = false;
+    }
+
+    public void moveToPointConstantP(double constant, double thresh, double pGain, double targX, double targY, double targH, double posThresh, double headThresh) {
+
+        isRunning = true;
+
+        count = 0;
+
+        Proportional orient = new Proportional(0.02, 0.3);
+        ConstantProportional velocityFinder = new ConstantProportional(constant, thresh, pGain);
+
+        double xDist, yDist, distance, h;
+        double targSpeed, scale;
+        double targVX, targVY, hCorrect;
+        boolean endCondition;
+
+        do{
+            localize();
+            xDist = targX - Adhameter.getPosition()[0];
+            yDist = targY - Adhameter.getPosition()[1];
+            distance = Math.hypot(xDist, yDist);
+            h = Adhameter.getHeadingContinuous();
+
+            targSpeed = Math.abs(velocityFinder.getCorrection(0, distance));
+            if(targSpeed < 0.17) {
+                targSpeed = 0.17;
+            }
+
+            scale = targSpeed/distance;
+
+            targVX = xDist * scale;
+            targVY = yDist * scale;
+            // Verified ^
+
+            hCorrect = orient.getCorrection(targH, h);
+
+            setGlobalVelocity(targVX, targVY, hCorrect); //hCorrect
+
+            endCondition = (distance < posThresh) && (Math.abs(orient.getError()) < headThresh);
+
+        }while(!endCondition && opmode.opModeIsActive());
+
+        setGlobalVelocity(0, 0, 0);
+        delay(10);
+
+        isRunning = false;
+    }
+
+    public void moveToPointVelocityCurve(double targX, double targY, double targH, double posThresh, double headThresh) {
+
+        isRunning = true;
+
+        count = 0;
+
+        Proportional orient = new Proportional(0.02, 0.3);
 
         double initialDistance = Math.hypot(targX - Adhameter.getPosition()[0], targY - Adhameter.getPosition()[1]);
         double xDist, yDist, distance, h;
@@ -436,29 +468,77 @@ public class Drive2 extends Subsystem {
         double targVX, targVY, hCorrect;
         boolean endCondition;
 
-        VelocityCurve velocityCurve = new VelocityCurve(0.7, 0.2, 5, 5, initialDistance+10, "P");
+        VelocityCurve velocityCurve = new VelocityCurve(0.6, 0.1, 0, 8, 20, initialDistance, "P");
 
         do{
+            localize();
             xDist = targX - Adhameter.getPosition()[0];
             yDist = targY - Adhameter.getPosition()[1];
             distance = Math.hypot(xDist, yDist);
-            h = Adhameter.getHeadingDeg();
+            h = Adhameter.getHeadingContinuous();
 
             targSpeed = velocityCurve.getOutput(distance);
             scale = targSpeed/distance;
 
             targVX = xDist * scale;
             targVY = yDist * scale;
+            // Verified ^
 
             hCorrect = orient.getCorrection(targH, h);
 
-            setGlobalVelocity(targVX, targVY, hCorrect);
+            setGlobalVelocity(targVX, targVY, hCorrect); //hCorrect
 
             endCondition = (distance < posThresh) && (Math.abs(orient.getError()) < headThresh);
-            localize();
-        }while(!endCondition);
+
+        }while(!endCondition && opmode.opModeIsActive());
 
         setGlobalVelocity(0, 0, 0);
+        delay(10);
+
+        isRunning = false;
+    }
+
+    public void moveToPointPD(double targX, double targY, double targH, double posThresh, double headThresh) {
+
+        isRunning = true;
+
+        count = 0;
+
+        Proportional orient = new Proportional(0.02, 0.3);
+
+
+        double xDist, yDist, distance, h;
+        double targSpeed, scale;
+        double targVX, targVY, hCorrect;
+        boolean endCondition;
+
+        PID velocityFinder = new PID(0.0125,0,0.01,0,0.75,0.12);
+
+        do{
+            localize();
+            xDist = targX - Adhameter.getPosition()[0];
+            yDist = targY - Adhameter.getPosition()[1];
+            distance = Math.hypot(xDist, yDist);
+            h = Adhameter.getHeadingContinuous();
+
+            targSpeed = Math.abs(velocityFinder.getCorrection(0, distance));
+
+            scale = targSpeed/distance;
+
+            targVX = xDist * scale;
+            targVY = yDist * scale;
+            // Verified ^
+
+            hCorrect = orient.getCorrection(targH, h);
+
+            setGlobalVelocity(targVX, targVY, hCorrect); //hCorrect
+
+            endCondition = (distance < posThresh) && (Math.abs(orient.getError()) < headThresh);
+
+        }while(!endCondition && opmode.opModeIsActive());
+
+        setGlobalVelocity(0, 0, 0);
+        delay(10);
 
         isRunning = false;
     }
@@ -466,13 +546,13 @@ public class Drive2 extends Subsystem {
 
     // Utility Methods =============================================================================
 
-    public void setGlobalVelocity(double xVel, double yVel, double hVel) {
+    public void setGlobalVelocity(double xVel, double yVel, double hVel) { // Verified
         double h = Adhameter.getHeadingDeg();
 
         double xRelVel = cos(-h) * xVel - sin(-h) * yVel;
         double yRelVel = sin(-h) * xVel + cos(-h) * yVel;
 
-        double xMotor = xRelVel * 1;
+        double xMotor = xRelVel * 1.1;
         double yMotor = yRelVel * 1;
         double hMotor = hVel * 1;
 
@@ -494,8 +574,11 @@ public class Drive2 extends Subsystem {
     public long getLoopTime(){
         return loopTime;
     }
+
     private void delay(int millis) {
-        try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
+        if(opmode.opModeIsActive()){
+            try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
+        }
     }
 
     private double cos(double theta) {

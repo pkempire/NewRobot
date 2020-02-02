@@ -25,13 +25,13 @@ public class MainPipeline extends OpenCvPipeline {
 
     //X is actually Y
     private double cx0 = 135;
-    private double cy0 = 210;
+    private double cy0 = 200;
 
     private double cx1 = 135;
-    private double cy1 = 150;
+    private double cy1 = 140;
 
     private double cx2 = 135;
-    private double cy2 = 90;
+    private double cy2 = 80;
 
     private int r = 6;
     private int strokeWidth = 3;

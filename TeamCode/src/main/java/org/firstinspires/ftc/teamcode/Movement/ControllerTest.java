@@ -77,8 +77,8 @@ public class ControllerTest extends LinearOpMode {
         //Start Autonomous period
         Adham.startTracking(0, 0, 0);
 
-        PID holdFar = new PID(0.015, 0.000, 0.00, 0, 0.4);
-        PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4);
+        PID holdFar = new PID(0.015, 0.000, 0.00, 0, 0.4, 0);
+        PID holdNear = new PID(0.008, 0.0008, 0.025, 5, 0.4, 0);
 
         double current;
         double target = 0;

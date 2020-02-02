@@ -10,14 +10,15 @@ public class PID extends Controller {
     private double errorSum = 0;
     private double error = 1000;
     private double lastError = 0;
-    private double sumLimit, correctLimit;
+    private double sumLimit, cLimit, cLowLimit;
 
-    public PID(double p_Gain, double i_Gain, double d_Gain, double iLimit, double cLimit) {
+    public PID(double p_Gain, double i_Gain, double d_Gain, double iLimit, double cLimit, double cLowLimit) {
         this.pGain = p_Gain;
         this.iGain = i_Gain;
         this.dGain = d_Gain;
         this.sumLimit = iLimit;
-        this.correctLimit = cLimit;
+        this.cLimit = cLimit;
+        this.cLowLimit = cLowLimit;
 
     }
 
@@ -48,10 +49,16 @@ public class PID extends Controller {
 
         correction = P + I + D;
 
-        if(correction > correctLimit) {
-            correction = correctLimit;
-        }else if(correction < -correctLimit) {
-            correction = -correctLimit;
+        if(correction > cLimit) {
+            correction = cLimit;
+        }else if(correction < -cLimit) {
+            correction = -cLimit;
+        }
+
+        if(correction >= 0 && correction < cLowLimit) {
+            correction = cLowLimit;
+        }else if(correction < 0 && correction > -cLowLimit) {
+            correction = -cLowLimit;
         }
 
         return correction;

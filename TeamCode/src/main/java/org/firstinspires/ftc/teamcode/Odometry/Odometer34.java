@@ -33,6 +33,7 @@ public class Odometer34 extends Odometer{
     private double lastY;
     private double heading;
     private double headingContinuous;
+    private double rotations;
     private double headingOffset;
     private double[] position = {0, 0};
 
@@ -114,6 +115,7 @@ public class Odometer34 extends Odometer{
         leftChange = 0;
         backChange = 0;
         headingChange = 0;
+        rotations = 0;
 
         rightLastVal = 0;
         leftLastVal = 0;
@@ -132,9 +134,9 @@ public class Odometer34 extends Odometer{
         lastX = x;
         lastY = y;
 
-        headingOffset = Heading;
-        headingLastVal = 0;
-        headingContinuous = Math.toRadians(headingOffset);
+        headingOffset = Math.toRadians(Heading);
+        headingLastVal = Math.toRadians(Heading);
+        headingContinuous = Math.toRadians(Heading);
 
     }
 
@@ -147,7 +149,7 @@ public class Odometer34 extends Odometer{
             back = backEnc.getCurrentPosition() * encScale * backEncDir;
 
             // Calculates direction
-            heading = Math.toRadians(getImuHeading());
+            heading = Math.toRadians(getImuHeading()) + headingOffset;
 
             rightChange = right - rightLastVal;
             leftChange = left - leftLastVal;

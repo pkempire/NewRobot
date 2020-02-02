@@ -1,17 +1,20 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import android.app.ApplicationErrorReport;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DigitalChannel;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.BatteryChecker;
 
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 
-@TeleOp(name="V2.0 Teleop", group="Linear Opmode")
+@TeleOp(name="V2.0 Teleop Kaden", group="Linear Opmode")
 
-public class TeleOpFinal extends LinearOpMode {
+public class TeleOpFinalKaden extends LinearOpMode {
 
     // Declare OpMode members.
     private DcMotor driveFrontLeft;
@@ -53,8 +56,8 @@ public class TeleOpFinal extends LinearOpMode {
 
     private Servo capstone;
 
-
     private double LOWER_INTAKE = 0;
+
 
 
     private boolean G2_RIGHT_BUMPER_RELEASED;
@@ -71,13 +74,16 @@ public class TeleOpFinal extends LinearOpMode {
     private boolean slidesRunning = false;
 //    private boolean dropOffRunning = false;
 
-    private boolean dpadUpPressed = false;
-    private boolean dpadDownPressed = false;
+    private boolean dpadUpReleased = false;
+    private boolean dpadDownReleased = false;
     private boolean liftAtBottom = true;
     private int grabberState = 0;
     private boolean liftManualMode = false;
     private  int dropoffCounter = 0;
     private boolean dropoffRunning = false;
+    private int blocklevelStatic = 0;
+    private boolean rightBumperReleased = false;
+    private boolean rightTriggerReleased = false;
 
     private void initialize() {
         // Initialize all objects declared above
@@ -94,7 +100,6 @@ public class TeleOpFinal extends LinearOpMode {
 
         liftRight = hardwareMap.dcMotor.get("liftRight");
         liftLeft = hardwareMap.dcMotor.get("liftLeft");
-
 
         //SERVOS FROM HARDWARE MAP:
         //Use same naming scheme as motors when available, otherwise, use a logical name
@@ -304,52 +309,120 @@ public class TeleOpFinal extends LinearOpMode {
                     slidesRunning = false;
                     liftManualMode = true;
                 }
-                if (gamepad2.dpad_down || gamepad2.dpad_up) {
-                    slidesRunning = true;
+                if(!gamepad2.right_bumper){
+                    rightBumperReleased = true;
                 }
-                if (gamepad2.dpad_up) {
-                    dpadUpPressed = true;
-                }
-                if (!gamepad2.dpad_up && dpadUpPressed) {
-
-                    if (blocklevel == 0) {
+                if(gamepad2.right_bumper && rightBumperReleased){
+                    blocklevelStatic += 1;
+                    if (blocklevelStatic == 0) {
                         liftGoal = 185;
                     }
-                    if (blocklevel == 1) {
+                    if (blocklevelStatic == 1) { // 165
                         liftGoal = 350;
                     }
-                    if (blocklevel == 2) {
+                    if (blocklevelStatic == 2) {// 185
                         liftGoal = 535;
                     }
-                    if (blocklevel == 3) {
+                    if (blocklevelStatic == 3) {// 175
                         liftGoal = 710;
                     }
-                    if (blocklevel == 4) {
+                    if (blocklevelStatic == 4) {// 165
                         liftGoal = 875;
                     }
-                    if (blocklevel == 5) {
+                    if (blocklevelStatic == 5) {// 190
                         liftGoal = 1065;
                     }
-                    if (blocklevel == 6) {
+                    if (blocklevelStatic == 6) {// 160
                         liftGoal = 1225;
-                    } // if (blocklevel == 7){liftGoal = liftGoal + }  if (blocklevel == 8){liftGoal = liftGoal + }
-                    blocklevel = blocklevel + 1;
-                    lastPressedFlipper = 2; //sets the flipper to upright position when dpadUp is pressed.
+                    }
                     if (liftGoal > liftMax) {
                         liftGoal = liftMax; //makes sure the slides don't exceed the max encoder position.
                     }
-                    dpadUpPressed = false;
                     slidesRunning = true;
+                    lastPressedFlipper = 2;
+                    rightBumperReleased = false;
                 }
-                if (gamepad2.dpad_down) {
-                    dpadDownPressed = true;
+                if(gamepad2.right_trigger <= .2){
+                    rightTriggerReleased = true;
                 }
-                if (!gamepad2.dpad_down && dpadDownPressed) {
-                    dpadDownPressed = false;
-                    liftGoal = liftGoal - 50;
+                if(gamepad2.right_trigger > .2 && rightTriggerReleased){
+                    if(blocklevelStatic > 0){
+                        blocklevelStatic -= 1;
+                    }
+                    if (blocklevelStatic == 0) {
+                        liftGoal = 185;
+                    }
+                    if (blocklevelStatic == 1) { // 165
+                        liftGoal = 350;
+                    }
+                    if (blocklevelStatic == 2) {// 185
+                        liftGoal = 535;
+                    }
+                    if (blocklevelStatic == 3) {// 175
+                        liftGoal = 710;
+                    }
+                    if (blocklevelStatic == 4) {// 165
+                        liftGoal = 875;
+                    }
+                    if (blocklevelStatic == 5) {// 190
+                        liftGoal = 1065;
+                    }
+                    if (blocklevelStatic == 6) {// 160
+                        liftGoal = 1225;
+                    }
                     if (liftGoal < 0) {
                         liftGoal = 0;
                     }
+                    slidesRunning = true;
+                    rightTriggerReleased = false;
+                }
+                if (gamepad2.dpad_down || gamepad2.dpad_up) {
+                    slidesRunning = true;
+                }
+                if (!gamepad2.dpad_up) {
+                    dpadUpReleased = true;
+                }
+                if (gamepad2.dpad_up && dpadUpReleased) {
+                    blocklevel += 1;
+                    blocklevelStatic = blocklevel;
+                    if (blocklevelStatic == 0) {
+                        liftGoal = 185;
+                    }
+                    if (blocklevelStatic == 1) { // 165
+                        liftGoal = 350;
+                    }
+                    if (blocklevelStatic == 2) {// 185
+                        liftGoal = 535;
+                    }
+                    if (blocklevelStatic == 3) {// 175
+                        liftGoal = 710;
+                    }
+                    if (blocklevelStatic == 4) {// 165
+                        liftGoal = 875;
+                    }
+                    if (blocklevelStatic == 5) {// 190
+                        liftGoal = 1065;
+                    }
+                    if (blocklevelStatic == 6) {// 160
+                        liftGoal = 1225;
+                    }
+                    if (liftGoal > liftMax) {
+                        liftGoal = liftMax; //makes sure the slides don't exceed the max encoder position.
+                    }
+                    lastPressedFlipper = 2;
+                    slidesRunning = true;
+                    dpadUpReleased = false;
+                }
+                if (!gamepad2.dpad_down) {
+                    dpadDownReleased = true;
+                }
+                if (gamepad2.dpad_down && dpadDownReleased) {
+                    liftGoal -= 50;
+                    if (liftGoal < 0) {
+                        liftGoal = 0;
+                    }
+                    slidesRunning = true;
+                    dpadDownReleased = false;
                 }
 
 
@@ -370,7 +443,7 @@ public class TeleOpFinal extends LinearOpMode {
                     liftLeft.setPower(0);
                 }
             }
-            if (gamepad2.right_bumper){ //if'statement starts the automatic dropoff sequence
+            if (gamepad2.left_stick_button && gamepad2.right_stick_button){ //if'statement starts the automatic dropoff sequence
                 slidesResetting = false; //make sure gamepad2.A code is not running
                 slidesRunning = false; //make sure that "hover to position" code stops running
                 dropoffCounter = 0; //this will be used as the "timer" to run the dropoff sequence
@@ -379,9 +452,9 @@ public class TeleOpFinal extends LinearOpMode {
             if (dropoffRunning){//this code runs once dropoff sequence is initiated. it will be responsible for controlling servo + motor movements.
                 grabberState = 1; //change grabberState variable so the grabbers are set to open position
 
-                if (dropoffCounter > 5 && dropoffCounter < 14  && liftAverage<liftMax){ //after 5 loops of this code, the slides will start extruding up.
-                    liftLeft.setPower(-.7);
-                    liftRight.setPower(-.7);
+                if (dropoffCounter > 5 && dropoffCounter < 7  && liftAverage<liftMax){ //after 5 loops of this code, the slides will start extruding up.
+                    liftLeft.setPower(-.5);
+                    liftRight.setPower(-.5);
                 }
                 if (dropoffCounter > 12){ //after 20 loops, the flipper servos will start moving into the robot.
                     lastPressedFlipper = 0; //changes flipper variable so the flipper is set to inside chassis pos
@@ -401,17 +474,17 @@ public class TeleOpFinal extends LinearOpMode {
                     liftGoal = 0;
                     blocklevel = 0;
 
-                    dropoffRunning = false; //makes sure to end the dropoff sequence by setting dropoff Running back to false.
+                    dropoffRunning = false; //makes sure to end the dropoff  sequence by setting dropoff Running back to false.
                 }
                 dropoffCounter = dropoffCounter + 1; //increment dropoff counter - this keeps track of time.
             }
 
 //                if (gamepad2.dpad_down) {
-//                    dpadDownPressed = true;
+//                    dpadDownReleased = true;
 //                }
-//                if (!gamepad2.dpad_down && dpadDownPressed) {
+//                if (!gamepad2.dpad_down && dpadDownReleased) {
 //                    liftGoal = liftGoal - 200;
-//                   dpadDownPressed = false;
+//                   dpadDownReleased = false;
 //                slidesRunning = true;
             //                  //liftLeft.setTargetPosition(liftGoal);
             //                // liftLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -521,8 +594,8 @@ public class TeleOpFinal extends LinearOpMode {
             //FOUNDATION CLAMP--=============================================================
 
             if (gamepad1.left_bumper) {
-                foundationClampLeft.setPosition(.255);
-                foundationClampRight.setPosition(.75);
+                foundationClampLeft.setPosition(0.275); //updated positions, not updated in auto yet. Should help with traction issue.
+                foundationClampRight.setPosition(0.73);
             } else {
                 foundationClampLeft.setPosition(0.745);
                 foundationClampRight.setPosition(0.26);

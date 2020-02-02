@@ -130,40 +130,68 @@ public class BlueTeamNew extends LinearOpMode {
         telemetry.update();
 
         //Put Arm Half Down
+//        primeHook();
 
-
-
+        //0,63,270
+       // Driver.strafeToPointOrient(0, 51, 270, 5, 3,1,0.02, 0.01, 0, 8);
+        //closest to wall = 56, 68, 270
+        //middle spot = -175,68,270
+        //drop off spot = -217,82,270
         //GRAB FIRST BLOCK
-        if(skyPosition == 0) { //Skystone Closest To Wall
-            Driver.strafeToPointOrient(11, 68, 270, 1, 1,.95,0.008, 0.02, 0.01, 5); //closest to field wall
-        }else if(skyPosition == 1) { //Center Skystone
-            Driver.strafeToPointOrient(-8, 71, 270, 1, 1,.95,0.008, 0.02, 0.01, 5);
-        }else if(skyPosition == 2) { //Furthest Skystone From Wall
-            Driver.strafeToPointOrient(-30, 68, 270, 1, 1,.95,0.008, 0.02, 0.01, 5); //furthest from field wall
+        if(skyPosition == 1) { //Skystone Closest To Wall
+
+            Driver.strafeToPointOrient(0, 100, 0, 2, 1.5,.95,0.013, 0.005, 0.01, 8); //closest to field wall
+            delay(50000);
+
+            Driver.strafeToPointOrient(55, 67, 270, 2, 1.5,.95,0.013, 0.005, 0.01, 8); //closest to field wall
+            grabBlock();
+
+        }else if(skyPosition == 2) { //Center Skystone
+            Driver.strafeToPointOrient(55, 67, 270, 2, 1.5,.95,0.013, 0.005, 0.015, 8); //closest to field wall
+
+        }else if(skyPosition == 0) { //Furthest Skystone From Wall
+            Driver.strafeToPointOrient(55, 67, 270, 2, 1.5,.95,0.013, 0.005, 0.01, 8); //closest to field wall
 
         }
-        grabBlock();
 
-        Driver.strafeToPointOrient(-44,60,270,2,2,1.3,0.008, 0.02, 0.02, 5); //MIDDLE POSITION
-
-        Driver.strafeToPointOrient(-210,76,270,2,1,1,0.008, 0.02, 0.02, 5); //FOUNDATION PLACING
-
+        Driver.strafeToPointOrient(-175, 63, 270, 4, 1.35,1.3,0.002, 0, 0.13, 5);
+        Driver.strafeToPointOrient(-217, 80, 270, 4, 2,1.1,0.002, 0.005, 0.09, 8);
         depositBlock();
 
 
-
-        Driver.strafeToPointOrient(-44,60,270,2,2,1.3,0.008, 0.02, 0.02, 5); // MIDDLE POSITION
-
-        autoFlipperLeft.setPosition(.3); //PRIMING FLIPPER
-        autoGrabberLeft.setPosition(.65); //PRIMING GRABBER
-
         //GRAB SECOND BLOCK
         if(skyPosition == 0) { //RIGHT
-            Driver.strafeToPointOrient(68,75,270,1,1, 1.05,0.008, 0.02, 0.01, 5);
+            Driver.strafeToPointOrient(68,75,270,1,1, 1.05,0.008, 0.01, 0.05, 5);
+
+        }else if(skyPosition == 1) { //Center Skystone
+            Driver.strafeToPointOrient(-7, 62, 270, 5, 2,1.4,0.002, 0.005, 0.11, 5); //closest to field wall
+            Driver.strafeToPointOrient(-7, 69, 270, 1.5, 1.5,.95,0.005, 0.005, 0.05, 5); //closest to field wall
+            primeHook();
+            grabBlock();
+
+
+        }else if(skyPosition == 2) { //LEFT
+
+            Driver.strafeToPointOrient(28,75,270,1,1, 1.05,0.008, 0.01, 0.01, 5);
+
+
+        }
+
+        Driver.strafeToPointOrient(-175, 63, 270, 4, 1.5,1.3,0.005, 0, 0.12, 5);
+        Driver.strafeToPointOrient(-238.7, 88, 270, 10, 2.5,1.1,0.005, 0, 0.09, 5);
+        depositBlock();
+
+
+        //GRAB third BLOCK
+        if(skyPosition == 0) { //RIGHT
+            Driver.strafeToPointOrient(68,75,270,1,1, 1.05,0.008, 0, 0.01, 5);
 
 
         }else if(skyPosition == 1) { //Center Skystone
-            Driver.strafeToPointOrient(50,69,270,1,1, 1.05,0.008, 0.02, 0.01, 5);
+            Driver.strafeToPointOrient(-44, 62, 270, 5, 2,1.5,0.012, 0.02, 0.1, 5); //closest to field wall
+            Driver.strafeToPointOrient(-44, 67, 270, 2, 1.5,.95,0.013, 0.01, 0.05, 5); //closest to field wall
+            primeHook();
+            grabBlock();
 
 
         }else if(skyPosition == 2) { //LEFT
@@ -172,18 +200,14 @@ public class BlueTeamNew extends LinearOpMode {
 
 
         }
-        grabBlock();
 
-        Driver.strafeToPointOrient(-44,60,270,2,2,1.3,0.008, 0.02, 0.02, 5); //MIDDLE POSITION
-
-        Driver.strafeToPointOrient(-210,76,270,2,1,1,0.008, 0.02, 0.02, 5); //FOUNDATION PLACING
-
-
-
+        Driver.strafeToPointOrient(-175, 63, 270, 4.5, 1.5,1.5,0.012, 0, 0.12, 5);
+        Driver.strafeToPointOrient(-217, 80, 270, 4, 2,1.2,0.05, 0, 0.09, 5);
         depositBlock();
 
 
 
+/*
         //OPEN FOUNDATION CLAMPS
         foundationClampLeft.setPosition(0.745);
         foundationClampRight.setPosition(0.26);
@@ -191,7 +215,7 @@ public class BlueTeamNew extends LinearOpMode {
         delay(150);
 
         //Align with foundation - still far apart
-        Driver.strafeToPointOrient(-218,68,180,3,3, 1.05,0.008, 0.02, 0.01, 5);
+        Driver.strafeToPointOrient(-255,82,180,3,3, 1.05,0.008, 0.02, 0.01, 5);
 
 
         //Back up into foundation
@@ -215,6 +239,9 @@ public class BlueTeamNew extends LinearOpMode {
         //Park
         Driver.strafeToPointOrient(-100,66,270,3 ,2,1.05,0.008, 0.02, 0.01, 5);
 
+
+*/
+
     }
 
     private void scanSkystone(){
@@ -233,20 +260,26 @@ public class BlueTeamNew extends LinearOpMode {
 
     private void grabBlock(){ //must prime arm (open & put fully down) before grabbing
         autoFlipperLeft.setPosition(.25); //put arm fully down
-        delay(350); //350
-        autoGrabberLeft.setPosition(.23); //grab stone
-        delay(200);
+        autoGrabberLeft.setPosition(.19); //grab stone
+        delay(300);
         autoFlipperLeft.setPosition(.74); // arm up
+        delay(300);
     }
 
     private void depositBlock(){
         //DROP BLOCK AT FOUNDATION
         autoFlipperLeft.setPosition(.42); //put arm half down
-        delay(200);
         autoGrabberLeft.setPosition(.65); //open grabber
-        delay(200);
+        delay(480);
         autoFlipperLeft.setPosition(.74); // arm up
         autoGrabberLeft.setPosition(.23); //grabber closed
+        delay(480);
+    }
+
+    private void primeHook(){
+        autoFlipperLeft.setPosition(.3); //PRIMING FLIPPER
+        autoGrabberLeft.setPosition(.65); //PRIMING GRABBER
+        delay(380);
     }
 
 }

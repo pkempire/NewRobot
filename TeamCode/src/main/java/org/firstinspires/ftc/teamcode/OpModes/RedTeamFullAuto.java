@@ -52,6 +52,12 @@ public class RedTeamFullAuto extends LinearOpMode {
     private Servo foundationClampLeft;
     private Servo foundationClampRight;
 
+    private double FLIPPER_SERVO_HALFWAY = .64;
+    private double GRABBER_SERVO_OPEN = .36;
+    private double FLIPPER_SERVO_UP = .2;
+    private double GRABBER_SERVO_CLOSED = .75;
+    private double FLIPPER_SERVO_DOWN = .68;
+
     // Important Variables =========================================================================
     private int skyPosition;
 
@@ -108,8 +114,8 @@ public class RedTeamFullAuto extends LinearOpMode {
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();
 
-        autoFlipperLeft.setPosition(.77); //  LEFT arm up
-        autoGrabberLeft.setPosition(.23); // LEFT grabber closed
+        autoFlipperLeft.setPosition(.7); //  LEFT arm up
+        autoGrabberLeft.setPosition(FLIPPER_SERVO_UP); // LEFT grabber closed
     }
 
     @Override
@@ -126,19 +132,19 @@ public class RedTeamFullAuto extends LinearOpMode {
         telemetry.update();
 
 
-        autoFlipperRight.setPosition(.58); //flipper halfway
+        autoFlipperRight.setPosition(FLIPPER_SERVO_HALFWAY); //flipper halfway
 
         //Open Grabber
-        autoGrabberRight.setPosition(.36); //grabbers open
-        delay(400);
+        autoGrabberRight.setPosition(GRABBER_SERVO_OPEN); //grabbers open
+        delay(700);
 
-        //GRAB FIRST BLOCK
+        //GRAB FIRST BLOCK FLIPPER_SERVO_HALFWAY
         if(skyPosition == 2) { //Skystone Closest To Wall
-            Driver.strafeToPointOrient(-13, 66, 90, 1, 1,.85,0.008, 0.02, 0.01, 5); //closest to field wall
+            Driver.strafeToPointOrient(-13, 70, 90, 1.5, 1,.85,0.008, 0.02, 0.01, 5); //closest to field wall
         }else if(skyPosition == 1) { //Center Skystone
-            Driver.strafeToPointOrient(6, 66, 90, 1, 1,.85,0.008, 0.02, 0.01, 5);
+            Driver.strafeToPointOrient(6, 70, 90, 1.5, 1,.85,0.008, 0.02, 0.01, 5);
         }else if(skyPosition == 0) { //Furthest Skystone From Wall
-            Driver.strafeToPointOrient(28, 66, 90, 1, 1,.85,0.008, 0.02, 0.01, 5); //furthest from field wall
+            Driver.strafeToPointOrient(28, 70, 90, 1.5, 1,.85,0.008, 0.02, 0.01, 5); //furthest from field wall
         }
         grabBlock();
         telemetry.addData("First skystone aquired.  ", "I think.");
@@ -156,29 +162,32 @@ public class RedTeamFullAuto extends LinearOpMode {
         Driver.strafeToPointOrient(0,65,90,50,3,1.15,0.008, 0.02, 0.01, 5); //RETURNING SPECIAL THRESH MOVEMENT
         delay(20);
 
-        autoFlipperRight.setPosition(.58); //flipper half down
 
-        //Open Grabber
-        autoGrabberRight.setPosition(.37); //grabbers open
         delay(20);
 
         //GRAB SECOND BLOCK
         if(skyPosition == 2) { //Skystone Closest To Wall
             Driver.strafeToPointOrient(-60,58,90,1,1, 0.95,0.008, 0.02, 0.01, 5); //go to 72
-            delay(20);
+            autoFlipperRight.setPosition(FLIPPER_SERVO_HALFWAY); //flipper halfway
+            autoGrabberRight.setPosition(GRABBER_SERVO_OPEN); //grabbers open
+            delay(500);
             Driver.strafeToPointOrient(-68.5,72,90,1,1, 1.05,0.008, 0.02, 0.01, 5);
             grabBlock();
 
         }else if(skyPosition == 1) { //Center Skystone
             Driver.strafeToPointOrient(-53,58,90,1,1, 0.95,0.008, 0.02, 0.01, 5);
-            delay(20);
+            autoFlipperRight.setPosition(FLIPPER_SERVO_HALFWAY); //flipper halfway
+            autoGrabberRight.setPosition(GRABBER_SERVO_OPEN); //grabbers open
+            delay(500);
             Driver.strafeToPointOrient(-54,72,90,1,1, 1.05,0.008, 0.02, 0.01, 5);
             grabBlock();
 
         }else if(skyPosition == 0) { //Furthest Skystone From Wall
 
             Driver.strafeToPointOrient(-28,58,90,1,1, 0.94,0.008, 0.02, 0.01, 5);
-            delay(20);
+            autoFlipperRight.setPosition(FLIPPER_SERVO_HALFWAY); //flipper halfway
+            autoGrabberRight.setPosition(GRABBER_SERVO_OPEN); //grabbers open
+            delay(500);
             Driver.strafeToPointOrient(-34,75,90,1,1, 1.05,0.008, 0.02, 0.01, 5);
             grabBlock();
         }
@@ -196,7 +205,7 @@ public class RedTeamFullAuto extends LinearOpMode {
 
         //Open Clamp
         foundationClampLeft.setPosition(0.745);
-        foundationClampRight.setPosition(0.26);
+        foundationClampRight.setPosition(.26);
         delay(250);
 
         //Align with foundation - still far apart
@@ -204,19 +213,19 @@ public class RedTeamFullAuto extends LinearOpMode {
         delay(20);
 
         //Back up into foundation
-        Driver.driveStraight(.25,-1,42);
+        Driver.driveStraight(.2,-1,42);
 
         //Clamp
-        foundationClampLeft.setPosition(0.255);
-        foundationClampRight.setPosition(0.75);
+        foundationClampLeft.setPosition(.255);
+        foundationClampRight.setPosition(.75);
         delay(350);
 
-        Driver.strafeToPointOrientFoundation(160,53,90,5,5); //take foundation into second-to-final position
+        Driver.strafeToPointOrientFoundation(160,51,90,5,5); //take foundation into second-to-final position
         delay(20);
 
         //Un-Clamp
         foundationClampLeft.setPosition(0.745);
-        foundationClampRight.setPosition(0.26);
+        foundationClampRight.setPosition(.26);
 
         //Push Foundation against wall
         Driver.driveStraight(.5,-1,27);
@@ -242,21 +251,21 @@ public class RedTeamFullAuto extends LinearOpMode {
     }
 
     private void grabBlock(){ //must prime arm (open & put fully down) before grabbing
-        autoFlipperRight.setPosition(.68); //flipper down
+        autoFlipperRight.setPosition(FLIPPER_SERVO_DOWN); //flipper down
         delay(350); //350
-        autoGrabberRight.setPosition(.77); //grabbers closed
+        autoGrabberRight.setPosition(GRABBER_SERVO_CLOSED); //grabbers closed
         delay(400); //400
-        autoFlipperRight.setPosition(.2); //flipper up
+        autoFlipperRight.setPosition(FLIPPER_SERVO_UP); //flipper up
     }
 
     private void depositBlock(){
         //DROP BLOCK AT FOUNDATION
-        autoFlipperRight.setPosition(.56); //put arm half down
+        autoFlipperRight.setPosition(FLIPPER_SERVO_HALFWAY); //put arm half down
         delay(300);
-        autoGrabberRight.setPosition(.36); //grabbers open
+        autoGrabberRight.setPosition(GRABBER_SERVO_OPEN); //grabbers open
         delay(250);
-        autoFlipperRight.setPosition(.2); //flipper up
-        autoGrabberRight.setPosition(.75); //grabbers closed
+        autoFlipperRight.setPosition(FLIPPER_SERVO_UP); //flipper up
+        autoGrabberRight.setPosition(GRABBER_SERVO_CLOSED); //grabbers closed
     }
 
 }

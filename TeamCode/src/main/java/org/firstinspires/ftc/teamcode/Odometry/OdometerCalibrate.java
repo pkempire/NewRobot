@@ -13,6 +13,7 @@ import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Movement.Drive2;
 
 @Autonomous(name="Odometer Calibration Robot V2", group="Linear Opmode")
+@Disabled
 
 public class OdometerCalibrate extends LinearOpMode {
 

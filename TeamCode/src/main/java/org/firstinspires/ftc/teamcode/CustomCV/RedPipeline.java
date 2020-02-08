@@ -25,13 +25,13 @@ public class RedPipeline extends OpenCvPipeline {
 
     //X is actually Y //40
     private double cx0 = 135;
-    private double cy0 = 245;
+    private double cy0 = 260;
 
     private double cx1 = 135;
-    private double cy1 = 185;
+    private double cy1 = 200;
 
     private double cx2 = 132;
-    private double cy2 = 125;
+    private double cy2 = 140;
 
     private int r = 6;
     private int strokeWidth = 3;

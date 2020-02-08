@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Controllers.PID;
 import org.firstinspires.ftc.teamcode.Controllers.Proportional;
@@ -33,6 +34,7 @@ public class DriveTest extends LinearOpMode {
     private Drive2 Driver;
     private BNO055IMU Imu;
     private BNO055IMU.Parameters Params;
+    private ElapsedTime runtime;
 
     private void initialize(){
         telemetry.addData("Status: ", "Initializing");
@@ -74,11 +76,14 @@ public class DriveTest extends LinearOpMode {
         waitForStart();
         telemetry.addData("Status: ", "Running");
         telemetry.update();
+        runtime.reset();
+        runtime.startTime();
+        runtime.reset();
         //Start Autonomous period
         Adham.startTracking(0, 0, 0);
 
         // Original Paths
-        /* 3.3
+         /*3.3
         Driver.moveToPointPD(25,117,0,15,2);
         Driver.moveToPointPD(-14,245,0,10,2);
          */
@@ -86,18 +91,25 @@ public class DriveTest extends LinearOpMode {
         /* 3.5
         Driver.moveToPointConstant(0.5, 23, 107, 0, 10, 2);
         Driver.moveToPointConstants(-11, 234, 0, 5, 2);
-         */
 
-        /*
-        Driver.moveToPointConstantP(0.75, 50, 0.01, 25, 117, 0, 15, 1.5);
-        Driver.moveToPointConstantP(0.75, 50, 0.01, -14, 245, 0, 10, 1.5);
-        */
+
+        Driver.moveToPointPD(60,127,0,120,5);
+        Driver.moveToPointPD(-14,245,0,20,5);
+
+         */
 
     }
 
     private void delay(int millis) {
-        if(opModeIsActive()){
-            try{Thread.sleep(millis);}catch(InterruptedException e){e.printStackTrace();}
-        }
+        double startTime = runtime.milliseconds();
+        double elapsedTime;
+        do{
+            if(opModeIsActive()){
+                Adham.update();
+                elapsedTime = runtime.milliseconds() - startTime;
+            }else{
+                break;
+            }
+        }while(elapsedTime < millis);
     }
 }

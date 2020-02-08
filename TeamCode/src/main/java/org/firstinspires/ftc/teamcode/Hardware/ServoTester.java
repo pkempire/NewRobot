@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 
 @TeleOp(name="Servo Tester", group="Linear Opmode")
-
+@Disabled
 public class ServoTester extends LinearOpMode {
 
     // Declare OpMode members.

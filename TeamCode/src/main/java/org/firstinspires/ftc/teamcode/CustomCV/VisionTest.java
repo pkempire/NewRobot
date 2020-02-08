@@ -16,6 +16,7 @@ import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
 @TeleOp(name="V-Vision Test", group = "Linear Opmode")
+@Disabled
 public class VisionTest extends LinearOpMode {
 
     private OpenCvCamera phoneCam;

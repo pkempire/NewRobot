@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 
 import android.app.ApplicationErrorReport;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -13,6 +14,7 @@ import com.qualcomm.robotcore.util.BatteryChecker;
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 
 @TeleOp(name="V2.0 Teleop Kaden", group="Linear Opmode")
+@Disabled
 
 public class TeleOpFinalKaden extends LinearOpMode {
 

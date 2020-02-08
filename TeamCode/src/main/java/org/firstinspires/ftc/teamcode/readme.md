@@ -10,3 +10,11 @@ To wifi-direct to phone:
     -connect to its wifi
     -run the wireless batch file (right click, show in explorer)
 
+Important servo position
+ Right Flipper servo up: 0.434
+ Right Flipper servo Down: 0
+ Right Flipper Servo Storage: 0.467 - this is used when not holding a block
+
+ Right Clamp Servo Open: 0
+ Right Clamp Servo Clamped Block: 0.212
+ Right Clamp Servo Storage: 0.286

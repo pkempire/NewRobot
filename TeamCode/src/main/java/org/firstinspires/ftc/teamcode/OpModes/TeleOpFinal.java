@@ -1,5 +1,6 @@
 package org.firstinspires.ftc.teamcode.OpModes;
 
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -10,6 +11,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 
 @TeleOp(name="V2.0 Teleop", group="Linear Opmode")
+@Disabled
 
 public class TeleOpFinal extends LinearOpMode {
 
@@ -51,7 +53,7 @@ public class TeleOpFinal extends LinearOpMode {
     private Servo autoGrabberLeft;
     private Servo autoGrabberRight;
 
-    private Servo capstone;
+    //private Servo capstone;
 
 
     private double LOWER_INTAKE = 0;
@@ -63,7 +65,7 @@ public class TeleOpFinal extends LinearOpMode {
     private int TIME = 0;
     private int lastPressedFlipper = 0; //0 is in position , 1 is out position
     private int liftAverage = 0;
-    private int liftMax = 1425;
+    private int liftMax = 1900;
     private int liftGoal = 0;
     private int blocklevel = 0; //first level corresponds to second block. 0th level is first block.
     //    private int dropOffCounter = 0;
@@ -116,7 +118,7 @@ public class TeleOpFinal extends LinearOpMode {
         autoGrabberLeft = hardwareMap.servo.get("autoGrabberLeft");
         autoGrabberRight = hardwareMap.servo.get("autoGrabberRight");
 
-        capstone = hardwareMap.servo.get("capstone");
+        //capstone = hardwareMap.servo.get("capstone");
 
 
         leftLiftLimitSwitch = hardwareMap.digitalChannel.get("leftLiftLimitSwitch");
@@ -316,23 +318,27 @@ public class TeleOpFinal extends LinearOpMode {
                         liftGoal = 185;
                     }
                     if (blocklevel == 1) {
-                        liftGoal = 350;
+                        liftGoal = 420;
                     }
                     if (blocklevel == 2) {
-                        liftGoal = 535;
+                        liftGoal = 655;
                     }
                     if (blocklevel == 3) {
-                        liftGoal = 710;
+                        liftGoal = 871;
                     }
                     if (blocklevel == 4) {
-                        liftGoal = 875;
+                        liftGoal = 1067;
                     }
                     if (blocklevel == 5) {
-                        liftGoal = 1065;
+                        liftGoal = 1261;
                     }
                     if (blocklevel == 6) {
-                        liftGoal = 1225;
-                    } // if (blocklevel == 7){liftGoal = liftGoal + }  if (blocklevel == 8){liftGoal = liftGoal + }
+                        liftGoal = 1465;
+                    }
+                    if (blocklevel == 7) {
+                        liftGoal = 1491;
+                    }
+                    // if (blocklevel == 7){liftGoal = liftGoal + }  if (blocklevel == 8){liftGoal = liftGoal + }
                     blocklevel = blocklevel + 1;
                     lastPressedFlipper = 2; //sets the flipper to upright position when dpadUp is pressed.
                     if (liftGoal > liftMax) {
@@ -545,12 +551,14 @@ public class TeleOpFinal extends LinearOpMode {
             }
 
             //CAPSTONE==========================================================================
-
+/*
             if (gamepad1.right_trigger > 0.2) {
                 capstone.setPosition(.25); //capstone down
             } else {
                 capstone.setPosition(.68);//capstone up
             }
+
+ */
 
         }
     }

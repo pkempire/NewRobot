@@ -7,6 +7,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Gamepad;
 
+import org.firstinspires.ftc.teamcode.Controllers.ConstantPD;
 import org.firstinspires.ftc.teamcode.Controllers.GatedConstant;
 import org.firstinspires.ftc.teamcode.Controllers.Proportional;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
@@ -342,10 +343,11 @@ public class Drive2 extends Subsystem {
     }
 
     public void driveStraight(double magnitude, double direction, double gameTicks) {
+
         double counter = 0;
         double emergencyCounter = 10000;
         while (counter < gameTicks && opmode.opModeIsActive()) {
-            localize();
+            Adhameter.update();
             if(counter < emergencyCounter) {
                 frontRight.setPower(magnitude * direction);
                 frontLeft.setPower(magnitude * direction);
@@ -358,10 +360,12 @@ public class Drive2 extends Subsystem {
                 break;
             }
         }
+
         frontRight.setPower(0);
         backRight.setPower(0);
         frontLeft.setPower(0);
         backLeft.setPower(0);
+
     }
 
     public void moveToPointConstants(double near, double far, double thresh, double targX, double targY, double targH, double posThresh, double headThresh) {
@@ -370,7 +374,7 @@ public class Drive2 extends Subsystem {
 
         count = 0;
 
-        Proportional orient = new Proportional(0.02, 0.3);
+        Proportional orient = new Proportional(0.02, 0.2);
 
         double xDist, yDist, distance, h;
         double targSpeed, scale;
@@ -401,11 +405,7 @@ public class Drive2 extends Subsystem {
             endCondition = (distance < posThresh) && (Math.abs(orient.getError()) < headThresh);
 
         }while(!endCondition && opmode.opModeIsActive());
-
-        setGlobalVelocity(0, 0, 0);
-        delay(10);
-
-        isRunning = false;
+        localize();
     }
 
     public void moveToPointConstantP(double constant, double thresh, double pGain, double targX, double targY, double targH, double posThresh, double headThresh) {
@@ -498,13 +498,14 @@ public class Drive2 extends Subsystem {
         isRunning = false;
     }
 
-    public void moveToPointPD(double targX, double targY, double targH, double posThresh, double headThresh) {
+    public void moveToPointPD(double targX, double targY, double targH, double posThresh, double headThresh, double constantThreshold, double p, double d, double minimumSpeed, double power) {
 
         isRunning = true;
 
         count = 0;
 
-        Proportional orient = new Proportional(0.02, 0.3);
+
+        Proportional orient = new Proportional(0.03, 0.3);
 
 
         double xDist, yDist, distance, h;
@@ -512,7 +513,7 @@ public class Drive2 extends Subsystem {
         double targVX, targVY, hCorrect;
         boolean endCondition;
 
-        PID velocityFinder = new PID(0.0125,0,0.01,0,0.75,0.12);
+        ConstantPD velocityFinder = new ConstantPD(power, constantThreshold,p,d,power,minimumSpeed);
 
         do{
             localize();
@@ -534,15 +535,112 @@ public class Drive2 extends Subsystem {
             setGlobalVelocity(targVX, targVY, hCorrect); //hCorrect
 
             endCondition = (distance < posThresh) && (Math.abs(orient.getError()) < headThresh);
-
         }while(!endCondition && opmode.opModeIsActive());
+        localize();
+    }
 
+    public void holdPosition(double targX, double targY, double targH, int delay, double threshold){
+
+        isRunning = true;
+
+        count = 0;
+
+        Proportional orient = new Proportional(0.025, 0.27);
+
+
+        double xDist, yDist, distance, h;
+        double targSpeed, scale;
+        double targVX, targVY, hCorrect;
+
+        for(int i = 0; i < delay; i++){
+            localize();
+            xDist = targX - Adhameter.getPosition()[0];
+            yDist = targY - Adhameter.getPosition()[1];
+            distance = Math.hypot(xDist, yDist);
+            h = Adhameter.getHeadingContinuous();
+
+            targSpeed = .12;
+
+            if(distance > threshold){
+                scale = targSpeed/distance;
+
+                targVX = xDist * scale;
+                targVY = yDist * scale;
+                // Verified ^
+            }else{
+                targVX = 0;
+                targVY = 0;
+            }
+
+
+            hCorrect = orient.getCorrection(targH, h);
+
+            setGlobalVelocity(targVX, targVY, hCorrect); //hCorrect
+
+        }
+
+        localize();
         setGlobalVelocity(0, 0, 0);
-        delay(10);
 
         isRunning = false;
     }
 
+    public void moveToPointBlock(double targX, double targY, double targH, double posThresh, double headThresh, double constantThreshold, double p, double d, double minimumSpeed, double power) {
+
+        isRunning = true;
+
+        count = 0;
+
+        Proportional orient = new Proportional(0.025, 0.3);
+
+
+        double xDist, yDist, distance, h;
+        double targSpeed, scale;
+        double targVX, targVY, hCorrect;
+        boolean endCondition;
+
+        ConstantPD velocityFinder = new ConstantPD(power, constantThreshold,p,d,power,minimumSpeed);
+
+        do{
+            localize();
+            xDist = targX - Adhameter.getPosition()[0];
+            yDist = targY - Adhameter.getPosition()[1];
+            distance = Math.hypot(xDist, yDist);
+            h = Adhameter.getHeadingContinuous();
+
+            targSpeed = Math.abs(velocityFinder.getCorrection(0, distance));
+
+            scale = targSpeed/distance;
+
+            targVX = xDist * scale;
+            targVY = yDist * scale;
+            // Verified ^
+
+            hCorrect = orient.getCorrection(targH, h);
+
+            setGlobalVelocity(targVX, targVY, hCorrect); //hCorrect
+
+            endCondition = (distance < posThresh) && (Math.abs(orient.getError()) < headThresh);
+        }while(!endCondition && opmode.opModeIsActive());
+
+        localize();
+        setGlobalVelocity(0, 0, 0);
+
+        isRunning = false;
+    }
+
+    public void deadReckon(double xVel, double yVel, double hVel, int ticks) {
+        int loopCount = 0;
+        while(opmode.opModeIsActive()) {
+            setGlobalVelocity(xVel, yVel, hVel);
+            if(loopCount > ticks){
+                break;
+            }
+            Adhameter.update();
+            loopCount++;
+        }
+        setGlobalVelocity(0, 0, 0);
+    }
 
     // Utility Methods =============================================================================
 

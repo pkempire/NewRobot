@@ -55,8 +55,8 @@ public class RedTeamFullAuto extends LinearOpMode {
     private double FLIPPER_SERVO_DOWN = 0.0;
     private double GRABBER_SERVO_OPEN = 0.0;
     private double FLIPPER_SERVO_STORAGE = 0.467;
-    private double GRABBER_SERVO_CLOSED = 0.25;
-    private double FLIPPER_SERVO_UP = 0.425;
+    private double GRABBER_SERVO_CLOSED = 0.3;
+    private double FLIPPER_SERVO_UP = 0.410;
     private double GRABBER_SERVO_STORAGE = 0.286;
     private double FLIPPER_SERVO_DEPOSIT = 0.3;
     private double FLIPPER_SERVO_PRIME = .18;
@@ -145,11 +145,11 @@ public class RedTeamFullAuto extends LinearOpMode {
 
         //GRAB FIRST BLOCK
         if(skyPosition == 1) { //Closest to wall
-            Driver.moveToPointBlock(-57, 73.5, 90, 3, 2, 500, 0.011,0.01,0.15, .7);
+            Driver.moveToPointBlock(-57, 74.5, 90, 3, 2, 500, 0.011,0.01,0.15, .7);
         }else if(skyPosition == 0) { //Middle Stone
-            Driver.moveToPointBlock(-29, 73.5, 90, 3, 2, 500, 0.011,0.01,0.17, .7);
+            Driver.moveToPointBlock(-35, 74.5, 90, 3, 2, 500, 0.011,0.01,0.17, .7);
         }else if(skyPosition == 2) { //Furthest From Wall
-            Driver.moveToPointBlock(-18.5, 73, 90, 3,  2, 500, 0.011,0.01,0.17, .7);
+            Driver.moveToPointBlock(-18.5, 74.5, 90, 3,  2, 500, 0.011,0.01,0.17, .7);
         }
         grabBlock();
 
@@ -168,11 +168,11 @@ public class RedTeamFullAuto extends LinearOpMode {
         //GRAB SECOND BLOCK
         primeHook();
         if(skyPosition == 1) { //Closest to wall
-            Driver.moveToPointBlock(5, 73, 90, 3, 5, 500, 0.011,0.02,0.17, .7);
+            Driver.moveToPointBlock(5, 75, 90, 3, 5, 500, 0.011,0.02,0.17, .7);
         }else if(skyPosition == 0) { //Middle Stone
-            Driver.moveToPointBlock(24, 73, 90, 3,  5, 500, 0.011,0.02,0.2, .7);
+            Driver.moveToPointBlock(26, 75, 90, 3,  5, 500, 0.011,0.02,0.2, .7);
         }else if(skyPosition == 2) { //Furthest From Wall
-            Driver.moveToPointBlock(47, 73, 90, 3,  5, 500, 0.011,0.02,0.22, .7);
+            Driver.moveToPointBlock(47, 75, 90, 3,  5, 500, 0.011,0.02,0.22, .7);
         }
         grabBlock();
 
@@ -190,11 +190,11 @@ public class RedTeamFullAuto extends LinearOpMode {
         //GRAB THIRD BLOCK
         primeHook();
         if(skyPosition == 1) { //Closest to wall - grab the closest stone
-            Driver.moveToPointBlock(47, 74, 90, 3, 5, 500, 0.011,0.02,0.23, .7);
+            Driver.moveToPointBlock(47, 74.5, 90, 3, 5, 500, 0.011,0.02,0.23, .7);
         }else if(skyPosition == 0) { //Middle Stone - grab the closest stone
-            Driver.moveToPointBlock(47, 74, 90, 3,  5, 500, 0.011,0.02, 0.23, .7);
+            Driver.moveToPointBlock(46, 74.5, 90, 3,  5, 500, 0.011,0.02, 0.23, .7);
         }else if(skyPosition == 2) { //Furthest From Wall - grab the middle stone
-            Driver.moveToPointBlock(24, 74, 90, 3,  5, 500, 0.011,0.02,0.22, .7);
+            Driver.moveToPointBlock(24, 74.5, 90, 3,  5, 500, 0.011,0.02,0.22, .7);
         }
         grabBlock();
 

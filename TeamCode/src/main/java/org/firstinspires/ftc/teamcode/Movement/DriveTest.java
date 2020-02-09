@@ -18,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 
 @Autonomous(name="Drive Test - Robot V2", group="Linear Opmode")
-
+@Disabled
 public class DriveTest extends LinearOpMode {
 
     // Declare OpMode members.

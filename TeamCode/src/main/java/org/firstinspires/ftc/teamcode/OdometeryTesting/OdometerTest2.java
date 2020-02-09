@@ -10,10 +10,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Movement.Drive2;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
+import org.firstinspires.ftc.teamcode.Odometry.Odometer2Wheel;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 
 @Autonomous(name="Odometer Test Experiment", group="Linear Opmode")
-@Disabled
+
 public class OdometerTest2 extends LinearOpMode {
 
     // Declare OpMode members.
@@ -25,7 +26,7 @@ public class OdometerTest2 extends LinearOpMode {
     private DcMotor RightEncoder;
     private DcMotor LeftEncoder;
 
-    private Odometer34 Adham;
+    private Odometer2Wheel Adham;
     private Odometer34 oldAdham;
     private Drive2 Driver;
     private BNO055IMU Imu;
@@ -56,12 +57,12 @@ public class OdometerTest2 extends LinearOpMode {
 
         //oldAdham = new Odometer34(RightFront, LeftFront,LeftBack,Imu,-1,-1,-1,this); //tracking for V1 robot
 
-        Adham = new Odometer34(RightEncoder, LeftEncoder, LeftBack, Imu, 1, -1, 1, this); // Forward facing robot
+        Adham = new Odometer2Wheel(LeftEncoder, LeftBack, Imu, -1, 1, this); // Forward facing robot
         // Adham = new Odometer34(LeftEncoder, RightEncoder, LeftBack, Imu, 1, -1, -1, this); // Backwards facing robot
         Adham.initialize();
 
-        Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
-        Driver.initialize();
+        //Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
+        //Driver.initialize();
 
         telemetry.addData("Status: ", "Initialized");
         telemetry.update();

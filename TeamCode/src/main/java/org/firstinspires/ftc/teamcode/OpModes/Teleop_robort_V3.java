@@ -428,15 +428,15 @@ public class Teleop_robort_V3 extends LinearOpMode {
 
             //AUTO BLOCK GRABBERS=============================================================
             if (gamepad1.x) {
-                autoFlipperRight.setPosition(0.467); //flipper down
-                autoFlipperLeft.setPosition(0.467); //put arm fully down
+                autoFlipperRight.setPosition(0.0); //flipper down
+                autoFlipperLeft.setPosition(0.036); //put arm fully down
             } else {
                 autoFlipperRight.setPosition(0.467); //flipper up
                 autoFlipperLeft.setPosition(0.467);
             }
             if (gamepad1.y) {
-                autoGrabberRight.setPosition(0.286); //grabbers open
-                autoGrabberLeft.setPosition(0.281);
+                autoGrabberRight.setPosition(0.0); //grabbers open
+                autoGrabberLeft.setPosition(0.64);
             } else {
                 autoGrabberRight.setPosition(0.286); //grabbers closed
                 autoGrabberLeft.setPosition(0.281); //grabbers closed

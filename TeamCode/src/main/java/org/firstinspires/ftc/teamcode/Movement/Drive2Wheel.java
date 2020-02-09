@@ -440,20 +440,20 @@ public class Drive2Wheel extends Subsystem {
 
             localize();
 
-            fl = xRelVel + yRelVel - hCorrect;
-            bl = -xRelVel + yRelVel - hCorrect;
-            fr = -xRelVel + yRelVel + hCorrect;
-            br = xRelVel + yRelVel + hCorrect;
+            fl = xRelVel + yRelVel;
+            bl = -xRelVel + yRelVel;
+            fr = -xRelVel + yRelVel;
+            br = xRelVel + yRelVel;
 
-            l = targSpeed / (Math.max(Math.max(fr,br),Math.max(fl,bl)));
+            l = targSpeed - hCorrect / (Math.max(Math.max(Math.abs(fr),Math.abs(br)),Math.max(Math.abs(fl),Math.abs(bl))));
 
 
             // X -> Y ^ H e
-            frontLeft.setPower(fl * l);
-            backLeft.setPower(bl * l);
+            frontLeft.setPower(fl * l  - hCorrect);
+            backLeft.setPower(bl * l  - hCorrect);
 
-            frontRight.setPower(fr * l);
-            backRight.setPower(br * l);
+            frontRight.setPower(fr * l + hCorrect);
+            backRight.setPower(br * l + hCorrect);
 
             endCondition = (posStopX * flip > Adhameter.getPosition()[0] * flip);
 
@@ -746,11 +746,11 @@ public class Drive2Wheel extends Subsystem {
         localize();
 
         // X -> Y ^ H e
-        frontLeft.setPower((xRelVel + yRelVel - h));
-        backLeft.setPower((-xRelVel + yRelVel - h));
+        frontLeft.setPower((xRelVel + yRelVel - hVel));
+        backLeft.setPower((-xRelVel + yRelVel - hVel));
 
-        frontRight.setPower((-xRelVel + yRelVel + h));
-        backRight.setPower((xRelVel + yRelVel + h));
+        frontRight.setPower((-xRelVel + yRelVel + hVel));
+        backRight.setPower((xRelVel + yRelVel + hVel));
     }
 
     public void localize() {

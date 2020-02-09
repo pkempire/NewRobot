@@ -155,16 +155,16 @@ public class New4Block extends LinearOpMode {
         }
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -96, 1); // 30 to 45
+        Driver.moveToPointConstantsPower(0.5,0.8,20,-97,64,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.5,0.8,20,-213,78,-90, -223, 1);
+        Driver.moveToPointConstantsPower(0.5,0.8,20,-213,78,-90, -223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
         //Move to Middle
-        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -95, -1);
+        Driver.moveToPointConstantsPower(0.5,0.8,20,-97,64,-90, -95, -1);
 
         //GRAB SECOND BLOCK
         primeHook();
@@ -177,16 +177,16 @@ public class New4Block extends LinearOpMode {
         }
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -96, 1); // 30 to 45
+        Driver.moveToPointConstantsPower(0.5,1,20,-97,64,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.5,0.8,20,-213,78,-90, -223, 1);
+        Driver.moveToPointConstantsPower(0.5,1,20,-213,78,-90, -223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
         //Move to Middle
-        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -95, -1);
+        Driver.moveToPointConstantsPower(0.5,1,20,-97,64,-90, -95, -1);
 
         //GRAB THIRD BLOCK
         primeHook();
@@ -198,16 +198,16 @@ public class New4Block extends LinearOpMode {
         }
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -96, 1); // 30 to 45
+        Driver.moveToPointConstantsPower(0.5,1,20,-97,64,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.5,0.8,20,-213,78,-90, -223, 1);
+        Driver.moveToPointConstantsPower(0.5,1,20,-213,78,-90, -223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
         //Move to Middle
-        Driver.moveToPointConstants(0.5,0.8,30,-97,64,-90, -95, -1);
+        Driver.moveToPointConstantsPower(0.5,1,30,-97,64,-90, -95, -1);
 
         primeHook();
         if(skyPosition == 0) { //Closest to wall - grab the closest stone
@@ -218,9 +218,9 @@ public class New4Block extends LinearOpMode {
         }
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -96, 1); // 30 to 45
+        Driver.moveToPointConstantsPower(0.5,1,20,-97,64,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.5,0.8,20,-213,78,-90, -223, 1);
+        Driver.moveToPointConstantsPower(0.5,1,20,-213,78,-90, -223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);

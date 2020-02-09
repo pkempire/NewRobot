@@ -403,6 +403,64 @@ public class Drive2Wheel extends Subsystem {
         localize();
     }
 
+    public void moveToPointConstantsPower(double near, double far, double thresh, double targX, double targY, double targH, double posStopX, double flip) {
+
+        isRunning = true;
+
+        count = 0;
+
+        Proportional orient = new Proportional(0.005, 0.1);
+
+        double xDist, yDist, distance, h;
+        double targSpeed;
+        double targVX, targVY, hCorrect;
+        boolean endCondition;
+        double xRelVel, yRelVel;
+        double fl, fr, bl, br, l;
+
+        //0.6, 0.25, 40
+        GatedConstant velocityFinder = new GatedConstant(far, near, thresh);
+
+        do{
+            localize();
+            xDist = targX - Adhameter.getPosition()[0];
+            yDist = targY - Adhameter.getPosition()[1];
+            distance = Math.hypot(xDist, yDist);
+            h = Adhameter.getHeadingContinuous();
+
+            targSpeed = Math.abs(velocityFinder.getCorrection(0, distance));
+
+            targVX = xDist * targSpeed;
+            targVY = yDist * targSpeed;
+
+            hCorrect = orient.getCorrection(targH, h);
+
+            xRelVel = cos(-h) * targVX - sin(-h) * targVY;
+            yRelVel = sin(-h) * targVX + cos(-h) * targVY;
+
+            localize();
+
+            fl = xRelVel + yRelVel - hCorrect;
+            bl = -xRelVel + yRelVel - hCorrect;
+            fr = -xRelVel + yRelVel + hCorrect;
+            br = xRelVel + yRelVel + hCorrect;
+
+            l = targSpeed / (Math.max(Math.max(fr,br),Math.max(fl,bl)));
+
+
+            // X -> Y ^ H e
+            frontLeft.setPower(fl * l);
+            backLeft.setPower(bl * l);
+
+            frontRight.setPower(fr * l);
+            backRight.setPower(br * l);
+
+            endCondition = (posStopX * flip > Adhameter.getPosition()[0] * flip);
+
+        }while(!endCondition && opmode.opModeIsActive());
+        localize();
+    }
+
     public void moveToPointConstantsold(double near, double far, double thresh, double targX, double targY, double targH, double posThresh, double headThresh) {
 
         isRunning = true;

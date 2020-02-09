@@ -9,6 +9,7 @@ import org.firstinspires.ftc.teamcode.Controllers.ConstantProportional;
 import org.firstinspires.ftc.teamcode.Controllers.GatedConstant;
 import org.firstinspires.ftc.teamcode.Controllers.PID;
 import org.firstinspires.ftc.teamcode.Controllers.Proportional;
+import org.firstinspires.ftc.teamcode.Odometry.Odometer2Wheel;
 import org.firstinspires.ftc.teamcode.Subsystem;
 
 public class Drive2Wheel extends Subsystem {
@@ -46,10 +47,10 @@ public class Drive2Wheel extends Subsystem {
 
     public void initialize() {
 
-        frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         frontRight.setPower(0);
         frontLeft.setPower(0);
@@ -61,10 +62,10 @@ public class Drive2Wheel extends Subsystem {
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         count = 0;
 
@@ -362,13 +363,53 @@ public class Drive2Wheel extends Subsystem {
 
     }
 
-    public void moveToPointConstants(double near, double far, double thresh, double targX, double targY, double targH, double posThresh, double headThresh) {
+    public void moveToPointConstants(double near, double far, double thresh, double targX, double targY, double targH, double posStopX, double flip) {
 
         isRunning = true;
 
         count = 0;
 
-        Proportional orient = new Proportional(0.02, 0.2);
+        Proportional orient = new Proportional(0.005, 0.1);
+
+        double xDist, yDist, distance, h;
+        double targSpeed, scale;
+        double targVX, targVY, hCorrect;
+        boolean endCondition;
+
+        //0.6, 0.25, 40
+        GatedConstant velocityFinder = new GatedConstant(far, near, thresh);
+
+        do{
+            localize();
+            xDist = targX - Adhameter.getPosition()[0];
+            yDist = targY - Adhameter.getPosition()[1];
+            distance = Math.hypot(xDist, yDist);
+            h = Adhameter.getHeadingContinuous();
+
+            targSpeed = Math.abs(velocityFinder.getCorrection(0, distance));
+            scale = targSpeed/distance;
+
+            targVX = xDist * scale;
+            targVY = yDist * scale;
+            // Verified ^
+
+            hCorrect = orient.getCorrection(targH, h);
+
+            setGlobalVelocity(targVX, targVY, hCorrect); //hCorrect
+
+            endCondition = (posStopX * flip > Adhameter.getPosition()[0] * flip);
+
+        }while(!endCondition && opmode.opModeIsActive());
+        localize();
+    }
+
+    public void moveToPointConstantsold(double near, double far, double thresh, double targX, double targY, double targH, double posThresh, double headThresh) {
+
+        isRunning = true;
+
+        count = 0;
+
+        Proportional orient = new Proportional(0.005, 0.1);
 
         double xDist, yDist, distance, h;
         double targSpeed, scale;
@@ -585,7 +626,7 @@ public class Drive2Wheel extends Subsystem {
 
         count = 0;
 
-        Proportional orient = new Proportional(0.025, 0.3);
+        ConstantPD orient = new ConstantPD(0.25, 10,0.01,0.015,0.2,0.05);
 
 
         double xDist, yDist, distance, h;

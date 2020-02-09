@@ -10,6 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.CustomCV.RedPipeline;
+import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Movement.Drive2;
 import org.firstinspires.ftc.teamcode.Movement.Drive2Wheel;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2Wheel;
@@ -18,9 +19,9 @@ import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
 
-@Autonomous(name="Blue Team Full Auto 2Wheel", group="Linear Opmode")
+@Autonomous(name="MOTORENCODER AUTO", group="Linear Opmode")
 
-public class BlueTeamFullAuto2Wheel extends LinearOpMode {
+public class New4Block extends LinearOpMode {
 
     // Declare OpMode members ======================================================================
 
@@ -48,14 +49,14 @@ public class BlueTeamFullAuto2Wheel extends LinearOpMode {
     private Servo foundationClampLeft;
     private Servo foundationClampRight;
 
-    private double FLIPPER_SERVO_DOWN = 0.036;
+    private double FLIPPER_SERVO_DOWN = 0.0;
     private double GRABBER_SERVO_OPEN = 0.64;
     private double FLIPPER_SERVO_STORAGE = 0.475;
     private double GRABBER_SERVO_CLOSED = 0.362;
-    private double FLIPPER_SERVO_UP = 0.42;
+    private double FLIPPER_SERVO_UP = 0.395;
     private double GRABBER_SERVO_STORAGE = 0.281;
     private double FLIPPER_SERVO_DEPOSIT = 0.3;
-    private double FLIPPER_SERVO_PRIME = .18;
+    private double FLIPPER_SERVO_PRIME = .10;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -141,95 +142,90 @@ public class BlueTeamFullAuto2Wheel extends LinearOpMode {
         //Start Autonomous period
 
         primeHook();
-        scanSkystone();
-
+        //scanSkystone();
+        skyPosition = 0;
         telemetry.addData("Scan complete. Skystone number is: ", skyPosition);
         telemetry.update();
         //GRAB FIRST BLOCK
         if(skyPosition == 0) { //Closest to wall
-            Driver.moveToPointBlock(53, 73, -90, 3, 5, 500, 0.011,0.01,0.15, .7);
+            Driver.moveToPointBlock(56, 74, -90, 2.5, 90, 30, 0.015,0.022,0.11, .8);
+            grabBlock(56, 74, -90);
         }else if(skyPosition == 1) { //Middle Stone
-            Driver.moveToPointBlock(33, 73, -90, 3, 5, 500, 0.011,0.01,0.17, .7);
         }else if(skyPosition == 2) { //Furthest From Wall
-            Driver.moveToPointBlock(16, 73, -90, 3,  5, 500, 0.011,0.01,0.17, .7);
         }
-        grabBlock();
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -96, -1); // 30 to 45
+        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90, - 223, -1);
+        Driver.moveToPointConstants(0.5,0.8,20,-213,78,-90, -223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
         //Move to Middle
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -95, 1);
+        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -95, -1);
 
         //GRAB SECOND BLOCK
         primeHook();
         if(skyPosition == 0) { //Closest to wall
-            Driver.moveToPointBlock(-5, 73, -90, 3, 5, 500, 0.011,0.02,0.17, .7);
+            Driver.moveToPointBlock(-5, 74, -90, 2, 90, 30, 0.01,0.02,0.11, .7);
+            grabBlock(-5, 74, -90);
+
         }else if(skyPosition == 1) { //Middle Stone
-            Driver.moveToPointBlock(-24, 73, -90, 3,  5, 500, 0.011,0.02,0.2, .7);
         }else if(skyPosition == 2) { //Furthest From Wall
-            Driver.moveToPointBlock(-44, 73, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
         }
-        grabBlock();
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -96, -1); // 30 to 45
+        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90, - 223, -1);
+        Driver.moveToPointConstants(0.5,0.8,20,-213,78,-90, -223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
         //Move to Middle
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -95, 1);
+        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -95, -1);
 
         //GRAB THIRD BLOCK
         primeHook();
         if(skyPosition == 0) { //Closest to wall - grab the closest stone
-            Driver.moveToPointBlock(-47, 73, -90, 3, 5, 500, 0.011,0.02,0.23, .7);
+            Driver.moveToPointBlock(-46, 75, -90, 2, 90, 30, 0.01,0.02,0.11, .7);
+            grabBlock(-46, 75, -90);
         }else if(skyPosition == 1) { //Middle Stone - grab the closest stone
-            Driver.moveToPointBlock(-47, 73, -90, 3,  5, 500, 0.011,0.02, 0.23, .7);
         }else if(skyPosition == 2) { //Furthest From Wall - grab the middle stone
-            Driver.moveToPointBlock(-24, 73, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
         }
-        grabBlock();
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -96, -1); // 30 to 45
+        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90, - 223, -1);
+        Driver.moveToPointConstants(0.5,0.8,20,-213,78,-90, -223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
-        //MOVE FOUNDATION
-        //Move away and face clamp towards foundation
-        Driver.moveToPointBlock(-226, 68, -180, 3, 5, 500, 0.011, 0.02, 0.2, 0.7);
-        //Back into foundation
-        Driver.driveStraight(0.4, -1, 20);
-        //Clamp
-        foundationClampLeft.setPosition(0.263);
-        foundationClampRight.setPosition(0.742);
-        delay(200);
-        //Move it in
-        Driver.moveToPointBlock(-202, 36, -130, 3, 5, 500, 0.019, 0.02, 0.2, 0.7);
-        Driver.deadReckon(-0.3, 0.1, 0.5, 10);
-        //Un-Clamp
-        foundationClampLeft.setPosition(0.745);
-        foundationClampRight.setPosition(0.26);
-        delay(200);
+        //Move to Middle
+        Driver.moveToPointConstants(0.5,0.8,30,-97,64,-90, -95, -1);
 
-        //PARK
-        Driver.moveToPointConstants(0.3,0.3,5,-200, 68, -90, -198, 1);
-        Driver.moveToPointBlock(-97, 70, -90, 1, 1, 500, 0.011, 0.02, 0.2, 0.7);
+        primeHook();
+        if(skyPosition == 0) { //Closest to wall - grab the closest stone
+            Driver.moveToPointBlock(-25, 75, -90, 2, 90, 30, 0.01,0.02,0.11, .7);
+            grabBlock(-25, 75, -90);
+        }else if(skyPosition == 1) { //Middle Stone - grab the closest stone
+        }else if(skyPosition == 2) { //Furthest From Wall - grab the middle stone
+        }
+
+        //Go Under Bridge
+        Driver.moveToPointConstants(0.5,0.8,20,-97,64,-90, -96, 1); // 30 to 45
+        //Go To Foundation
+        Driver.moveToPointConstants(0.5,0.8,20,-213,78,-90, -223, 1);
+
+        //Deposit Block
+        Driver.setGlobalVelocity(0, 0, 0);
+        depositBlock();
+
 
     }
 
@@ -254,13 +250,13 @@ public class BlueTeamFullAuto2Wheel extends LinearOpMode {
         }while(elapsedTime < millis);
     }
 
-    private void grabBlock(){ //must prime arm (open & put fully down) before grabbing
+    private void grabBlock(double targetX, double targetY, double targetH){ //must prime arm (open & put fully down) before grabbing
         autoFlipperRight.setPosition(FLIPPER_SERVO_DOWN); //flipper down
-        delay(350); //350
+        Driver.holdPosition(targetX, targetY, targetH, 8, 1); //350
         autoGrabberRight.setPosition(GRABBER_SERVO_CLOSED); //grabbers closed
-        delay(400); //400
+        Driver.holdPosition(targetX, targetY, targetH, 6, 1); //400
         autoFlipperRight.setPosition(FLIPPER_SERVO_UP); //flipper up
-        delay(200);
+        Driver.holdPosition(targetX, targetY, targetH, 5, 1);
     }
 
     private void primeHook(){//when not holding a block

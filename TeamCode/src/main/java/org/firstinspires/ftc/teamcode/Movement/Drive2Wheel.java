@@ -743,18 +743,14 @@ public class Drive2Wheel extends Subsystem {
         double xRelVel = cos(-h) * xVel - sin(-h) * yVel;
         double yRelVel = sin(-h) * xVel + cos(-h) * yVel;
 
-        double xMotor = xRelVel * 1.1;
-        double yMotor = yRelVel * 1;
-        double hMotor = hVel * 1;
-
         localize();
 
         // X -> Y ^ H e
-        frontLeft.setPower((xMotor + yMotor - hMotor));
-        backLeft.setPower((-xMotor + yMotor - hMotor));
+        frontLeft.setPower((xRelVel + yRelVel - h));
+        backLeft.setPower((-xRelVel + yRelVel - h));
 
-        frontRight.setPower((-xMotor + yMotor + hMotor));
-        backRight.setPower((xMotor + yMotor + hMotor));
+        frontRight.setPower((-xRelVel + yRelVel + h));
+        backRight.setPower((xRelVel + yRelVel + h));
     }
 
     public void localize() {

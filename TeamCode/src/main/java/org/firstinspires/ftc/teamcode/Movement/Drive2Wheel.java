@@ -9,8 +9,6 @@ import org.firstinspires.ftc.teamcode.Controllers.ConstantProportional;
 import org.firstinspires.ftc.teamcode.Controllers.GatedConstant;
 import org.firstinspires.ftc.teamcode.Controllers.PID;
 import org.firstinspires.ftc.teamcode.Controllers.Proportional;
-import org.firstinspires.ftc.teamcode.Odometry.Odometer2Wheel;
-import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 import org.firstinspires.ftc.teamcode.Subsystem;
 
 public class Drive2Wheel extends Subsystem {

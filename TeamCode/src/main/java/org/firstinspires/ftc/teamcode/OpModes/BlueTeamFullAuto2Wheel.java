@@ -10,10 +10,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.CustomCV.RedPipeline;
-import org.firstinspires.ftc.teamcode.Movement.Drive2;
 import org.firstinspires.ftc.teamcode.Movement.Drive2Wheel;
-import org.firstinspires.ftc.teamcode.Odometry.Odometer2Wheel;
-import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;

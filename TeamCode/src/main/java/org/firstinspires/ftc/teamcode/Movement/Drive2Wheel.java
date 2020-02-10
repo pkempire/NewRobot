@@ -435,7 +435,11 @@ public class Drive2Wheel extends Subsystem {
             distance = Math.hypot(xDist, yDist);
             h = Adhameter.getHeadingContinuous();
 
-            targSpeed = Math.abs(velocityFinder.getCorrection(0, distance));
+            if(Math.abs(distance) > thresh){
+                targSpeed = far;
+            }else{
+                targSpeed = near;
+            }
 
             hCorrect = orient.getCorrection(targH, h);
 

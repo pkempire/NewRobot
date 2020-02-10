@@ -367,8 +367,6 @@ public class Drive2Wheel extends Subsystem {
 
         isRunning = true;
 
-        count = 0;
-
         Proportional orient = new Proportional(0.005, 0.1);
 
         double xDist, yDist, distance, h;
@@ -407,19 +405,10 @@ public class Drive2Wheel extends Subsystem {
 
         isRunning = true;
 
-        count = 0;
-
         Proportional orient = new Proportional(0.005, 0.1);
 
-        double xDist, yDist, distance, h;
-        double targSpeed;
-        double targVX, targVY, hCorrect;
+        double xDist, yDist, distance, h, targSpeed, hCorrect, xRelVel, yRelVel, fl, fr, bl, br, l;
         boolean endCondition;
-        double xRelVel, yRelVel;
-        double fl, fr, bl, br, l;
-
-        //0.6, 0.25, 40
-        GatedConstant velocityFinder = new GatedConstant(far, near, thresh);
 
         if(!encoders){
             frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -466,13 +455,15 @@ public class Drive2Wheel extends Subsystem {
             endCondition = (posStopX * flip > Adhameter.getPosition()[0] * flip);
 
         }while(!endCondition && opmode.opModeIsActive());
-        localize();
+
         if(!encoders){
             frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
+
+        localize();
     }
 
 

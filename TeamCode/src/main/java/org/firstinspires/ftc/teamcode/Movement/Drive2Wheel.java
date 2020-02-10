@@ -403,7 +403,7 @@ public class Drive2Wheel extends Subsystem {
         localize();
     }
 
-    public void moveToPointConstantsPower(double near, double far, double thresh, double targX, double targY, double targH, double posStopX, double flip) {
+    public void moveToPointConstantsPower(double near, double far, double thresh, double targX, double targY, double targH, double posStopX, double flip, boolean encoders) {
 
         isRunning = true;
 
@@ -421,6 +421,13 @@ public class Drive2Wheel extends Subsystem {
         //0.6, 0.25, 40
         GatedConstant velocityFinder = new GatedConstant(far, near, thresh);
 
+        if(!encoders){
+            frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        }
+
         do{
             localize();
             xDist = targX - Adhameter.getPosition()[0];
@@ -430,13 +437,10 @@ public class Drive2Wheel extends Subsystem {
 
             targSpeed = Math.abs(velocityFinder.getCorrection(0, distance));
 
-            targVX = xDist * targSpeed;
-            targVY = yDist * targSpeed;
-
             hCorrect = orient.getCorrection(targH, h);
 
-            xRelVel = cos(-h) * targVX - sin(-h) * targVY;
-            yRelVel = sin(-h) * targVX + cos(-h) * targVY;
+            xRelVel = cos(-h) * xDist - sin(-h) * yDist;
+            yRelVel = sin(-h) * xDist + cos(-h) * yDist;
 
             localize();
 
@@ -459,7 +463,14 @@ public class Drive2Wheel extends Subsystem {
 
         }while(!endCondition && opmode.opModeIsActive());
         localize();
+        if(!encoders){
+            frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
     }
+
 
     public void moveToPointConstantsold(double near, double far, double thresh, double targX, double targY, double targH, double posThresh, double headThresh) {
 

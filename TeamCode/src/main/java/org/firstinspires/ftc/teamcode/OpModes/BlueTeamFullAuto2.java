@@ -14,9 +14,11 @@ import org.firstinspires.ftc.teamcode.CustomCV.RedPipeline;
 import org.firstinspires.ftc.teamcode.Movement.Drive;
 import org.firstinspires.ftc.teamcode.Hardware.Intake;
 import org.firstinspires.ftc.teamcode.Movement.Drive2;
+import org.firstinspires.ftc.teamcode.Movement.Drive2Wheel;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2;
 
 import org.firstinspires.ftc.teamcode.CustomCV.MainPipeline;
+import org.firstinspires.ftc.teamcode.Odometry.Odometer2Wheel;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -33,11 +35,11 @@ public class BlueTeamFullAuto2 extends LinearOpMode {
     private DcMotor LeftFront;
     private DcMotor LeftBack;
 
-    private DcMotor IntakeLeft;
-    private DcMotor IntakeRight;
+    private DcMotor horizontalEnc;
+    private DcMotor verticalEnc;
 
-    private Odometer34 Adham;
-    private Drive2 Driver;
+    private Odometer2Wheel Adham;
+    private Drive2Wheel Driver;
     private BNO055IMU Imu;
     private BNO055IMU.Parameters Params;
 
@@ -56,10 +58,10 @@ public class BlueTeamFullAuto2 extends LinearOpMode {
     private double GRABBER_SERVO_OPEN = 0.64;
     private double FLIPPER_SERVO_STORAGE = 0.475;
     private double GRABBER_SERVO_CLOSED = 0.362;
-    private double FLIPPER_SERVO_UP = 0.404;
+    private double FLIPPER_SERVO_UP = 0.385;
     private double GRABBER_SERVO_STORAGE = 0.281;
-    private double FLIPPER_SERVO_DEPOSIT = 0.3;
-    private double FLIPPER_SERVO_PRIME = .18;
+    private double FLIPPER_SERVO_DEPOSIT = 0.35;
+    private double FLIPPER_SERVO_PRIME = .10;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -85,9 +87,6 @@ public class BlueTeamFullAuto2 extends LinearOpMode {
         LeftBack = hardwareMap.dcMotor.get("driveBackLeft");
         RightBack = hardwareMap.dcMotor.get("driveBackRight");
 
-        IntakeLeft = hardwareMap.dcMotor.get("intakeLeft");
-        IntakeRight = hardwareMap.dcMotor.get("intakeRight");
-
         autoFlipperRight = hardwareMap.servo.get("autoFlipperLeft");
         autoGrabberRight = hardwareMap.servo.get("autoGrabberLeft");
 
@@ -97,11 +96,14 @@ public class BlueTeamFullAuto2 extends LinearOpMode {
         foundationClampLeft = hardwareMap.servo.get("foundationClampLeft");
         foundationClampRight = hardwareMap.servo.get("foundationClampRight");
 
+        verticalEnc = hardwareMap.dcMotor.get("intakeLeft");
+        horizontalEnc = hardwareMap.dcMotor.get("intakeRight");
+
         Imu.initialize(Params);
-        Adham = new Odometer34(IntakeRight, IntakeLeft, LeftBack, Imu, 1, -1, 1, this);
+        Adham = new Odometer2Wheel(verticalEnc, horizontalEnc, Imu, -1, 1, this);
         Adham.initialize();
 
-        Driver = new Drive2(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
+        Driver = new Drive2Wheel(LeftFront, RightFront, LeftBack, RightBack, Adham, this);
         Driver.initialize();
 
         telemetry.addData("Status: ", "Initialized");
@@ -125,6 +127,10 @@ public class BlueTeamFullAuto2 extends LinearOpMode {
         autoGrabberRight.setPosition(0.286);
         autoFlipperRight.setPosition(0.467);
 
+        //Un-Clamp
+        foundationClampLeft.setPosition(0.745);
+        foundationClampRight.setPosition(0.26);
+
     }
 
     @Override
@@ -144,63 +150,63 @@ public class BlueTeamFullAuto2 extends LinearOpMode {
         telemetry.update();
         //GRAB FIRST BLOCK
         if(skyPosition == 0) { //Closest to wall
-            Driver.moveToPointBlock(53, 74, -90, 2, 3, 500, 0.011,0.01,0.15, .7);
+            Driver.moveToPointBlock(56, 74, -90, 2, 3, 500, 0.011,0.01,0.15, .7);
         }else if(skyPosition == 1) { //Middle Stone
-            Driver.moveToPointBlock(33, 74, -90, 2, 3, 500, 0.011,0.01,0.17, .7);
+            Driver.moveToPointBlock(38, 74, -90, 2, 3, 500, 0.011,0.01,0.17, .7);
         }else if(skyPosition == 2) { //Furthest From Wall
-            Driver.moveToPointBlock(16, 74, -90, 2,  3, 500, 0.011,0.01,0.17, .7);
+            Driver.moveToPointBlock(18, 74, -90, 2,  3, 500, 0.011,0.01,0.17, .7);
         }
         grabBlock();
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90,10,5); // 30 to 45
+        Driver.moveToPointConstant(0.35,0.7,30,-97,57,-90,10,5); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90,11,5);
+        Driver.moveToPointConstant(0.25,0.7,40,-215,80,-90,11,5);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
         //Move to Middle
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90,10,5);
+        Driver.moveToPointConstant(0.35,0.7,30,-97,57,-90,10,5);
 
         //GRAB SECOND BLOCK
         primeHook();
         if(skyPosition == 0) { //Closest to wall
             Driver.moveToPointBlock(-5, 74, -90, 3, 5, 500, 0.011,0.02,0.17, .7);
         }else if(skyPosition == 1) { //Middle Stone
-            Driver.moveToPointBlock(-24, 74, -90, 3,  5, 500, 0.011,0.02,0.2, .7);
+            Driver.moveToPointBlock(-25, 74, -90, 3,  5, 500, 0.011,0.02,0.2, .7);
         }else if(skyPosition == 2) { //Furthest From Wall
-            Driver.moveToPointBlock(-44, 74, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
+            Driver.moveToPointBlock(-46, 74, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
         }
         grabBlock();
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.35,0.75,30,-97,57,-90,10,5);
+        Driver.moveToPointConstant(0.35,0.75,30,-97,57,-90,10,5);
         //Go To Foundation
-        Driver.moveToPointConstants(0.25,0.75,40,-235,80,-90,11,5);
+        Driver.moveToPointConstant(0.25,0.75,40,-235,80,-90,11,5);
 
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
         //Move to middle
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90,10,5);
+        Driver.moveToPointConstant(0.35,0.7,30,-97,57,-90,10,5);
 
         //GRAB THIRD BLOCK
         primeHook();
         if(skyPosition == 0) { //Closest to wall - grab the closest stone
-            Driver.moveToPointBlock(-47, 74.5, -90, 3, 5, 500, 0.011,0.02,0.23, .7);
+            Driver.moveToPointBlock(-46, 74, -90, 3, 5, 500, 0.011,0.02,0.23, .7);
         }else if(skyPosition == 1) { //Middle Stone - grab the closest stone
-            Driver.moveToPointBlock(-47, 74.5, -90, 3,  5, 500, 0.011,0.02, 0.23, .7);
+            Driver.moveToPointBlock(-46, 74, -90, 3,  5, 500, 0.011,0.02, 0.23, .7);
         }else if(skyPosition == 2) { //Furthest From Wall - grab the middle jk stone
-            Driver.moveToPointBlock(-24, 74.5, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
+            Driver.moveToPointBlock(-25, 74, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
         }
         grabBlock();
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.3,0.7,30,-97,55,-90,10,5);
+        Driver.moveToPointConstant(0.3,0.7,30,-97,55,-90,10,5);
         //Go To Foundation
-        Driver.moveToPointConstants(0.25,0.7,40,-245,80,-90,11,5);
+        Driver.moveToPointConstant(0.25,0.7,40,-245,80,-90,11,5);
 
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
@@ -209,13 +215,13 @@ public class BlueTeamFullAuto2 extends LinearOpMode {
         //Move away and face clamp towards foundation
         Driver.moveToPointBlock(-226, 68, -180, 3, 5, 500, 0.011, 0.02, 0.2, 0.7);
         //Back into foundation
-        Driver.driveStraight(0.4, -1, 20);
+        Driver.driveStraight(0.4, -1, 25);
         //Clamp
         foundationClampLeft.setPosition(0.261);
         foundationClampRight.setPosition(0.739);
         delay(200);
         //Move it in
-        Driver.moveToPointBlock(-202, 36, -130, 3, 5, 500, 0.019, 0.02, 0.2, 0.7);
+        Driver.moveToPointBlock(-195, 36, -130, 3, 5, 500, 0.019, 0.02, 0.2, 0.7);
         Driver.deadReckon(-0.3, 0.1, 0.5, 12);
         //Un-Clamp
         foundationClampLeft.setPosition(0.745);
@@ -223,7 +229,7 @@ public class BlueTeamFullAuto2 extends LinearOpMode {
         delay(200);
 
         //PARK
-        Driver.moveToPointConstants(0.3,0.3,5,-200, 68, -90, 5, 5);
+        Driver.moveToPointConstant(0.3,0.3,5,-200, 64, -90, 5, 5);
         Driver.moveToPointBlock(-97, 64, -90, 1, 1, 500, 0.011, 0.02, 0.2, 0.7);
 
     }
@@ -268,7 +274,7 @@ public class BlueTeamFullAuto2 extends LinearOpMode {
         autoFlipperRight.setPosition(FLIPPER_SERVO_DEPOSIT); //put arm half down
         delay(100);
         autoGrabberRight.setPosition(GRABBER_SERVO_OPEN); //grabbers open
-        delay(50);
+        delay(70);
         autoFlipperRight.setPosition(FLIPPER_SERVO_STORAGE); //flipper up
         autoGrabberRight.setPosition(GRABBER_SERVO_STORAGE); //grabbers closed
     }

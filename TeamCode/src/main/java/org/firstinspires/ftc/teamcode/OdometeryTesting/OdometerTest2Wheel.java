@@ -7,13 +7,14 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
+import org.firstinspires.ftc.robotcore.internal.ftdi.eeprom.FT_EEPROM_232H;
 import org.firstinspires.ftc.teamcode.Movement.Drive2;
 import org.firstinspires.ftc.teamcode.Movement.Drive2Wheel;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer2Wheel;
 import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 
 @Autonomous(name="Odometer Test Robot V2Wheel", group="Linear Opmode")
-
+@Disabled
 
 public class OdometerTest2Wheel extends LinearOpMode {
 
@@ -80,23 +81,10 @@ public class OdometerTest2Wheel extends LinearOpMode {
         //Start Autonomous period
         Adham.startTracking(0, 0, 0);
 
-        while(opModeIsActive()) {
-            telemetry.addData("heading", Adham.getHeadingDeg());
-            telemetry.addData("X", Adham.getPosition()[0]);
-            telemetry.addData("Y", Adham.getPosition()[1]);
-            telemetry.addData("headingContinuous", Adham.getHeadingContinuous());
-            //telemetry.addData("HeadingChange", Math.toDegrees(Adham.getHeadingChange()));
-            //telemetry.addData("ContinuousHeading", Math.toDegrees(Adham.getHeadingContinuous()));
-            //telemetry.addData("CrossedHeading0", Adham.crossed);
-            //telemetry.addData("Left Omni", Adham.getLeftReading());
-            //telemetry.addData("Right Omni", Adham.getRightReading());
-            //telemetry.addData("Horizontal Omni", Adham.getBackReading());
-            telemetry.update();
-
-            Driver.localize();
             //delay(100);
+        Driver.moveToPointConstantP(0.8,40,0.005,0,120,0,5,3);
+        Driver.moveToPointPD(0,0,0,3,3,40,0.008,0.01,0.12,0.8);
 
-        }
         //Make sure nothing is still using the thread
     }
 

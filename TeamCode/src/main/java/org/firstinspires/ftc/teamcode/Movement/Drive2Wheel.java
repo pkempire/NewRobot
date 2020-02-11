@@ -62,10 +62,10 @@ public class Drive2Wheel extends Subsystem {
         backLeft.setDirection(DcMotor.Direction.FORWARD);
         backRight.setDirection(DcMotor.Direction.REVERSE);
 
-        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         count = 0;
 
@@ -401,7 +401,7 @@ public class Drive2Wheel extends Subsystem {
         localize();
     }
 
-    public void moveToPointConstantsPower(double near, double far, double thresh, double targX, double targY, double targH, double posStopX, double flip, boolean encoders) {
+    public void moveToPointConstantsPower(double near, double far, double thresh, double targX, double targY, double targH, double posStopX, double flip, boolean encoders, double targ2X, double targ2Y) {
 
         isRunning = true;
 
@@ -429,6 +429,7 @@ public class Drive2Wheel extends Subsystem {
             }else{
                 targSpeed = near;
             }
+            // X -> Y ^ H e
 
             hCorrect = orient.getCorrection(targH, h);
 
@@ -442,15 +443,25 @@ public class Drive2Wheel extends Subsystem {
             fr = -xRelVel + yRelVel;
             br = xRelVel + yRelVel;
 
-            l = targSpeed - hCorrect / (Math.max(Math.max(Math.abs(fr),Math.abs(br)),Math.max(Math.abs(fl),Math.abs(bl))));
+            l = Math.abs(fl);
+
+            if(Math.abs(fr) > l){
+                l = Math.abs(fr);
+            }else if(Math.abs(br) > l){
+                l = Math.abs(br);
+            }else if(Math.abs(bl) > l) {
+                l = Math.abs(bl);
+            }
+
+            l = targSpeed - hCorrect / l;
 
 
             // X -> Y ^ H e
-            frontLeft.setPower(fl * l  - hCorrect);
-            backLeft.setPower(bl * l  - hCorrect);
+            frontLeft.setPower((fl * l) - hCorrect);
+            backLeft.setPower((bl * l)  - hCorrect);
 
-            frontRight.setPower(fr * l + hCorrect);
-            backRight.setPower(br * l + hCorrect);
+            frontRight.setPower((fr * l) + hCorrect);
+            backRight.setPower((br * l) + hCorrect);
 
             endCondition = (posStopX * flip > Adhameter.getPosition()[0] * flip);
 
@@ -462,8 +473,8 @@ public class Drive2Wheel extends Subsystem {
             backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
+        setGlobalVelocity(targ2X- Adhameter.getPosition()[0], targ2Y - Adhameter.getPosition()[1], hCorrect = orient.getCorrection(targH, Adhameter.getHeadingContinuous()));
 
-        localize();
     }
 
 
@@ -658,7 +669,7 @@ public class Drive2Wheel extends Subsystem {
             distance = Math.hypot(xDist, yDist);
             h = Adhameter.getHeadingContinuous();
 
-            targSpeed = .12;
+            targSpeed = .11;
 
             if(distance > threshold){
                 scale = targSpeed/distance;
@@ -682,6 +693,40 @@ public class Drive2Wheel extends Subsystem {
         setGlobalVelocity(0, 0, 0);
 
         isRunning = false;
+    }
+
+    public void rotate(double direction, double heading){
+        isRunning = true;
+
+        Proportional orient = new Proportional(0.3, 0.5);
+
+            frontRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            frontLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            backLeft.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            backRight.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        double h, hCorrect;
+        do{
+            localize();
+            h = Adhameter.getHeadingAbsoluteDeg();
+            hCorrect = orient.getCorrection(heading, h);
+
+            frontLeft.setPower(hCorrect * direction);
+            backLeft.setPower(hCorrect * direction);
+
+            frontRight.setPower(-hCorrect * direction);
+            backRight.setPower(-hCorrect * direction);
+        }while(h * direction < heading * direction  && opmode.opModeIsActive());
+
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        setGlobalVelocity(0,0,0);
+
+
+        localize();
     }
 
     public void moveToPointBlock(double targX, double targY, double targH, double posThresh, double headThresh, double constantThreshold, double p, double d, double minimumSpeed, double power) {
@@ -741,6 +786,45 @@ public class Drive2Wheel extends Subsystem {
         setGlobalVelocity(0, 0, 0);
     }
 
+    public void moveToPointConstant(double near, double far, double thresh, double targX, double targY, double targH, double posThresh, double headThresh) {
+
+        isRunning = true;
+
+        count = 0;
+
+        Proportional orient = new Proportional(0.02, 0.2);
+
+        double xDist, yDist, distance, h;
+        double targSpeed, scale;
+        double targVX, targVY, hCorrect;
+        boolean endCondition;
+
+        //0.6, 0.25, 40
+        GatedConstant velocityFinder = new GatedConstant(far, near, thresh);
+
+        do{
+            localize();
+            xDist = targX - Adhameter.getPosition()[0];
+            yDist = targY - Adhameter.getPosition()[1];
+            distance = Math.hypot(xDist, yDist);
+            h = Adhameter.getHeadingContinuous();
+
+            targSpeed = Math.abs(velocityFinder.getCorrection(0, distance));
+            scale = targSpeed/distance;
+
+            targVX = xDist * scale;
+            targVY = yDist * scale;
+            // Verified ^
+
+            hCorrect = orient.getCorrection(targH, h);
+
+            setGlobalVelocity(targVX, targVY, hCorrect); //hCorrect
+
+            endCondition = (distance < posThresh) && (Math.abs(orient.getError()) < headThresh);
+
+        }while(!endCondition && opmode.opModeIsActive());
+        localize();
+    }
     // Utility Methods =============================================================================
 
     public void setGlobalVelocity(double xVel, double yVel, double hVel) { // Verified
@@ -748,6 +832,10 @@ public class Drive2Wheel extends Subsystem {
 
         double xRelVel = cos(-h) * xVel - sin(-h) * yVel;
         double yRelVel = sin(-h) * xVel + cos(-h) * yVel;
+
+        double xMotor = xRelVel * 1;
+        double yMotor = yRelVel * 1.1;
+        double hMotor = hVel * 1;
 
         localize();
 

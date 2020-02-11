@@ -4,6 +4,7 @@ package org.firstinspires.ftc.teamcode.OpModes;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.hardware.bosch.JustLoggingAccelerationIntegrator;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -17,7 +18,7 @@ import org.firstinspires.ftc.teamcode.Odometry.Odometer34;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 import org.openftc.easyopencv.OpenCvInternalCamera;
-
+@Disabled
 @Autonomous(name="Blue Team Full Auto 2Wheel", group="Linear Opmode")
 
 public class BlueTeamFullAuto2Wheel extends LinearOpMode {
@@ -48,14 +49,14 @@ public class BlueTeamFullAuto2Wheel extends LinearOpMode {
     private Servo foundationClampLeft;
     private Servo foundationClampRight;
 
-    private double FLIPPER_SERVO_DOWN = 0.036;
+    private double FLIPPER_SERVO_DOWN = 0.0;
     private double GRABBER_SERVO_OPEN = 0.64;
     private double FLIPPER_SERVO_STORAGE = 0.475;
     private double GRABBER_SERVO_CLOSED = 0.362;
-    private double FLIPPER_SERVO_UP = 0.42;
+    private double FLIPPER_SERVO_UP = 0.385;
     private double GRABBER_SERVO_STORAGE = 0.281;
-    private double FLIPPER_SERVO_DEPOSIT = 0.3;
-    private double FLIPPER_SERVO_PRIME = .18;
+    private double FLIPPER_SERVO_DEPOSIT = 0.35;
+    private double FLIPPER_SERVO_PRIME = .10;
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -147,64 +148,71 @@ public class BlueTeamFullAuto2Wheel extends LinearOpMode {
         telemetry.update();
         //GRAB FIRST BLOCK
         if(skyPosition == 0) { //Closest to wall
-            Driver.moveToPointBlock(53, 73, -90, 3, 5, 500, 0.011,0.01,0.15, .7);
+            Driver.moveToPointBlock(53, 74, -90, 3, 5, 500, 0.011,0.01,0.15, .7);
+            grabBlock(53, 74, -90);
         }else if(skyPosition == 1) { //Middle Stone
-            Driver.moveToPointBlock(33, 73, -90, 3, 5, 500, 0.011,0.01,0.17, .7);
+            Driver.moveToPointBlock(33, 74, -90, 3, 5, 500, 0.011,0.01,0.17, .7);
+            grabBlock(33, 74, -90);
         }else if(skyPosition == 2) { //Furthest From Wall
-            Driver.moveToPointBlock(16, 73, -90, 3,  5, 500, 0.011,0.01,0.17, .7);
+            Driver.moveToPointBlock(16, 74, -90, 3,  5, 500, 0.011,0.01,0.17, .7);
+            grabBlock(16, 74, -90);
         }
-        grabBlock();
+
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -96, -1); // 30 to 45
+        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90, - 223, -1);
+        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90, - 223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
         //Move to Middle
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -95, 1);
+        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -95, -1);
 
         //GRAB SECOND BLOCK
         primeHook();
         if(skyPosition == 0) { //Closest to wall
-            Driver.moveToPointBlock(-5, 73, -90, 3, 5, 500, 0.011,0.02,0.17, .7);
+            Driver.moveToPointBlock(-5, 74, -90, 3, 5, 500, 0.011,0.02,0.17, .7);
+            grabBlock(-5, 74, -90);
         }else if(skyPosition == 1) { //Middle Stone
-            Driver.moveToPointBlock(-24, 73, -90, 3,  5, 500, 0.011,0.02,0.2, .7);
+            Driver.moveToPointBlock(-24, 74, -90, 3,  5, 500, 0.011,0.02,0.2, .7);
+            grabBlock(-24, 74, -90);
         }else if(skyPosition == 2) { //Furthest From Wall
-            Driver.moveToPointBlock(-44, 73, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
+            Driver.moveToPointBlock(-44, 74, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
+            grabBlock(-44, 74, -90);
         }
-        grabBlock();
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -96, -1); // 30 to 45
+        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90, - 223, -1);
+        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90, - 223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
         depositBlock();
 
         //Move to Middle
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -95, 1);
+        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -95, -1);
 
         //GRAB THIRD BLOCK
         primeHook();
         if(skyPosition == 0) { //Closest to wall - grab the closest stone
-            Driver.moveToPointBlock(-47, 73, -90, 3, 5, 500, 0.011,0.02,0.23, .7);
+            Driver.moveToPointBlock(-47, 74, -90, 3, 5, 500, 0.011,0.02,0.23, .7);
+            grabBlock(-47, 74, -90);
         }else if(skyPosition == 1) { //Middle Stone - grab the closest stone
-            Driver.moveToPointBlock(-47, 73, -90, 3,  5, 500, 0.011,0.02, 0.23, .7);
+            Driver.moveToPointBlock(-47, 74, -90, 3,  5, 500, 0.011,0.02, 0.23, .7);
+            grabBlock(-47, 74, -90);
         }else if(skyPosition == 2) { //Furthest From Wall - grab the middle stone
-            Driver.moveToPointBlock(-24, 73, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
+            Driver.moveToPointBlock(-24, 74, -90, 3,  5, 500, 0.011,0.02,0.22, .7);
+            grabBlock(-24,74, -90);
         }
-        grabBlock();
 
         //Go Under Bridge
-        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -96, -1); // 30 to 45
+        Driver.moveToPointConstants(0.35,0.7,30,-97,57,-90, -96, 1); // 30 to 45
         //Go To Foundation
-        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90, - 223, -1);
+        Driver.moveToPointConstants(0.25,0.7,40,-225,80,-90, - 223, 1);
 
         //Deposit Block
         Driver.setGlobalVelocity(0, 0, 0);
@@ -228,7 +236,8 @@ public class BlueTeamFullAuto2Wheel extends LinearOpMode {
         delay(200);
 
         //PARK
-        Driver.moveToPointConstants(0.3,0.3,5,-200, 68, -90, -198, 1);
+        Driver.moveToPointConstants(1,1,5,-225, 68, -90, -120, -1);
+        Driver.moveToPointConstants(0.4,0.4,5,-200, 68, -90, -198, -1);
         Driver.moveToPointBlock(-97, 70, -90, 1, 1, 500, 0.011, 0.02, 0.2, 0.7);
 
     }
@@ -254,13 +263,13 @@ public class BlueTeamFullAuto2Wheel extends LinearOpMode {
         }while(elapsedTime < millis);
     }
 
-    private void grabBlock(){ //must prime arm (open & put fully down) before grabbing
+    private void grabBlock(double targetX, double targetY, double targetH){ //must prime arm (open & put fully down) before grabbing
         autoFlipperRight.setPosition(FLIPPER_SERVO_DOWN); //flipper down
-        delay(350); //350
+        Driver.holdPosition(targetX, targetY, targetH, 6, 1); //350
         autoGrabberRight.setPosition(GRABBER_SERVO_CLOSED); //grabbers closed
-        delay(400); //400
+        Driver.holdPosition(targetX, targetY, targetH, 3, 1); //400
         autoFlipperRight.setPosition(FLIPPER_SERVO_UP); //flipper up
-        delay(200);
+        Driver.holdPosition(targetX, targetY, targetH, 2, 1);
     }
 
     private void primeHook(){//when not holding a block

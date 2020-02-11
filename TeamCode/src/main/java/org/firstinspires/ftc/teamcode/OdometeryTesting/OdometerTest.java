@@ -78,23 +78,9 @@ public class OdometerTest extends LinearOpMode {
         //Start Autonomous period
         Adham.startTracking(0, 0, 0);
 
-        while(opModeIsActive()) {
-            telemetry.addData("heading", Adham.getHeadingDeg());
-            telemetry.addData("X", Adham.getPosition()[0]);
-            telemetry.addData("Y", Adham.getPosition()[1]);
-            telemetry.addData("headingContinuous", Adham.getHeadingContinuous());
-            //telemetry.addData("HeadingChange", Math.toDegrees(Adham.getHeadingChange()));
-            //telemetry.addData("ContinuousHeading", Math.toDegrees(Adham.getHeadingContinuous()));
-            //telemetry.addData("CrossedHeading0", Adham.crossed);
-            //telemetry.addData("Left Omni", Adham.getLeftReading());
-            //telemetry.addData("Right Omni", Adham.getRightReading());
-            //telemetry.addData("Horizontal Omni", Adham.getBackReading());
-            telemetry.update();
-
-            Driver.localize();
             //delay(100);
             
-        }
+
         //Make sure nothing is still using the thread
     }
 

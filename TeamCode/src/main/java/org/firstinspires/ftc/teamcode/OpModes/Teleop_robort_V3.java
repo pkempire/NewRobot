@@ -136,11 +136,6 @@ public class Teleop_robort_V3 extends LinearOpMode {
         liftRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         liftLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        driveFrontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
         liftRight.setDirection(DcMotor.Direction.REVERSE);
 
         telemetry.addData("Status", "Initialized - Welcome, Operators");

@@ -657,11 +657,11 @@ public class Drive2 extends Subsystem {
         localize();
 
         // X -> Y ^ H e
-        frontLeft.setPower((xMotor + yMotor - hMotor));
-        backLeft.setPower((-xMotor + yMotor - hMotor));
+        frontLeft.setPower((xMotor*1.2 + yMotor - hMotor));
+        backLeft.setPower((-xMotor*1.2 + yMotor - hMotor));
 
-        frontRight.setPower((-xMotor + yMotor + hMotor));
-        backRight.setPower((xMotor + yMotor + hMotor));
+        frontRight.setPower((-xMotor*1.2 + yMotor + hMotor));
+        backRight.setPower((xMotor*1.2 + yMotor + hMotor));
     }
 
     public void localize() {

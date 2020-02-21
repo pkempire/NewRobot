@@ -840,11 +840,11 @@ public class Drive2Wheel extends Subsystem {
         localize();
 
         // X -> Y ^ H e
-        frontLeft.setPower((xRelVel + yRelVel - hVel));
-        backLeft.setPower((-xRelVel + yRelVel - hVel));
+        frontLeft.setPower((xRelVel*1.2 + yRelVel - hVel));
+        backLeft.setPower((-xRelVel*1.2 + yRelVel - hVel));
 
-        frontRight.setPower((-xRelVel + yRelVel + hVel));
-        backRight.setPower((xRelVel + yRelVel + hVel));
+        frontRight.setPower((-xRelVel*1.2 + yRelVel + hVel));
+        backRight.setPower((xRelVel*1.2 + yRelVel + hVel));
     }
 
     public void localize() {
